@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
-// وب‌هوک بات تلگرام فدک — پیام خصوصی + پست کانال (سینک خودکار آرشیو)
+// وب‌هوک بات تلگرام فدک — پیام خصوصی + پست کانال + فوروارد به بات
 export async function POST(req: Request) {
   try {
     const update = await req.json();
@@ -11,7 +11,6 @@ export async function POST(req: Request) {
     const channelPost = update?.channel_post;
     if (channelPost?.text && supabase) {
       const text = channelPost.text as string;
-      // اگر پست شامل هشتگ #مراسم باشد، به‌عنوان مراسم جدید ثبت کن
       if (text.includes("#مراسم") || text.includes("#روضه")) {
         const firstLine = text.split("\n")[0].slice(0, 120);
         const slug = `tg-${channelPost.message_id}-${Date.now()}`;
@@ -27,10 +26,36 @@ export async function POST(req: Request) {
     }
 
     const msg = update?.message;
-    if (!msg?.text) return NextResponse.json({ ok: true });
+    if (!msg) return NextResponse.json({ ok: true });
 
     const chatId = msg.chat.id;
-    const text = msg.text as string;
+    const text = (msg.text as string) || (msg.caption as string) || "";
+
+    // فوروارد به بات یا پیام با هشتگ مراسم → ساخت مراسم در آرشیو
+    const isForward = Boolean(msg.forward_from || msg.forward_from_chat);
+    if ((isForward || text.includes("#مراسم") || text.includes("#روضه")) && supabase && text) {
+      const firstLine = text.split("\n")[0].slice(0, 120);
+      const slug = `fwd-${msg.message_id}-${Date.now()}`;
+      await supabase.from("events").insert({
+        title: firstLine || "مراسم فدک",
+        slug,
+        status: "past",
+        maddah: "کربلایی حسین طاهری",
+        description: text.slice(0, 2000),
+      });
+
+      if (token) {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: "✅ مراسم دریافت شد و به آرشیو سایت اضافه شد!",
+          }),
+        });
+      }
+      return NextResponse.json({ ok: true });
+    }
 
     let reply = "سلام! من بات فدک هستم. /events برای مراسم آینده، /hadith برای حدیث روز";
 
@@ -39,7 +64,7 @@ export async function POST(req: Request) {
     } else if (text.startsWith("/hadith")) {
       reply = "حدیث روز: إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ — همانا اعمال به نیت‌ها بستگی دارد.";
     } else if (text.startsWith("/start")) {
-      reply = "سلام! به بات فدک خوش آمدید. /events مراسم آینده | /hadith حدیث روز | /link صفحات حسین طاهری";
+      reply = "سلام! به بات فدک خوش آمدید. /events مراسم آینده | /hadith حدیث روز | /link صفحات حسین طاهری\n\nبرای اضافه شدن به آرشیو، پست مراسم رو فوروارد کن یا با هشتگ #مراسم بفرست.";
     } else if (text.startsWith("/link")) {
       reply = "صفحات حسین طاهری: https://fadak-site-murex.vercel.app/link";
     }
