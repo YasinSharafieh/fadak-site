@@ -1,3 +1,5 @@
+export const instant = false;
+
 import { supabase } from "@/lib/supabase";
 
 export default async function AdminKhadamPage() {
