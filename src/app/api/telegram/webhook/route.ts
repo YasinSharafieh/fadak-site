@@ -33,7 +33,8 @@ export async function POST(req: Request) {
 
     // فوروارد به بات یا پیام با هشتگ مراسم → ساخت مراسم در آرشیو
     const isForward = Boolean(msg.forward_from || msg.forward_from_chat);
-    if ((isForward || text.includes("#مراسم") || text.includes("#روضه")) && supabase && text) {
+    const isEventText = text.includes("#مراسم") || text.includes("#روضه") || text.includes("روضه") || text.includes("مجلس") || text.includes("مراسم");
+    if ((isForward || isEventText) && supabase && text) {
       const firstLine = text.split("\n")[0].slice(0, 120);
       const slug = `fwd-${msg.message_id}-${Date.now()}`;
       await supabase.from("events").insert({
