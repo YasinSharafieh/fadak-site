@@ -1,4 +1,5 @@
-import { NextResponse, redirect } from "next/server";
+import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 
