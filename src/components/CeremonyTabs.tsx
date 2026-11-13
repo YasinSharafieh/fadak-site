@@ -11,6 +11,7 @@ type Props = {
 
 export default function CeremonyTabs({ photos, audios, videos }: Props) {
   const [tab, setTab] = useState<"photos" | "audios" | "videos">("photos");
+  const [playingId, setPlayingId] = useState<string | null>(null);
 
   const tabs = [
     { id: "photos" as const, label: `📷 عکس‌ها (${photos.length})` },
@@ -63,16 +64,27 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
         {tab === "videos" && (
           <div>
             {videos.length === 0 && <p className="text-sm text-[#3D2B1F]/60">هنوز ویدیویی ثبت نشده.</p>}
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-5 md:grid-cols-2">
               {videos.map((v) => (
-                <a key={v.id} href={`https://www.aparat.com/v/${v.aparat_id}`} target="_blank" rel="noreferrer" className="overflow-hidden rounded-3xl bg-white shadow hover:shadow-lg">
-                  <div className="relative">
-                    {v.thumbnail && <img src={v.thumbnail} alt={v.title} className="aspect-video w-full object-cover" />}
-                    {v.duration && <span className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">{v.duration}</span>}
-                    <span className="absolute inset-0 flex items-center justify-center text-5xl text-white/90">▶</span>
-                  </div>
+                <div key={v.id} className="overflow-hidden rounded-3xl bg-white shadow">
+                  {playingId === v.id && v.aparat_id ? (
+                    <iframe
+                      src={`https://www.aparat.com/video/${v.aparat_id}/vframe/embed`}
+                      allowFullScreen
+                      className="aspect-video w-full"
+                      title={v.title}
+                    />
+                  ) : (
+                    <button onClick={() => setPlayingId(v.id)} className="relative block w-full">
+                      {v.thumbnail && <img src={v.thumbnail} alt={v.title} className="aspect-video w-full object-cover" />}
+                      <span className="absolute inset-0 flex items-center justify-center">
+                        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-black/60 text-3xl text-white">▶</span>
+                      </span>
+                      {v.duration && <span className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">{v.duration}</span>}
+                    </button>
+                  )}
                   <div className="p-4 text-center font-bold">{v.title}</div>
-                </a>
+                </div>
               ))}
             </div>
           </div>
