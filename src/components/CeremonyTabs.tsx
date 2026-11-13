@@ -11,7 +11,6 @@ type Props = {
 
 export default function CeremonyTabs({ photos, audios, videos }: Props) {
   const [tab, setTab] = useState<"photos" | "audios" | "videos">("photos");
-  const [playingId, setPlayingId] = useState<string | null>(null);
 
   const tabs = [
     { id: "photos" as const, label: `📷 عکس‌ها (${photos.length})` },
@@ -66,26 +65,26 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
             {videos.length === 0 && <p className="text-sm text-[#3D2B1F]/60">هنوز ویدیویی ثبت نشده.</p>}
             <div className="grid gap-5 md:grid-cols-2">
               {videos.map((v) => (
-                <div key={v.id} className="overflow-hidden rounded-3xl bg-white shadow">
+                <a
+                  key={v.id}
+                  href={v.aparat_id ? `https://www.aparat.com/v/${v.aparat_id}` : "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group overflow-hidden rounded-3xl bg-white shadow transition hover:shadow-lg"
+                >
                   <div className="relative aspect-video w-full bg-black">
-                    {playingId === v.id && v.file_url ? (
-                      <video src={v.file_url} controls autoPlay className="absolute inset-0 h-full w-full" />
+                    {v.thumbnail ? (
+                      <img src={v.thumbnail} alt={v.title} className="h-full w-full object-cover" />
                     ) : (
-                      <button onClick={() => setPlayingId(v.id)} className="absolute inset-0 block w-full">
-                        {v.thumbnail ? (
-                          <img src={v.thumbnail} alt={v.title} className="h-full w-full object-cover" />
-                        ) : (
-                          <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0B3D2E] to-[#0E7C7B]" />
-                        )}
-                        <span className="absolute inset-0 flex items-center justify-center">
-                          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-black/60 text-3xl text-white">▶</span>
-                        </span>
-                        {v.duration && <span className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">{v.duration}</span>}
-                      </button>
+                      <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0B3D2E] to-[#0E7C7B]" />
                     )}
+                    <span className="absolute inset-0 flex items-center justify-center">
+                      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-black/60 text-3xl text-white transition group-hover:bg-[#C9A227]">▶</span>
+                    </span>
+                    {v.duration && <span className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">{v.duration}</span>}
                   </div>
                   <div className="p-4 text-center font-bold">{v.title}</div>
-                </div>
+                </a>
               ))}
             </div>
           </div>
