@@ -107,8 +107,12 @@ async function handlePost(post: any) {
 
   if (!event) return;
 
-  // زیرنویس = خط اول متن (مثل شور | یوحنا)
-  const subtitle = text ? text.split("\n")[0].trim().slice(0, 120) : "";
+  // زیرنویس کوتاه = بخش اول خط اول قبل از مجلس/تاریخ/هشتگ (مثل شور | لم داده‌ام...)
+  let subtitle = text ? text.split("\n")[0].trim() : "";
+  subtitle = subtitle.split("مجلس")[0].trim();
+  subtitle = subtitle.replace(/\|\s*$/, "").trim();
+  subtitle = subtitle.replace(/#\S+/g, "").trim();
+  subtitle = subtitle.slice(0, 80) || "صوت مراسم";
 
   if (post.photo?.length) {
     const fileId = post.photo[post.photo.length - 1].file_id;

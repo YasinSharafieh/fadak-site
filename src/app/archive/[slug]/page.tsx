@@ -33,18 +33,16 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
     photos = p.data || [];
   }
 
-  // ویدیوها فعلاً در جدول photos با کپشن ویدیو ذخیره می‌شوند
   const videos = photos.filter((p) => (p.caption || "").includes("ویدیو"));
   const onlyPhotos = photos.filter((p) => !(p.caption || "").includes("ویدیو"));
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
       <Link href="/archive" className="text-sm text-[#0E7C7B]">← بازگشت به آرشیو</Link>
-      <div className="gold-frame mt-4 rounded-3xl bg-white p-8">
+      <div className="gold-frame mt-4 rounded-3xl bg-white p-8 text-center">
         <h1 className="text-3xl font-extrabold text-[#0B3D2E]">{title}</h1>
         <p className="mt-2 text-[#3D2B1F]/80">{dateFa} | {dateHijri}</p>
         <p className="mt-1 text-sm">مداح: {maddah} | {location}</p>
-        {event?.description && <p className="mt-4 leading-8 whitespace-pre-line">{event.description}</p>}
       </div>
 
       <CeremonyTabs photos={onlyPhotos} audios={audios} videos={videos} />
