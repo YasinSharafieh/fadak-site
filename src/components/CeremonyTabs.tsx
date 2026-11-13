@@ -6,7 +6,7 @@ import AudioPlayer from "./AudioPlayer";
 type Props = {
   photos: { id: string; url: string; caption?: string }[];
   audios: { id: string; title: string; file_url: string }[];
-  videos: { id: string; title: string; aparat_id: string; thumbnail?: string; duration?: string }[];
+  videos: { id: string; title: string; aparat_id: string; thumbnail?: string; duration?: string; file_url?: string }[];
 };
 
 export default function CeremonyTabs({ photos, audios, videos }: Props) {
@@ -68,13 +68,8 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
               {videos.map((v) => (
                 <div key={v.id} className="overflow-hidden rounded-3xl bg-white shadow">
                   <div className="relative aspect-video w-full bg-black">
-                    {playingId === v.id && v.aparat_id ? (
-                      <iframe
-                        src={`https://www.aparat.com/video/${v.aparat_id}/vframe/embed`}
-                        allowFullScreen
-                        className="absolute inset-0 h-full w-full"
-                        title={v.title}
-                      />
+                    {playingId === v.id && v.file_url ? (
+                      <video src={v.file_url} controls autoPlay className="absolute inset-0 h-full w-full" />
                     ) : (
                       <button onClick={() => setPlayingId(v.id)} className="absolute inset-0 block w-full">
                         {v.thumbnail ? (

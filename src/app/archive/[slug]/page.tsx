@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import CeremonyTabs from "@/components/CeremonyTabs";
-import { refreshVideoThumbnails } from "@/lib/aparat";
+import { getAparatVideoInfo } from "@/lib/aparat";
 
 export const instant = false;
 
@@ -41,7 +41,19 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
   const tgVideos = photos.filter((p) => (p.caption || "").includes("ویدیو"));
   const onlyPhotos = photos.filter((p) => !(p.caption || "").includes("ویدیو"));
   const allVideos = [...videos, ...tgVideos.map((p) => ({ id: p.id, title: p.caption || "ویدیو مراسم", aparat_id: "", thumbnail: p.url }))];
-  const freshVideos = await refreshVideoThumbnails(allVideos);
+
+  const freshVideos = await Promise.all(
+    allVideos.map(async (v: any) => {
+      if (!v.aparat_id) return v;
+      const info = await getAparatVideoInfo(v.aparat_id);
+      return {
+        ...v,
+        thumbnail: info.thumbnail || v.thumbnail,
+        duration: info.duration || v.duration,
+        file_url: info.fileUrl || "",
+      };
+    })
+  );
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
