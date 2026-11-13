@@ -20,6 +20,7 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
   const dateFa = event?.date_fa || "—";
   const dateHijri = event?.date_hijri || "—";
   const maddah = event?.maddah || "کربلایی حسین طاهری";
+  const speaker = event?.speaker || "";
   const location = event?.location || "حسینیه سیدالشهدا (ع)، تهران";
 
   let audios: any[] = [];
@@ -36,7 +37,6 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
     videos = v.data || [];
   }
 
-  // ویدیوهای قدیمی تلگرامی در photos هستند — جدا کن
   const tgVideos = photos.filter((p) => (p.caption || "").includes("ویدیو"));
   const onlyPhotos = photos.filter((p) => !(p.caption || "").includes("ویدیو"));
   const allVideos = [...videos, ...tgVideos.map((p) => ({ id: p.id, title: p.caption || "ویدیو مراسم", aparat_id: "", thumbnail: p.url }))];
@@ -47,7 +47,14 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
       <div className="gold-frame mt-4 rounded-3xl bg-white p-8 text-center">
         <h1 className="text-3xl font-extrabold text-[#0B3D2E]">{title}</h1>
         <p className="mt-2 text-[#3D2B1F]/80">{dateFa} | {dateHijri}</p>
-        <p className="mt-1 text-sm">مداح: {maddah} | {location}</p>
+        {speaker && <p className="mt-1 text-sm">سخنران: {speaker}</p>}
+        <p className="mt-1 text-sm">مداحان: {maddah}</p>
+        <p className="mt-1 text-sm text-[#3D2B1F]/70">{location}</p>
+        {event?.description && (
+          <div className="mx-auto mt-4 max-w-xl whitespace-pre-line rounded-2xl bg-[#F7F3E8] p-4 text-right text-sm leading-7">
+            {event.description}
+          </div>
+        )}
       </div>
 
       <CeremonyTabs photos={onlyPhotos} audios={audios} videos={allVideos} />

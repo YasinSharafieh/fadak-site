@@ -15,6 +15,46 @@ function extractDate(text: string): string | null {
   return null;
 }
 
+function parseCeremony(text: string) {
+  const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+  let title = "";
+  let speaker = "";
+  let maddahs: string[] = [];
+  let dateFa = "";
+  let inMaddah = false;
+
+  for (const line of lines) {
+    if (line.includes("📌")) title = line.replace("📌|", "").replace("📌", "").trim();
+    if (line.includes("سخنران")) {
+      const parts = line.split(":");
+      speaker = (parts[1] || "").trim();
+      inMaddah = false;
+    } else if (line.includes("مداحان") || line.includes("مداح :")) {
+      inMaddah = true;
+    } else if (line.includes("📅")) {
+      dateFa = line.replace("📅|", "").replace("📅", "").trim();
+      inMaddah = false;
+    } else if (inMaddah) {
+      if (line.startsWith("#") || line.includes("کربلایی") || line.includes("حاج")) {
+        const clean = line.replace("#", "").replace(/_/g, " ").trim();
+        if (clean) maddahs.push(clean);
+      } else if (line.length > 0 && !line.includes("📅") && !line.includes("⬇️")) {
+        maddahs.push(line);
+      }
+    }
+  }
+
+  // اگر سخنران در خط بعدی بود
+  const speakerIdx = lines.findIndex((l) => l.includes("سخنران"));
+  if (!speaker && speakerIdx >= 0 && lines[speakerIdx + 1]) speaker = lines[speakerIdx + 1].trim();
+
+  const maddahStr = maddahs.length > 0 ? [...new Set(maddahs)].join("، ") : extractMaddahs(text);
+  const descParts = [title, speaker ? `سخنران: ${speaker}` : "", maddahStr ? `مداحان: ${maddahStr}` : ""].filter(Boolean);
+  const description = descParts.join("\n");
+
+  return { title: title || "مراسم فدک", speaker, maddah: maddahStr, dateFa, description };
+}
+
 function extractMaddahs(text: string): string {
   const tags = text.match(/#کربلایی_[^\s#]+/g) || text.match(/#حاج_[^\s#]+/g) || [];
   const names = [...new Set(tags.map((t) => t.replace("#", "").replace(/_/g, " ").trim()))];
@@ -44,9 +84,10 @@ async function findOrCreateEvent(text: string) {
     // مراسم جدید با عنوان شامل تاریخ بساز
     const title = firstLine.includes(date) ? firstLine : `روضه هفتگی ${date}`;
     const slug = slugify(title);
+    const parsed = parseCeremony(text);
     const { data: created } = await supabase
       .from("events")
-      .insert({ title, slug, date_fa: date, status: "past", maddah: extractMaddahs(text), description: text.slice(0, 2000) })
+      .insert({ title: parsed.title, slug, date_fa: parsed.dateFa || date, speaker: parsed.speaker, status: "past", maddah: parsed.maddah, description: parsed.description })
       .select()
       .single();
     return created;
@@ -61,9 +102,10 @@ async function findOrCreateEvent(text: string) {
 
   // پست متنی جدید → مراسم جدید
   const slug = slugify(firstLine);
+  const parsed = parseCeremony(text);
   const { data: created } = await supabase
     .from("events")
-    .insert({ title: firstLine || "مراسم فدک", slug, status: "past", maddah: extractMaddahs(text), description: text.slice(0, 2000) })
+    .insert({ title: parsed.title, slug, date_fa: parsed.dateFa, speaker: parsed.speaker, status: "past", maddah: parsed.maddah, description: parsed.description })
     .select()
     .single();
   return created;
