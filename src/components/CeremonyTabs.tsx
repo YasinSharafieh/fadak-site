@@ -76,9 +76,16 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
                         title={v.title}
                       />
                     ) : (
-                      <button onClick={() => setPlayingId(v.id)} className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0B3D2E] to-[#0E7C7B]">
-                        <span className="flex h-20 w-20 items-center justify-center rounded-full bg-[#C9A227] text-4xl text-white shadow-lg">▶</span>
-                        {v.duration && <span className="absolute bottom-3 left-3 rounded bg-black/70 px-2 py-1 text-xs text-white">{v.duration}</span>}
+                      <button onClick={() => setPlayingId(v.id)} className="absolute inset-0 block w-full">
+                        {v.thumbnail ? (
+                          <img src={v.thumbnail} alt={v.title} className="h-full w-full object-cover" />
+                        ) : (
+                          <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0B3D2E] to-[#0E7C7B]" />
+                        )}
+                        <span className="absolute inset-0 flex items-center justify-center">
+                          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-black/60 text-3xl text-white">▶</span>
+                        </span>
+                        {v.duration && <span className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">{v.duration}</span>}
                       </button>
                     )}
                   </div>
