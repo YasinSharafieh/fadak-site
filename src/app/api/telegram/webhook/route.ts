@@ -6,7 +6,6 @@ function extractDate(text: string): string | null {
   const months = ["فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"];
   const m = text.match(/(\d{1,2})\s+(فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)/);
   if (m) return `${m[1]} ${m[2]}`;
-  // اعداد فارسی
   const fa = text.match(/([۰-۹]{1,2})\s+(فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)/);
   if (fa) {
     const num = fa[1].replace(/[۰-۹]/g, (d: string) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d).toString());
@@ -35,7 +34,6 @@ function parseCeremony(text: string) {
       dateFa = line.replace("📅|", "").replace("📅", "").trim();
       inMaddah = false;
     } else if (inMaddah) {
-      // توقف در خط تاریخ، دانلود، فوتر یا لینک
       if (line.includes("📅") || line.includes("⬇️") || line.includes("🔹") || line.includes("www.") || line.includes("💠") || line.includes("📷")) {
         inMaddah = false;
       } else if (line.startsWith("#") || line.includes("کربلایی") || line.includes("حاج")) {
@@ -47,7 +45,6 @@ function parseCeremony(text: string) {
     }
   }
 
-  // اگر سخنران در خط بعدی بود
   const speakerIdx = lines.findIndex((l) => l.includes("سخنران"));
   if (!speaker && speakerIdx >= 0 && lines[speakerIdx + 1]) speaker = lines[speakerIdx + 1].trim();
 
@@ -68,23 +65,33 @@ function slugify(s: string) {
   return s.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\u0600-\u06FF-]/g, "").slice(0, 80) || `event-${Date.now()}`;
 }
 
-// پیدا کردن یا ساخت مراسم بر اساس تاریخ/عنوان
+// زیرنویس کوتاه از کپشن/متن
+function getSubtitle(text: string): string {
+  if (!text) return "";
+  let sub = text.split("\n")[0].trim();
+  sub = sub.split("مجلس")[0].trim();
+  sub = sub.replace(/\|\s*$/, "").trim();
+  sub = sub.replace(/#\S+/g, "").trim();
+  // حذف ایموجی‌های اول خط
+  sub = sub.replace(/^[🔊📷🎬📌📅\s]+/, "").trim();
+  return sub.slice(0, 80);
+}
+
+// پیدا کردن یا ساخت مراسم
 async function findOrCreateEvent(text: string) {
   if (!supabase) return null;
   const date = extractDate(text);
   const firstLine = text.split("\n")[0].trim().slice(0, 120);
 
-  // اگر تاریخ پیدا شد، دنبال مراسم همون تاریخ بگرد
   if (date) {
     const { data: existing } = await supabase
       .from("events")
       .select("*")
-      .ilike("title", `%${date}%`)
+      .ilike("date_fa", `%${date}%`)
       .order("created_at", { ascending: false })
       .limit(1);
     if (existing && existing.length > 0) return existing[0];
 
-    // مراسم جدید با عنوان شامل تاریخ بساز
     const title = firstLine.includes(date) ? firstLine : `روضه هفتگی ${date}`;
     const slug = slugify(title);
     const parsed = parseCeremony(text);
@@ -96,22 +103,9 @@ async function findOrCreateEvent(text: string) {
     return created;
   }
 
-  // بدون تاریخ: اگر پست فقط رسانه است، به آخرین مراسم بچسبان
-  const isMediaOnly = !text || text.length < 10;
-  if (isMediaOnly) {
-    const { data: latest } = await supabase.from("events").select("*").order("created_at", { ascending: false }).limit(1).single();
-    return latest || null;
-  }
-
-  // پست متنی جدید → مراسم جدید
-  const slug = slugify(firstLine);
-  const parsed = parseCeremony(text);
-  const { data: created } = await supabase
-    .from("events")
-    .insert({ title: parsed.title, slug, date_fa: parsed.dateFa, speaker: parsed.speaker, status: "past", maddah: parsed.maddah, description: parsed.description })
-    .select()
-    .single();
-  return created;
+  // بدون تاریخ: به آخرین مراسم بچسبان
+  const { data: latest } = await supabase.from("events").select("*").order("created_at", { ascending: false }).limit(1).single();
+  return latest || null;
 }
 
 async function downloadAndUpload(fileId: string, bucket: string, ext: string) {
@@ -126,7 +120,7 @@ async function downloadAndUpload(fileId: string, bucket: string, ext: string) {
     const buf = await dlRes.arrayBuffer();
     const name = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     const { error } = await supabase.storage.from(bucket).upload(name, buf, {
-      contentType: ext === "jpg" || ext === "png" ? `image/${ext}` : ext === "ogg" ? "audio/ogg" : "application/octet-stream",
+      contentType: ext === "jpg" || ext === "png" ? `image/${ext}` : ext === "ogg" ? "audio/ogg" : ext === "mp3" ? "audio/mpeg" : "application/octet-stream",
       upsert: true,
     });
     if (error) return null;
@@ -141,44 +135,47 @@ async function handlePost(post: any) {
   if (!supabase) return;
   const text = (post.text as string) || (post.caption as string) || "";
   const hasMedia = Boolean(post.photo || post.voice || post.audio || post.video || post.document);
-  const isEventText = text.includes("#مراسم") || text.includes("#روضه") || text.includes("روضه") || text.includes("مجلس") || text.includes("مراسم");
+  const isEventText = text.includes("#مراسم") || text.includes("#روضه") || text.includes("روضه") || text.includes("مجلس") || text.includes("مراسم") || text.includes("📌");
 
-  // فقط پست‌های متنی مراسم، مراسم جدید می‌سازن؛ رسانه‌ها به مراسم موجود وصل می‌شن
+  // تصمیم‌گیری برای مراسم
   let event: any = null;
-  if (isEventText && text && !hasMedia) {
-    event = await findOrCreateEvent(text);
-  } else if (isEventText && text && hasMedia) {
-    // پست متن+رسانه: اگر مراسم همون تاریخ هست، همون رو استفاده کن، وگرنه جدید بساز
+  if (isEventText && text) {
     event = await findOrCreateEvent(text);
   } else if (hasMedia) {
     // رسانه بدون متن مراسم → به آخرین مراسم بچسبان
     const { data: latest } = await supabase.from("events").select("*").order("created_at", { ascending: false }).limit(1).single();
     event = latest;
+  } else if (text) {
+    // فقط متن بدون رسانه و بدون کلمه کلیدی → نادیده بگیر
+    return;
   }
 
   if (!event) return;
 
-  // زیرنویس کوتاه = بخش اول خط اول قبل از مجلس/تاریخ/هشتگ (مثل شور | لم داده‌ام...)
-  let subtitle = text ? text.split("\n")[0].trim() : "";
-  subtitle = subtitle.split("مجلس")[0].trim();
-  subtitle = subtitle.replace(/\|\s*$/, "").trim();
-  subtitle = subtitle.replace(/#\S+/g, "").trim();
-  subtitle = subtitle.slice(0, 80) || "صوت مراسم";
+  const subtitle = getSubtitle(text);
 
+  // عکس
   if (post.photo?.length) {
     const fileId = post.photo[post.photo.length - 1].file_id;
     const url = await downloadAndUpload(fileId, "photos", "jpg");
-    if (url) await supabase.from("photos").insert({ event_id: event.id, url, caption: subtitle });
+    if (url) await supabase.from("photos").insert({ event_id: event.id, url, caption: subtitle || "عکس مراسم" });
   }
+
+  // صوت (voice یا audio)
   const audioFile = post.voice || post.audio;
   if (audioFile?.file_id) {
-    const url = await downloadAndUpload(audioFile.file_id, "audios", "ogg");
-    if (url) await supabase.from("audios").insert({ event_id: event.id, title: subtitle || "صوت مراسم", file_url: url });
+    const ext = audioFile.mime_type?.includes("mpeg") ? "mp3" : "ogg";
+    const url = await downloadAndUpload(audioFile.file_id, "audios", ext);
+    if (url) await supabase.from("audios").insert({ event_id: event.id, title: subtitle || audioFile.file_name || "صوت مراسم", file_url: url });
   }
+
+  // ویدیو
   if (post.video?.file_id) {
     const url = await downloadAndUpload(post.video.file_id, "videos", "mp4");
     if (url) await supabase.from("photos").insert({ event_id: event.id, url, caption: subtitle || "ویدیو مراسم" });
   }
+
+  // سند (document) - صوت یا ویدیو
   if (post.document?.file_id) {
     const mime = post.document.mime_type || "";
     const ext = (post.document.file_name || "file").split(".").pop() || "bin";
@@ -197,22 +194,25 @@ export async function POST(req: Request) {
     const update = await req.json();
     const token = process.env.TELEGRAM_BOT_TOKEN;
 
+    // پست کانال
     const channelPost = update?.channel_post;
     if (channelPost) {
       await handlePost(channelPost);
       return NextResponse.json({ ok: true });
     }
 
+    // پیام مستقیم
     const msg = update?.message;
     if (!msg) return NextResponse.json({ ok: true });
 
     const chatId = msg.chat.id;
     const text = (msg.text as string) || (msg.caption as string) || "";
-    const isForward = Boolean(msg.forward_from || msg.forward_from_chat);
+    const hasMedia = Boolean(msg.photo || msg.voice || msg.audio || msg.video || msg.document);
 
-    if (isForward || text.includes("روضه") || text.includes("مجلس") || text.includes("مراسم")) {
+    // همه پیام‌های رسانه‌ای یا فوروارد یا دارای کلمه کلیدی رو پردازش کن
+    if (hasMedia || msg.forward_from || msg.forward_from_chat || text.includes("روضه") || text.includes("مجلس") || text.includes("مراسم")) {
       await handlePost(msg);
-      if (token) {
+      if (token && hasMedia) {
         await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -222,11 +222,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true });
     }
 
-    if (msg.photo || msg.voice || msg.audio || msg.video || msg.document) {
-      await handlePost(msg);
-      return NextResponse.json({ ok: true });
-    }
-
+    // دستورات
     let reply = "سلام! من بات فدک هستم. /events برای مراسم آینده، /hadith برای حدیث روز";
     if (text.startsWith("/events")) {
       reply = "مراسم آینده: مجلس روضه هفتگی — سه‌شنبه ۲۱ آبان ۱۴۰۵ ساعت ۱۹:۳۰، حسینیه سیدالشهدا (ع) تهران. جزئیات: https://fadak-site-murex.vercel.app/events";
