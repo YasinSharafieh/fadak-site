@@ -35,10 +35,13 @@ function parseCeremony(text: string) {
       dateFa = line.replace("📅|", "").replace("📅", "").trim();
       inMaddah = false;
     } else if (inMaddah) {
-      if (line.startsWith("#") || line.includes("کربلایی") || line.includes("حاج")) {
+      // توقف در خط تاریخ، دانلود، فوتر یا لینک
+      if (line.includes("📅") || line.includes("⬇️") || line.includes("🔹") || line.includes("www.") || line.includes("💠") || line.includes("📷")) {
+        inMaddah = false;
+      } else if (line.startsWith("#") || line.includes("کربلایی") || line.includes("حاج")) {
         const clean = line.replace("#", "").replace(/_/g, " ").trim();
-        if (clean) maddahs.push(clean);
-      } else if (line.length > 0 && !line.includes("📅") && !line.includes("⬇️")) {
+        if (clean && !clean.includes("فدائیان")) maddahs.push(clean);
+      } else if (line.length > 0) {
         maddahs.push(line);
       }
     }
