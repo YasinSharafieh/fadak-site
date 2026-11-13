@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import AudioPlayer from "@/components/AudioPlayer";
+import CeremonyTabs from "@/components/CeremonyTabs";
 
 export const instant = false;
 
@@ -33,6 +33,10 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
     photos = p.data || [];
   }
 
+  // ویدیوها فعلاً در جدول photos با کپشن ویدیو ذخیره می‌شوند
+  const videos = photos.filter((p) => (p.caption || "").includes("ویدیو"));
+  const onlyPhotos = photos.filter((p) => !(p.caption || "").includes("ویدیو"));
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
       <Link href="/archive" className="text-sm text-[#0E7C7B]">← بازگشت به آرشیو</Link>
@@ -40,34 +44,10 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
         <h1 className="text-3xl font-extrabold text-[#0B3D2E]">{title}</h1>
         <p className="mt-2 text-[#3D2B1F]/80">{dateFa} | {dateHijri}</p>
         <p className="mt-1 text-sm">مداح: {maddah} | {location}</p>
-        {event?.description && <p className="mt-4 leading-8">{event.description}</p>}
+        {event?.description && <p className="mt-4 leading-8 whitespace-pre-line">{event.description}</p>}
       </div>
 
-      <section className="mt-10">
-        <h2 className="text-2xl font-extrabold text-[#0B3D2E]">صوت‌های مراسم</h2>
-        <div className="mt-4 space-y-3">
-          {audios.length === 0 && <p className="text-sm text-[#3D2B1F]/60">هنوز صوتی برای این مراسم ثبت نشده. از پنل مدیریت اضافه کنید.</p>}
-          {audios.map((a) => (
-            <AudioPlayer key={a.id} title={a.title} src={a.file_url} />
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="text-2xl font-extrabold text-[#0B3D2E]">گالری تصاویر</h2>
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {photos.length === 0 && <p className="text-sm text-[#3D2B1F]/60">هنوز عکسی ثبت نشده.</p>}
-          {photos.map((p) => (
-            <img key={p.id} src={p.url} alt={p.caption || title} className="aspect-square w-full rounded-2xl object-cover" />
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="text-2xl font-extrabold text-[#0B3D2E]">ویدیو و نماهنگ</h2>
-        <p className="mt-2 text-sm text-[#3D2B1F]/70">ویدیوهای این مراسم از آپارات نمایش داده می‌شوند.</p>
-        <a href="https://www.aparat.com" target="_blank" rel="noreferrer" className="mt-3 inline-block rounded-full bg-[#0B3D2E] px-5 py-2 text-sm text-white">مشاهده در آپارات ←</a>
-      </section>
+      <CeremonyTabs photos={onlyPhotos} audios={audios} videos={videos} />
     </div>
   );
 }
