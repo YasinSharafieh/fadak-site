@@ -24,17 +24,22 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
 
   let audios: any[] = [];
   let photos: any[] = [];
+  let videos: any[] = [];
   if (supabase && event?.id) {
-    const [a, p] = await Promise.all([
+    const [a, p, v] = await Promise.all([
       supabase.from("audios").select("*").eq("event_id", event.id),
       supabase.from("photos").select("*").eq("event_id", event.id),
+      supabase.from("videos").select("*").eq("event_id", event.id),
     ]);
     audios = a.data || [];
     photos = p.data || [];
+    videos = v.data || [];
   }
 
-  const videos = photos.filter((p) => (p.caption || "").includes("ویدیو"));
+  // ویدیوهای قدیمی تلگرامی در photos هستند — جدا کن
+  const tgVideos = photos.filter((p) => (p.caption || "").includes("ویدیو"));
   const onlyPhotos = photos.filter((p) => !(p.caption || "").includes("ویدیو"));
+  const allVideos = [...videos, ...tgVideos.map((p) => ({ id: p.id, title: p.caption || "ویدیو مراسم", aparat_id: "", thumbnail: p.url }))];
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
@@ -45,7 +50,7 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
         <p className="mt-1 text-sm">مداح: {maddah} | {location}</p>
       </div>
 
-      <CeremonyTabs photos={onlyPhotos} audios={audios} videos={videos} />
+      <CeremonyTabs photos={onlyPhotos} audios={audios} videos={allVideos} />
     </div>
   );
 }

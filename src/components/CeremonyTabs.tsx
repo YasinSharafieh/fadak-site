@@ -6,7 +6,7 @@ import AudioPlayer from "./AudioPlayer";
 type Props = {
   photos: { id: string; url: string; caption?: string }[];
   audios: { id: string; title: string; file_url: string }[];
-  videos: { id: string; url: string; caption?: string }[];
+  videos: { id: string; title: string; aparat_id: string; thumbnail?: string; duration?: string }[];
 };
 
 export default function CeremonyTabs({ photos, audios, videos }: Props) {
@@ -63,12 +63,16 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
         {tab === "videos" && (
           <div>
             {videos.length === 0 && <p className="text-sm text-[#3D2B1F]/60">هنوز ویدیویی ثبت نشده.</p>}
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               {videos.map((v) => (
-                <figure key={v.id} className="overflow-hidden rounded-2xl bg-black">
-                  <video src={v.url} controls className="aspect-video w-full" />
-                  {v.caption && <figcaption className="bg-white p-3 text-center text-sm font-bold">{v.caption}</figcaption>}
-                </figure>
+                <a key={v.id} href={`https://www.aparat.com/v/${v.aparat_id}`} target="_blank" rel="noreferrer" className="overflow-hidden rounded-3xl bg-white shadow hover:shadow-lg">
+                  <div className="relative">
+                    {v.thumbnail && <img src={v.thumbnail} alt={v.title} className="aspect-video w-full object-cover" />}
+                    {v.duration && <span className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">{v.duration}</span>}
+                    <span className="absolute inset-0 flex items-center justify-center text-5xl text-white/90">▶</span>
+                  </div>
+                  <div className="p-4 text-center font-bold">{v.title}</div>
+                </a>
               ))}
             </div>
           </div>

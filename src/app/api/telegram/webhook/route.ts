@@ -15,6 +15,12 @@ function extractDate(text: string): string | null {
   return null;
 }
 
+function extractMaddahs(text: string): string {
+  const tags = text.match(/#کربلایی_[^\s#]+/g) || text.match(/#حاج_[^\s#]+/g) || [];
+  const names = [...new Set(tags.map((t) => t.replace("#", "").replace(/_/g, " ").trim()))];
+  return names.length > 0 ? names.join("، ") : "کربلایی حسین طاهری";
+}
+
 function slugify(s: string) {
   return s.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\u0600-\u06FF-]/g, "").slice(0, 80) || `event-${Date.now()}`;
 }
@@ -40,7 +46,7 @@ async function findOrCreateEvent(text: string) {
     const slug = slugify(title);
     const { data: created } = await supabase
       .from("events")
-      .insert({ title, slug, date_fa: date, status: "past", maddah: "کربلایی حسین طاهری", description: text.slice(0, 2000) })
+      .insert({ title, slug, date_fa: date, status: "past", maddah: extractMaddahs(text), description: text.slice(0, 2000) })
       .select()
       .single();
     return created;
@@ -57,7 +63,7 @@ async function findOrCreateEvent(text: string) {
   const slug = slugify(firstLine);
   const { data: created } = await supabase
     .from("events")
-    .insert({ title: firstLine || "مراسم فدک", slug, status: "past", maddah: "کربلایی حسین طاهری", description: text.slice(0, 2000) })
+    .insert({ title: firstLine || "مراسم فدک", slug, status: "past", maddah: extractMaddahs(text), description: text.slice(0, 2000) })
     .select()
     .single();
   return created;
