@@ -23,6 +23,9 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
   const maddah = event?.maddah || "کربلایی حسین طاهری";
   const speaker = event?.speaker || "";
   const location = event?.location || "حسینیه سیدالشهدا (ع)، تهران";
+  const address = event?.address || "";
+  const posterUrl = event?.poster_url || "";
+  const mapUrl = event?.map_url || "";
 
   let audios: any[] = [];
   let photos: any[] = [];
@@ -50,25 +53,57 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
         ...v,
         thumbnail: info.thumbnail || v.thumbnail,
         duration: info.duration || v.duration,
-        file_url: info.fileUrl || "",
       };
     })
   );
 
+  const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&details=${encodeURIComponent(`مراسم ${title} - ${maddah}`)}`;
+
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12">
-      <Link href="/archive" className="text-sm text-[#0E7C7B]">← بازگشت به آرشیو</Link>
-      <div className="gold-frame mt-4 rounded-3xl bg-white p-8 text-center">
-        <h1 className="text-3xl font-extrabold text-[#0B3D2E]">{title}</h1>
-        <p className="mt-2 text-[#3D2B1F]/80">{dateFa} | {dateHijri}</p>
-        {speaker && <p className="mt-1 text-sm">سخنران: {speaker}</p>}
-        <p className="mt-1 text-sm">مداحان: {maddah}</p>
-        <p className="mt-1 text-sm text-[#3D2B1F]/70">{location}</p>
-        {event?.description && (
-          <div className="mx-auto mt-4 max-w-xl whitespace-pre-line rounded-2xl bg-[#F7F3E8] p-4 text-right text-sm leading-7">
-            {event.description}
+    <div className="mx-auto max-w-5xl px-4 py-12 animate-fade-in">
+      <Link href="/archive" className="text-sm text-[#0E7C7B] hover:underline">← بازگشت به آرشیو</Link>
+
+      {/* هدر مراسم */}
+      <div className="gold-frame mt-4 rounded-3xl bg-white p-8">
+        <div className="flex flex-col md:flex-row gap-6">
+          {posterUrl && (
+            <div className="shrink-0">
+              <img src={posterUrl} alt="پوستر مراسم" className="w-full md:w-64 rounded-2xl object-cover" />
+            </div>
+          )}
+          <div className="flex-1 text-center md:text-right">
+            <h1 className="text-3xl font-extrabold text-[#0B3D2E]">{title}</h1>
+            <p className="mt-3 text-[#3D2B1F]/80">{dateFa} {dateHijri && `| ${dateHijri}`}</p>
+            {speaker && <p className="mt-2 text-sm"><span className="font-bold">سخنران:</span> {speaker}</p>}
+            <p className="mt-1 text-sm"><span className="font-bold">مداحان:</span> {maddah}</p>
+            <p className="mt-1 text-sm text-[#3D2B1F]/70"><span className="font-bold">مکان:</span> {location}</p>
+            {address && <p className="mt-1 text-sm text-[#3D2B1F]/70"><span className="font-bold">آدرس:</span> {address}</p>}
+
+            {/* دکمه‌های اقدام */}
+            <div className="mt-6 flex flex-wrap gap-3 justify-center md:justify-start">
+              {mapUrl && (
+                <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="btn-green rounded-full px-5 py-2 text-sm">
+                  🗺️ مسیریابی
+                </a>
+              )}
+              <a href={calendarUrl} target="_blank" rel="noopener noreferrer" className="rounded-full border px-5 py-2 text-sm hover:bg-[#F7F3E8] transition">
+                📅 افزودن به تقویم
+              </a>
+              <a href={`https://t.me/fadak_media_bot`} target="_blank" rel="noopener noreferrer" className="rounded-full border px-5 py-2 text-sm hover:bg-[#F7F3E8] transition">
+                🔔 یادآور تلگرام
+              </a>
+              <button className="rounded-full border px-5 py-2 text-sm hover:bg-[#F7F3E8] transition">
+                📤 اشتراک‌گذاری
+              </button>
+            </div>
+
+            {event?.description && (
+              <div className="mt-6 whitespace-pre-line rounded-2xl bg-[#F7F3E8] p-4 text-right text-sm leading-7">
+                {event.description}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       <CeremonyTabs photos={onlyPhotos} audios={audios} videos={freshVideos} />
