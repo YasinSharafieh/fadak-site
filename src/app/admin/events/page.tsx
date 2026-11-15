@@ -1,42 +1,82 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+
 export const instant = false;
 
-export default function AdminEventsPage() {
+export default async function AdminEventsPage() {
+  const cookieStore = await cookies();
+  if (cookieStore.get("fadak_admin")?.value !== "authenticated") {
+    redirect("/admin/login");
+  }
+
+  let events: any[] = [];
+  if (supabase) {
+    const { data } = await supabase.from("events").select("*").order("created_at", { ascending: false });
+    events = data || [];
+  }
+
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="text-3xl font-extrabold text-[#0B3D2E]">افزودن مراسم جدید</h1>
-      <form className="mt-8 space-y-4 rounded-3xl bg-white p-6 shadow" action="/api/admin/events" method="post">
-        <div>
-          <label className="text-sm font-bold">عنوان مراسم *</label>
-          <input name="title" required className="mt-1 w-full rounded-xl border p-3" placeholder="مثلاً مجلس روضه هفتگی" />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
+    <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-extrabold text-[#0B3D2E]">مدیریت مراسم‌ها</h1>
+        <Link href="/admin" className="text-sm text-[#0E7C7B] hover:underline">← بازگشت به داشبورد</Link>
+      </div>
+
+      {/* فرم افزودن مراسم */}
+      <form action="/api/admin/events" method="POST" className="gold-frame mt-8 rounded-3xl bg-white p-6 space-y-4">
+        <h2 className="text-lg font-extrabold">افزودن مراسم جدید</h2>
+        <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className="text-sm font-bold">تاریخ شمسی</label>
-            <input name="date_fa" className="mt-1 w-full rounded-xl border p-3" placeholder="سه‌شنبه ۲۱ آبان ۱۴۰۵" />
+            <label className="mb-1 block text-sm font-bold">عنوان مراسم *</label>
+            <input name="title" required className="w-full rounded-xl border border-[#C9A227]/40 px-4 py-3" placeholder="مجلس روضه هفتگی" />
           </div>
           <div>
-            <label className="text-sm font-bold">تاریخ قمری</label>
-            <input name="date_hijri" className="mt-1 w-full rounded-xl border p-3" placeholder="۲۱ جمادی‌الثانی ۱۴۴۸" />
+            <label className="mb-1 block text-sm font-bold">تاریخ شمسی *</label>
+            <input name="date_fa" required className="w-full rounded-xl border border-[#C9A227]/40 px-4 py-3" placeholder="سه‌شنبه ۲۱ آبان ۱۴۰۵" />
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-sm font-bold">سخنران</label>
+            <input name="speaker" className="w-full rounded-xl border border-[#C9A227]/40 px-4 py-3" placeholder="حجت‌الاسلام..." />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-bold">مداحان</label>
+            <input name="maddah" className="w-full rounded-xl border border-[#C9A227]/40 px-4 py-3" placeholder="کربلایی حسین طاهری" />
           </div>
         </div>
         <div>
-          <label className="text-sm font-bold">مداح</label>
-          <input name="maddah" defaultValue="کربلایی حسین طاهری" className="mt-1 w-full rounded-xl border p-3" />
-        </div>
-        <div>
-          <label className="text-sm font-bold">مکان</label>
-          <input name="location" className="mt-1 w-full rounded-xl border p-3" placeholder="حسینیه سیدالشهدا (ع)، تهران" />
-        </div>
-        <div>
-          <label className="text-sm font-bold">وضعیت</label>
-          <select name="status" className="mt-1 w-full rounded-xl border p-3">
+          <label className="mb-1 block text-sm font-bold">وضعیت</label>
+          <select name="status" className="w-full rounded-xl border border-[#C9A227]/40 px-4 py-3">
             <option value="upcoming">آینده</option>
-            <option value="past">گذشته (آرشیو)</option>
+            <option value="past">گذشته</option>
           </select>
         </div>
-        <button className="w-full rounded-full bg-[#0B3D2E] py-3 font-bold text-white">ذخیره مراسم</button>
+        <div>
+          <label className="mb-1 block text-sm font-bold">توضیحات</label>
+          <textarea name="description" rows={3} className="w-full rounded-xl border border-[#C9A227]/40 px-4 py-3" placeholder="توضیحات مراسم..." />
+        </div>
+        <button className="btn-green w-full rounded-xl py-3">افزودن مراسم</button>
       </form>
-      <a href="/admin" className="mt-4 inline-block text-sm text-[#0E7C7B]">← بازگشت به پنل</a>
+
+      {/* لیست مراسم‌ها */}
+      <div className="mt-8 space-y-3">
+        <h2 className="text-lg font-extrabold">مراسم‌های موجود ({events.length})</h2>
+        {events.map((e) => (
+          <div key={e.id} className="flex items-center justify-between rounded-2xl bg-white p-4 shadow">
+            <div>
+              <div className="font-bold">{e.title}</div>
+              <div className="text-sm text-[#3D2B1F]/70">{e.date_fa} • {e.status === "upcoming" ? "آینده" : "گذشته"}</div>
+            </div>
+            <div className="flex gap-2">
+              <Link href={`/archive/${e.slug}`} className="rounded-full border px-4 py-2 text-sm hover:bg-[#F7F3E8] transition">مشاهده</Link>
+              <Link href="/admin/upload" className="rounded-full bg-[#0B3D2E] px-4 py-2 text-sm text-white">آپلود صوت</Link>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
