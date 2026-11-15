@@ -1,22 +1,95 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import AudioPlayer from "@/components/AudioPlayer";
 
-const tracks = [
-  { title: "روضه هفتگی — ۱۴ مهر ۱۴۰۵ — بخش ۱", src: "https://www.soundhelix.com/examples/soundhelix-song-1.mp3" },
-  { title: "روضه هفتگی — ۱۴ مهر ۱۴۰۵ — بخش ۲", src: "https://www.soundhelix.com/examples/soundhelix-song-2.mp3" },
-  { title: "شهادت حضرت جوادالائمه (ع) — ۱۴۰۵", src: "https://www.soundhelix.com/examples/soundhelix-song-3.mp3" },
-];
+type Audio = {
+  id: string;
+  title: string;
+  file_url: string;
+  event_id: string;
+  created_at: string;
+};
+
+type Event = {
+  id: string;
+  title: string;
+  date_fa: string;
+};
 
 export default function AudioPage() {
+  const [audios, setAudios] = useState<Audio[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [filterEvent, setFilterEvent] = useState<string>("all");
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      if (supabase) {
+        const [au, ev] = await Promise.all([
+          supabase.from("audios").select("*").order("created_at", { ascending: false }),
+          supabase.from("events").select("id,title,date_fa").order("created_at", { ascending: false }),
+        ]);
+        setAudios(au.data || []);
+        setEvents(ev.data || []);
+      }
+      setLoading(false);
+    }
+    load();
+  }, []);
+
+  const filtered = audios.filter((a) => {
+    const matchEvent = filterEvent === "all" || a.event_id === filterEvent;
+    const matchSearch = !search || a.title.includes(search);
+    return matchEvent && matchSearch;
+  });
+
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="text-3xl font-extrabold text-[#0B3D2E]">صوت</h1>
-      <p className="mt-2 text-[#3D2B1F]/80">پخش آنلاین صوت‌های مراسم با دانلود و پلی‌لیست</p>
-      <div className="mt-8 space-y-4">
-        {tracks.map((t) => (
-          <AudioPlayer key={t.title} title={t.title} src={t.src} />
-        ))}
+    <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
+      <div className="text-center">
+        <h1 className="text-3xl font-extrabold text-[#0B3D2E]">کتابخانه صوتی</h1>
+        <p className="mt-2 text-[#3D2B1F]/70">آرشیو کامل صوت‌های مراسم‌های فدک</p>
       </div>
-      <p className="mt-6 rounded-2xl bg-[#F7F3E8] p-4 text-sm">فایل‌های صوتی واقعی پس از اتصال Supabase Storage جایگزین می‌شوند.</p>
+
+      {/* فیلترها */}
+      <div className="mt-8 flex flex-col gap-4 md:flex-row">
+        <input
+          type="text"
+          placeholder="جستجو در صوت‌ها..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 rounded-full border border-[#C9A227]/40 bg-white px-5 py-3"
+        />
+        <select
+          value={filterEvent}
+          onChange={(e) => setFilterEvent(e.target.value)}
+          className="rounded-full border border-[#C9A227]/40 bg-white px-5 py-3"
+        >
+          <option value="all">همه مراسم‌ها</option>
+          {events.map((e) => (
+            <option key={e.id} value={e.id}>{e.title} — {e.date_fa}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* لیست صوت‌ها */}
+      <div className="mt-8 space-y-3">
+        {loading ? (
+          <p className="text-center text-[#3D2B1F]/60">در حال بارگذاری...</p>
+        ) : filtered.length === 0 ? (
+          <p className="text-center text-[#3D2B1F]/60">صوتی یافت نشد.</p>
+        ) : (
+          filtered.map((a) => (
+            <AudioPlayer key={a.id} title={a.title} src={a.file_url} />
+          ))
+        )}
+      </div>
+
+      <p className="mt-8 text-center text-sm text-[#3D2B1F]/60">
+        {filtered.length} صوت از {audios.length} صوت
+      </p>
     </div>
   );
 }

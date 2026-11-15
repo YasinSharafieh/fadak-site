@@ -4,36 +4,62 @@ export default function Footer() {
   return (
     <footer className="mt-16 bg-[#0B3D2E] text-[#F7F3E8]">
       <div className="islamic-pattern-dark">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-3">
-          <div>
-            <div className="text-xl font-extrabold">فدک</div>
-            <p className="mt-2 text-sm leading-7 text-white/80">
-              حسینیه مجازی هیأت فدائیان حضرت زهرا (س) — پایگاه حفظ و نشر آثار کربلایی حسین طاهری
-            </p>
-            <p className="mt-3 text-xs text-white/60">
-              تهران، میدان هفتم تیر، خیابان مفتح جنوبی، خیابان ورزنده، حسینیه سیدالشهدا (ع)
-            </p>
+        <div className="mx-auto max-w-7xl px-4 py-12">
+          <div className="grid gap-8 md:grid-cols-4">
+            {/* درباره فدک */}
+            <div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#C9A227] text-xl font-extrabold text-[#0B3D2E]">ف</div>
+                <div>
+                  <div className="text-lg font-extrabold">فدک</div>
+                  <div className="text-xs text-white/70">حفظ و نشر آثار کربلایی حسین طاهری</div>
+                </div>
+              </div>
+              <p className="mt-4 text-sm leading-6 text-white/80">
+                پایگاه حفظ و نشر آثار کربلایی حسین طاهری و هیأت فدائیان حضرت زهرا (س) — آرشیو زنده و مرجع دیجیتال.
+              </p>
+            </div>
+
+            {/* نشانی */}
+            <div>
+              <h3 className="font-extrabold text-[#C9A227]">نشانی</h3>
+              <p className="mt-3 text-sm leading-6 text-white/80">
+                تهران، میدان هفتم تیر، خیابان مفتح جنوبی، خیابان ورزنده (جنب ورزشگاه شهید شیرودی)، خیابان ملک الشعراء بهار، حسینیه سیدالشهدا (ع)
+              </p>
+              <a href="https://www.openstreetmap.org/?mlat=35.725616&mlon=51.445673#map=16/35.725616/51.445673" target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-sm text-[#C9A227] hover:underline">
+                🗺️ مشاهده روی نقشه
+              </a>
+            </div>
+
+            {/* دسترسی سریع */}
+            <div>
+              <h3 className="font-extrabold text-[#C9A227]">دسترسی سریع</h3>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li><Link href="/events" className="text-white/80 hover:text-[#C9A227] transition">مراسم آینده</Link></li>
+                <li><Link href="/archive" className="text-white/80 hover:text-[#C9A227] transition">آرشیو مراسم</Link></li>
+                <li><Link href="/audio" className="text-white/80 hover:text-[#C9A227] transition">کتابخانه صوتی</Link></li>
+                <li><Link href="/videos" className="text-white/80 hover:text-[#C9A227] transition">نماهنگ‌ها</Link></li>
+                <li><Link href="/reels" className="text-white/80 hover:text-[#C9A227] transition">ریلز فدک</Link></li>
+                <li><Link href="/poems" className="text-white/80 hover:text-[#C9A227] transition">اشعار</Link></li>
+              </ul>
+            </div>
+
+            {/* پیوندها */}
+            <div>
+              <h3 className="font-extrabold text-[#C9A227]">پیوندهای مرتبط</h3>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li><a href="https://noorieh.ir/" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-[#C9A227] transition">پایگاه اطلاع‌رسانی نوریه</a></li>
+                <li><a href="https://gharaar.net/" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-[#C9A227] transition">کاروان قرار بی‌قرارها</a></li>
+                <li><a href="https://farsi.khamenei.ir/" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-[#C9A227] transition">پایگاه رهبر معظم انقلاب</a></li>
+                <li><a href="https://fotros.ir/" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-[#C9A227] transition">پایگاه اطلاع‌رسانی فطرس</a></li>
+              </ul>
+            </div>
           </div>
-          <div>
-            <div className="font-bold text-[#C9A227]">دسترسی سریع</div>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li><Link href="/events" className="hover:text-[#C9A227]">مراسم آینده</Link></li>
-              <li><Link href="/archive" className="hover:text-[#C9A227]">آرشیو مراسم</Link></li>
-              <li><Link href="/khadam" className="hover:text-[#C9A227]">ثبت‌نام خادمین</Link></li>
-              <li><Link href="/link" className="hover:text-[#C9A227]">صفحات حسین طاهری</Link></li>
-              <li><Link href="https://gharaar.net" target="_blank" className="hover:text-[#C9A227]">قرار بی‌قرارها</Link></li>
-            </ul>
+
+          <div className="mt-10 border-t border-white/10 pt-6 text-center text-sm text-white/60">
+            <p>هیأت فدائیان حضرت زهرا (س) — تمامی حقوق محفوظ است.</p>
+            <p className="mt-2">ساخته شده با ❤️ برای حفظ و نشر آثار اهل بیت (ع)</p>
           </div>
-          <div>
-            <div className="font-bold text-[#C9A227]">شبکه‌های اجتماعی</div>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li>اینستاگرام، تلگرام، ایتا، بله، روبیکا، آپارات</li>
-              <li className="text-white/60">لینک‌ها در صفحه /link به‌روزرسانی می‌شوند</li>
-            </ul>
-          </div>
-        </div>
-        <div className="border-t border-white/10 py-4 text-center text-xs text-white/50">
-          © فدک — تمامی حقوق محفوظ است.
         </div>
       </div>
     </footer>

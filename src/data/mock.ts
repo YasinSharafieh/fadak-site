@@ -3,87 +3,93 @@ export type EventItem = {
   title: string;
   dateFa: string;
   dateHijri: string;
-  speaker: string;
   maddah: string;
+  speaker?: string;
   location: string;
+  address: string;
+  mapUrl: string;
   poster?: string;
-  status: "upcoming" | "past";
 };
+
+export const fadakAddress = "تهران، میدان هفتم تیر، خیابان مفتح جنوبی، خیابان ورزنده (جنب ورزشگاه شهید شیرودی)، خیابان ملک الشعراء بهار، حسینیه سیدالشهدا (ع)";
+export const fadakMapUrl = "https://www.openstreetmap.org/?mlat=35.725616&mlon=51.445673#map=16/35.725616/51.445673";
 
 export const upcomingEvents: EventItem[] = [
   {
-    id: "roze-haftagi",
+    id: "next-1",
     title: "مجلس روضه هفتگی",
-    dateFa: "سه‌شنبه ۲۱ آبان ۱۴۰۵ — ساعت ۱۹:۳۰",
+    dateFa: "سه‌شنبه ۲۱ آبان ۱۴۰۵",
     dateHijri: "۲۱ جمادی‌الثانی ۱۴۴۸",
-    speaker: "—",
     maddah: "کربلایی حسین طاهری",
-    location: "حسینیه سیدالشهدا (ع)، تهران",
-    status: "upcoming",
-  },
-  {
-    id: "veladat-aliakbar",
-    title: "جشن ولادت حضرت علی‌اکبر (ع)",
-    dateFa: "جمعه ۱۰ بهمن ۱۴۰۴ — ساعت ۲۰:۰۰",
-    dateHijri: "۱۱ شعبان ۱۴۴۷",
-    speaker: "حجت‌الاسلام ...",
-    maddah: "کربلایی حسین طاهری",
-    location: "حسینیه سیدالشهدا (ع)، تهران",
-    status: "upcoming",
+    location: "حسینیه سیدالشهدا (ع)",
+    address: fadakAddress,
+    mapUrl: fadakMapUrl,
   },
 ];
 
 export const pastEvents: EventItem[] = [
   {
-    id: "14-mehr",
-    title: "مجلس روضه هفتگی — ۱۴ مهر ۱۴۰۵",
+    id: "past-1",
+    title: "مجلس‌روضه هفتگی‌",
     dateFa: "۱۴ مهر ۱۴۰۵",
-    dateHijri: "۱۴ ربیع‌الثانی ۱۴۴۸",
-    speaker: "—",
+    dateHijri: "۲۴ ربیع‌الثانی ۱۴۴۸",
     maddah: "کربلایی حسین طاهری",
     location: "حسینیه سیدالشهدا (ع)",
-    status: "past",
+    address: fadakAddress,
+    mapUrl: fadakMapUrl,
   },
   {
-    id: "7-mehr",
-    title: "مجلس روضه هفتگی — ۷ مهر ۱۴۰۵",
+    id: "past-2",
+    title: "مجلس‌روضه هفتگی‌",
     dateFa: "۷ مهر ۱۴۰۵",
-    dateHijri: "۷ ربیع‌الثانی ۱۴۴۸",
-    speaker: "—",
+    dateHijri: "۱۷ ربیع‌الثانی ۱۴۴۸",
     maddah: "کربلایی حسین طاهری",
     location: "حسینیه سیدالشهدا (ع)",
-    status: "past",
+    address: fadakAddress,
+    mapUrl: fadakMapUrl,
   },
   {
-    id: "javadolaeme",
-    title: "روز شهادت حضرت جوادالائمه (ع)",
+    id: "past-3",
+    title: "روز شهادت حضرت جوادالائمه(ع)",
     dateFa: "۲۷ اردیبهشت ۱۴۰۵",
     dateHijri: "۲۹ ذی‌القعده ۱۴۴۷",
-    speaker: "—",
     maddah: "کربلایی حسین طاهری",
     location: "حسینیه سیدالشهدا (ع)",
-    status: "past",
+    address: fadakAddress,
+    mapUrl: fadakMapUrl,
   },
 ];
 
 export const hadithOfDay = {
   text: "إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ",
   translation: "همانا اعمال به نیت‌ها بستگی دارد.",
-  source: "پیامبر اکرم (ص) — بحارالانوار",
+  source: "صحیح بخاری و مسلم",
 };
 
 export const reels = [
-  { id: "r1", title: "عاقبت توقع بی‌جا", duration: "۰:۴۵" },
-  { id: "r2", title: "معجزه یاد مرگ", duration: "۱:۱۰" },
-  { id: "r3", title: "الگوی ناب بندگی", duration: "۰:۵۸" },
-  { id: "r4", title: "پناهگاه حق", duration: "۱:۰۲" },
+  { id: "1", title: "شور | یوحنا", duration: "03:51" },
+  { id: "2", title: "مناجات با امام زمان", duration: "07:26" },
+  { id: "3", title: "زمینه | قرارمونو بهم نزن", duration: "02:18" },
+  { id: "4", title: "شور | جهان مانوس اباالفضل", duration: "04:56" },
+  { id: "5", title: "شور | میگن اسمت غمه حسین", duration: "04:39" },
 ];
 
 export const socialLinks = [
-  { name: "اینستاگرام", href: "https://instagram.com", desc: "ریلز و عکس‌های مراسم" },
-  { name: "تلگرام", href: "https://t.me", desc: "کانال اطلاع‌رسانی و صوت" },
-  { name: "ایتا", href: "https://eitaa.com", desc: "کانال ایتا" },
-  { name: "بله", href: "https://ble.ir", desc: "کانال بله" },
-  { name: "روبیکا", href: "https://rubika.ir", desc: "کانال روبیکا" },
-  { name: "آپارات", href: "https://aparat.com", desc: "نماهنگ‌ها و ویدیوها" },
+  { name: "اینستاگرام فدک", url: "https://instagram.com/fadakinfo", icon: "📸" },
+  { name: "تلگرام فدک", url: "https://t.me/fadakinfo_channel", icon: "✈️" },
+  { name: "آپارات فدک", url: "https://www.aparat.com/fadakinfo", icon: "🎬" },
+  { name: "روبیکا فدک", url: "https://rubika.ir/fadakinfo", icon: "🔴" },
+  { name: "یوتیوب حسین طاهری", url: "https://youtube.com/@hoseintaheri", icon: "▶️" },
+  { name: "تلگرام حسین طاهری", url: "https://t.me/hoseintaheri_telegram", icon: "✈️" },
+  { name: "نوریه", url: "https://noorieh.ir/", icon: "🕌" },
+  { name: "قرار بی‌قرارها", url: "https://gharaar.net/", icon: "🚐" },
+];
+
+export const collections = [
+  { name: "فاطمیه", slug: "fatimieh" },
+  { name: "محرم", slug: "moharam" },
+  { name: "صفر", slug: "safar" },
+  { name: "رمضان", slug: "ramadan" },
+  { name: "برنامه هفتگی", slug: "weekly" },
+  { name: "مناسبت‌های مذهبی", slug: "occasions" },
 ];
