@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { collections } from "@/data/mock";
 
+export const instant = false;
+
 export default async function CollectionDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const collection = collections.find((c) => c.slug === slug);
