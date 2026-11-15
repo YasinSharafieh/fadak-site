@@ -1,10 +1,44 @@
-export default function Page() {
+export default function AboutTaheriPage() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12">
-      <div className="gold-frame rounded-3xl bg-white p-8">
-        <h1 className="text-3xl font-extrabold text-[#0B3D2E]">درباره حسین طاهری</h1>
-        <p className="mt-3 leading-8 text-[#3D2B1F]/80">بیوگرافی کربلایی حسین طاهری و آثار ایشان.</p>
-        <p className="mt-4 rounded-xl bg-[#F7F3E8] p-4 text-sm">این صفحه در اسکلت فاز ۱ ساخته شده و در فازهای بعدی با دیتابیس واقعی (Supabase) و پنل مدیریت کامل می‌شود.</p>
+    <div className="mx-auto max-w-4xl px-4 py-12 animate-fade-in">
+      <div className="text-center">
+        <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-[#0B3D2E] text-5xl font-extrabold text-[#C9A227]">ح</div>
+        <h1 className="mt-6 text-3xl font-extrabold text-[#0B3D2E]">کربلایی حسین طاهری</h1>
+        <p className="mt-2 text-[#3D2B1F]/70">مداح اهل بیت (ع) | هیأت فدائیان حضرت زهرا (س)</p>
+      </div>
+
+      <div className="gold-frame mt-10 rounded-3xl bg-white p-8 md:p-10">
+        <h2 className="text-xl font-extrabold text-[#0B3D2E]">درباره</h2>
+        <div className="poem-text mt-4 space-y-4 leading-loose text-[#3D2B1F]/90">
+          <p>
+            کربلایی حسین طاهری از مداحان برجسته اهل بیت (ع) است که با صدای گرم و سبک خاص خود، سال‌هاست در هیأت فدائیان حضرت زهرا (س) به مداحی می‌پردازد.
+          </p>
+          <p>
+            آثار ایشان در زمینه‌های مختلف مداحی از جمله شور، زمینه، روضه و مناجات در آرشیو فدک قابل دسترسی است.
+          </p>
+          <p>
+            حسین طاهری همچنین در تولید نماهنگ‌ها و محتوای رسانه‌ای فعال است و آثار ایشان در کانال آپارات فدک منتشر می‌شود.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-8 grid gap-4 md:grid-cols-2">
+        <a href="https://www.aparat.com/fadakinfo" target="_blank" rel="noopener noreferrer" className="card-hover rounded-2xl bg-[#0B3D2E] p-6 text-center text-white">
+          <div className="text-3xl">🎬</div>
+          <div className="mt-2 font-extrabold">کانال آپارات</div>
+          <p className="mt-1 text-sm text-white/70">مشاهده نماهنگ‌ها و ویدیوها</p>
+        </a>
+        <a href="https://t.me/hoseintaheri_telegram" target="_blank" rel="noopener noreferrer" className="card-hover rounded-2xl bg-[#0E7C7B] p-6 text-center text-white">
+          <div className="text-3xl">✈️</div>
+          <div className="mt-2 font-extrabold">تلگرام</div>
+          <p className="mt-1 text-sm text-white/70">کانال رسمی حسین طاهری</p>
+        </a>
+      </div>
+
+      <div className="mt-8 text-center">
+        <a href="/link" className="btn-gold rounded-full px-8 py-3">
+          همه شبکه‌های اجتماعی
+        </a>
       </div>
     </div>
   );
