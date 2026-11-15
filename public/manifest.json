@@ -1,0 +1,20 @@
+{
+  "name": "فدک — پایگاه حفظ و نشر آثار کربلایی حسین طاهری",
+  "short_name": "فدک",
+  "description": "آرشیو زنده و مرجع دیجیتال آثار کربلایی حسین طاهری و هیأت فدائیان حضرت زهرا (س)",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B3D2E",
+  "theme_color": "#0B3D2E",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["entertainment", "education"],
+  "lang": "fa",
+  "dir": "rtl"
+}

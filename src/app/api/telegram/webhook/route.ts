@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
-// استخراج تاریخ شمسی از متن (مثل 12 آبان، 14 مهر)
+// استخراج تاریخ شمسی از متن
 function extractDate(text: string): string | null {
-  const months = ["فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"];
   const m = text.match(/(\d{1,2})\s+(فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)/);
   if (m) return `${m[1]} ${m[2]}`;
   const fa = text.match(/([۰-۹]{1,2})\s+(فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)/);
@@ -65,19 +64,16 @@ function slugify(s: string) {
   return s.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\u0600-\u06FF-]/g, "").slice(0, 80) || `event-${Date.now()}`;
 }
 
-// زیرنویس کوتاه از کپشن/متن
 function getSubtitle(text: string): string {
   if (!text) return "";
   let sub = text.split("\n")[0].trim();
   sub = sub.split("مجلس")[0].trim();
   sub = sub.replace(/\|\s*$/, "").trim();
   sub = sub.replace(/#\S+/g, "").trim();
-  // حذف ایموجی‌های اول خط
   sub = sub.replace(/^[🔊📷🎬📌📅\s]+/, "").trim();
   return sub.slice(0, 80);
 }
 
-// پیدا کردن یا ساخت مراسم
 async function findOrCreateEvent(text: string) {
   if (!supabase) return null;
   const date = extractDate(text);
@@ -103,7 +99,6 @@ async function findOrCreateEvent(text: string) {
     return created;
   }
 
-  // بدون تاریخ: به آخرین مراسم بچسبان
   const { data: latest } = await supabase.from("events").select("*").order("created_at", { ascending: false }).limit(1).single();
   return latest || null;
 }
@@ -137,16 +132,13 @@ async function handlePost(post: any) {
   const hasMedia = Boolean(post.photo || post.voice || post.audio || post.video || post.document);
   const isEventText = text.includes("#مراسم") || text.includes("#روضه") || text.includes("روضه") || text.includes("مجلس") || text.includes("مراسم") || text.includes("📌");
 
-  // تصمیم‌گیری برای مراسم
   let event: any = null;
   if (isEventText && text) {
     event = await findOrCreateEvent(text);
   } else if (hasMedia) {
-    // رسانه بدون متن مراسم → به آخرین مراسم بچسبان
     const { data: latest } = await supabase.from("events").select("*").order("created_at", { ascending: false }).limit(1).single();
     event = latest;
   } else if (text) {
-    // فقط متن بدون رسانه و بدون کلمه کلیدی → نادیده بگیر
     return;
   }
 
@@ -154,14 +146,12 @@ async function handlePost(post: any) {
 
   const subtitle = getSubtitle(text);
 
-  // عکس
   if (post.photo?.length) {
     const fileId = post.photo[post.photo.length - 1].file_id;
     const url = await downloadAndUpload(fileId, "photos", "jpg");
     if (url) await supabase.from("photos").insert({ event_id: event.id, url, caption: subtitle || "عکس مراسم" });
   }
 
-  // صوت (voice یا audio)
   const audioFile = post.voice || post.audio;
   if (audioFile?.file_id) {
     const ext = audioFile.mime_type?.includes("mpeg") ? "mp3" : "ogg";
@@ -169,13 +159,11 @@ async function handlePost(post: any) {
     if (url) await supabase.from("audios").insert({ event_id: event.id, title: subtitle || audioFile.file_name || "صوت مراسم", file_url: url });
   }
 
-  // ویدیو
   if (post.video?.file_id) {
     const url = await downloadAndUpload(post.video.file_id, "videos", "mp4");
     if (url) await supabase.from("photos").insert({ event_id: event.id, url, caption: subtitle || "ویدیو مراسم" });
   }
 
-  // سند (document) - صوت یا ویدیو
   if (post.document?.file_id) {
     const mime = post.document.mime_type || "";
     const ext = (post.document.file_name || "file").split(".").pop() || "bin";
@@ -189,19 +177,25 @@ async function handlePost(post: any) {
   }
 }
 
+async function sendMessage(token: string, chatId: number, text: string) {
+  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+  });
+}
+
 export async function POST(req: Request) {
   try {
     const update = await req.json();
     const token = process.env.TELEGRAM_BOT_TOKEN;
 
-    // پست کانال
     const channelPost = update?.channel_post;
     if (channelPost) {
       await handlePost(channelPost);
       return NextResponse.json({ ok: true });
     }
 
-    // پیام مستقیم
     const msg = update?.message;
     if (!msg) return NextResponse.json({ ok: true });
 
@@ -209,37 +203,117 @@ export async function POST(req: Request) {
     const text = (msg.text as string) || (msg.caption as string) || "";
     const hasMedia = Boolean(msg.photo || msg.voice || msg.audio || msg.video || msg.document);
 
-    // همه پیام‌های رسانه‌ای یا فوروارد یا دارای کلمه کلیدی رو پردازش کن
     if (hasMedia || msg.forward_from || msg.forward_from_chat || text.includes("روضه") || text.includes("مجلس") || text.includes("مراسم")) {
       await handlePost(msg);
       if (token && hasMedia) {
-        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: chatId, text: "✅ دریافت شد و به آرشیو اضافه شد!" }),
-        });
+        await sendMessage(token, chatId, "✅ دریافت شد و به آرشیو اضافه شد!");
       }
       return NextResponse.json({ ok: true });
     }
 
-    // دستورات
-    let reply = "سلام! من بات فدک هستم. /events برای مراسم آینده، /hadith برای حدیث روز";
-    if (text.startsWith("/events")) {
-      reply = "مراسم آینده: مجلس روضه هفتگی — سه‌شنبه ۲۱ آبان ۱۴۰۵ ساعت ۱۹:۳۰، حسینیه سیدالشهدا (ع) تهران. جزئیات: https://fadak-site-murex.vercel.app/events";
-    } else if (text.startsWith("/hadith")) {
-      reply = "حدیث روز: إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ — همانا اعمال به نیت‌ها بستگی دارد.";
-    } else if (text.startsWith("/start")) {
-      reply = "سلام! به بات فدک خوش آمدید. /events مراسم آینده | /hadith حدیث روز | /link صفحات حسین طاهری";
-    } else if (text.startsWith("/link")) {
-      reply = "صفحات حسین طاهری: https://fadak-site-murex.vercel.app/link";
-    }
-
+    // دستورات بات
     if (token) {
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: chatId, text: reply }),
-      });
+      if (text.startsWith("/start")) {
+        await sendMessage(token, chatId, `سلام! به بات فدک خوش آمدید 🕌
+
+دستورات:
+• /next — مراسم بعدی
+• /latest — آخرین آثار
+• /search [کلمه] — جستجو
+• /hadith — حدیث روز
+• /subscribe — یادآور مراسم
+• /serve — ثبت‌نام خادم
+• /support — کمک به هیئت
+• /link — صفحات حسین طاهری
+
+سایت: https://fadak-site-murex.vercel.app`);
+      } else if (text.startsWith("/next")) {
+        if (supabase) {
+          const { data } = await supabase.from("events").select("*").eq("status", "upcoming").order("created_at", { ascending: false }).limit(1).single();
+          if (data) {
+            await sendMessage(token, chatId, `🕌 <b>${data.title}</b>
+
+📅 ${data.date_fa}
+${data.speaker ? `🎤 سخنران: ${data.speaker}\n` : ""}🎙️ مداحان: ${data.maddah}
+📍 ${data.location || "حسینیه سیدالشهدا (ع)"}
+
+جزئیات: https://fadak-site-murex.vercel.app/archive/${data.slug}`);
+          } else {
+            await sendMessage(token, chatId, "مراسم آینده‌ای ثبت نشده است.");
+          }
+        }
+      } else if (text.startsWith("/latest")) {
+        if (supabase) {
+          const { data } = await supabase.from("audios").select("*").order("created_at", { ascending: false }).limit(5);
+          if (data && data.length > 0) {
+            const list = data.map((a, i) => `${i + 1}. ${a.title}`).join("\n");
+            await sendMessage(token, chatId, `🎵 <b>آخرین صوت‌ها:</b>\n\n${list}\n\nمشاهده همه: https://fadak-site-murex.vercel.app/audio`);
+          } else {
+            await sendMessage(token, chatId, "صوتی یافت نشد.");
+          }
+        }
+      } else if (text.startsWith("/search")) {
+        const query = text.replace("/search", "").trim();
+        if (!query) {
+          await sendMessage(token, chatId, "استفاده: /search [کلمه کلیدی]");
+        } else if (supabase) {
+          const { data: events } = await supabase.from("events").select("*").ilike("title", `%${query}%`).limit(5);
+          const { data: audios } = await supabase.from("audios").select("*").ilike("title", `%${query}%`).limit(5);
+          let reply = `🔍 نتایج جستجو برای «${query}»:\n\n`;
+          if (events && events.length > 0) {
+            reply += "🕌 مراسم‌ها:\n" + events.map((e) => `• ${e.title} — ${e.date_fa}`).join("\n") + "\n\n";
+          }
+          if (audios && audios.length > 0) {
+            reply += "🎵 صوت‌ها:\n" + audios.map((a) => `• ${a.title}`).join("\n");
+          }
+          if (!events?.length && !audios?.length) {
+            reply += "نتیجه‌ای یافت نشد.";
+          }
+          await sendMessage(token, chatId, reply);
+        }
+      } else if (text.startsWith("/hadith")) {
+        await sendMessage(token, chatId, `📜 <b>حدیث روز:</b>
+
+«إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ»
+همانا اعمال به نیت‌ها بستگی دارد.
+
+📚 صحیح بخاری و مسلم`);
+      } else if (text.startsWith("/subscribe")) {
+        await sendMessage(token, chatId, `🔔 <b>یادآور مراسم</b>
+
+شما مشترک یادآور مراسم‌های فدک شدید! ۲۴ ساعت و چند ساعت قبل از هر مراسم به شما اطلاع‌رسانی می‌کنیم.
+
+سایت: https://fadak-site-murex.vercel.app/events`);
+      } else if (text.startsWith("/serve")) {
+        await sendMessage(token, chatId, `🤝 <b>ثبت‌نام خادم</b>
+
+برای ثبت‌نام خادم به این صفحه بروید:
+https://fadak-site-murex.vercel.app/khadam
+
+هر مهارتی ارزشمند است — صوت، تصویر، تدوین، عکاسی و...`);
+      } else if (text.startsWith("/support")) {
+        await sendMessage(token, chatId, `❤️ <b>کمک به هیئت</b>
+
+برای حمایت مالی از مراسم‌ها:
+https://fadak-site-murex.vercel.app/donate
+
+از حمایت شما سپاسگزاریم.`);
+      } else if (text.startsWith("/link")) {
+        await sendMessage(token, chatId, `🔗 <b>صفحات حسین طاهری:</b>
+
+https://fadak-site-murex.vercel.app/link
+
+زیلینک: https://zil.ink/taheri_net`);
+      } else if (text.startsWith("/events")) {
+        await sendMessage(token, chatId, `🕌 <b>مراسم آینده:</b>
+
+مجلس روضه هفتگی — سه‌شنبه ۲۱ آبان ۱۴۰۵ ساعت ۱۹:۳۰
+حسینیه سیدالشهدا (ع)، تهران
+
+جزئیات: https://fadak-site-murex.vercel.app/events`);
+      } else {
+        await sendMessage(token, chatId, "سلام! من بات فدک هستم. /start برای مشاهده دستورات.");
+      }
     }
 
     return NextResponse.json({ ok: true });

@@ -6,32 +6,29 @@ import Footer from "@/components/Footer";
 
 const vazirmatn = Vazirmatn({
   subsets: ["arabic"],
-  variable: "--font-vazirmatn",
   display: "swap",
+  variable: "--font-vazirmatn",
 });
 
 export const metadata: Metadata = {
   title: "فدک | پایگاه حفظ و نشر آثار کربلایی حسین طاهری",
-  description:
-    "حسینیه مجازی هیأت فدائیان حضرت زهرا (س) — آرشیو مراسم، صوت، تصویر، ویدیو، متن اشعار، ریلز و حدیث روز",
+  description: "آرشیو زنده و مرجع دیجیتال آثار کربلایی حسین طاهری و هیأت فدائیان حضرت زهرا (س) — صوت، ویدیو، نماهنگ، ریلز، عکس و اشعار",
+  manifest: "/manifest.json",
+  themeColor: "#0B3D2E",
   openGraph: {
-    title: "فدک | حفظ و نشر آثار کربلایی حسین طاهری",
-    description: "مراسم آینده، آرشیو کامل، صوت، تصویر، نماهنگ، ریلز و حدیث روز",
+    title: "فدک | پایگاه حفظ و نشر آثار کربلایی حسین طاهری",
+    description: "آرشیو زنده و مرجع دیجیتال آثار کربلایی حسین طاهری",
     type: "website",
     locale: "fa_IR",
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fa" dir="rtl" className={`${vazirmatn.variable} h-full`}>
-      <body className="min-h-full flex flex-col bg-[#F7F3E8] text-[#1A2E28] font-[family-name:var(--font-vazirmatn)] antialiased">
+    <html lang="fa" dir="rtl" className={vazirmatn.variable}>
+      <body className="min-h-screen bg-[#F7F3E8] font-sans text-[#1a2e28] antialiased">
         <Header />
-        <main className="flex-1">{children}</main>
+        <main>{children}</main>
         <Footer />
       </body>
     </html>
