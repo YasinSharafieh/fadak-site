@@ -48,6 +48,18 @@ export default function GlobalVideoPlayer() {
     return () => cancelAnimationFrame(rafId);
   }, [current, minimized, fullSlotRef]);
 
+  // هنگام ورود به حالت مینی: پاک کردن inline styleهای حالت کامل
+  // تا کلاس‌های مینی‌پلیر (bottom/right/width) بدون مانع اعمال شوند
+  useEffect(() => {
+    if (minimized && containerRef.current) {
+      const c = containerRef.current;
+      c.style.top = "";
+      c.style.left = "";
+      c.style.width = "";
+      c.style.height = "";
+    }
+  }, [minimized]);
+
   // توقف پخش هنگام ناوبری در حالت کامل (صفحه جدید slot ندارد)
   useEffect(() => {
     if (!minimized && current && !fullSlotRef.current) {
@@ -107,7 +119,7 @@ export default function GlobalVideoPlayer() {
           <button
             onClick={minimize}
             title="کوچک کردن پلیر"
-            className="absolute bottom-3 left-3 z-10 flex items-center gap-1 rounded-full bg-black/70 px-3 py-1.5 text-xs font-bold text-white backdrop-blur transition hover:bg-[#0e7c7b]"
+            className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/85 px-3.5 py-2 text-xs font-bold text-white shadow-lg backdrop-blur transition hover:bg-[#0e7c7b]"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M8 3v3a2 2 0 0 1-2 2H3" />
