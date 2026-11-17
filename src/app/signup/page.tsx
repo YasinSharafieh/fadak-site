@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import CityField from "@/components/CityField";
 import ThemeImage from "@/components/ThemeImage";
 
 function safeNext() {
@@ -152,13 +153,11 @@ export default function SignupPage() {
                 required
               />
               <label className="block text-sm font-bold text-white" htmlFor="city">شهر</label>
-              <input
+              <CityField
                 id="city"
-                autoComplete="address-level2"
                 value={city}
-                onChange={(e) => setCity(e.target.value)}
+                onChange={setCity}
                 className="w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-white"
-                required
               />
               <label className="block text-sm font-bold text-white" htmlFor="username">نام کاربری</label>
               <input

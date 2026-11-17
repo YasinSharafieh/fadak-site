@@ -5,9 +5,11 @@ import { BOX_COOKIE, decodeBox } from "@/lib/engage-box";
 import {
   ADMIN_COOKIE,
   IDENTITY_COOKIE,
+  PROFILE_COOKIE,
   SESSION_COOKIE,
   adminCookieOptions,
   decodeIdentity,
+  decodeSavedProfile,
   encodeIdentity,
   identityCookieOptions,
   identityFresh,
@@ -21,6 +23,7 @@ function clearAuth(res: NextResponse) {
   res.cookies.set(SESSION_COOKIE, "", dead);
   res.cookies.set(ADMIN_COOKIE, "", dead);
   res.cookies.set(BOX_COOKIE, "", dead);
+  res.cookies.set(PROFILE_COOKIE, "", dead);
 }
 
 export async function GET() {
@@ -62,13 +65,14 @@ export async function GET() {
     }
   }
   const role: Identity["role"] = stored?.role === "admin" || identity?.role === "admin" ? "admin" : "user";
+  const stamped = decodeSavedProfile(jar.get(PROFILE_COOKIE)?.value);
   const res = NextResponse.json({
     user: {
       id: stored?.id || "",
       phone: stored?.phone || "",
-      name: stored?.name || "",
-      family: stored?.family || "",
-      city: stored?.city || "",
+      name: stored?.name || stamped?.name || "",
+      family: stored?.family || stamped?.family || "",
+      city: stored?.city || stamped?.city || "",
       username,
       role,
     },

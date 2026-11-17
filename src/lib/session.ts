@@ -3,6 +3,9 @@ import { cookies } from "next/headers";
 export const SESSION_COOKIE = "fadak_session";
 export const ADMIN_COOKIE = "fadak_admin";
 export const IDENTITY_COOKIE = "fadak_identity";
+export const PROFILE_COOKIE = "fadak_profile";
+
+export type SavedProfile = { name: string; family: string; city: string };
 export const IDLE_SECONDS = 7 * 24 * 60 * 60;
 export const IDLE_MS = IDLE_SECONDS * 1000;
 
@@ -51,6 +54,21 @@ export function decodeIdentity(raw: string | undefined): Identity | null {
 
 export function identityFresh(value: Identity, now = Date.now()) {
   return now - value.seen < IDLE_MS;
+}
+
+export function encodeSavedProfile(value: SavedProfile) {
+  return Buffer.from(JSON.stringify(value)).toString("base64url");
+}
+
+export function decodeSavedProfile(raw: string | undefined): SavedProfile | null {
+  if (!raw) return null;
+  try {
+    const data = JSON.parse(Buffer.from(raw, "base64url").toString("utf8")) as Partial<SavedProfile>;
+    if (!data.name || !data.family || !data.city) return null;
+    return { name: String(data.name).slice(0, 80), family: String(data.family).slice(0, 80), city: String(data.city).slice(0, 80) };
+  } catch {
+    return null;
+  }
 }
 
 export function adminCookieOptions() {

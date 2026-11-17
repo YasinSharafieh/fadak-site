@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import CityField from "@/components/CityField";
 import { rememberEngage } from "@/components/EngageBar";
 import { displayIranMobile } from "@/lib/phone";
 
@@ -38,7 +39,14 @@ export default function AccountPage() {
       const res = await fetch("/api/account/favorites", { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
-        if (data.user?.id) applyUser(data.user);
+        if (data.user?.id) {
+          applyUser({
+            ...data.user,
+            name: data.user.name || who.user.name || "",
+            family: data.user.family || who.user.family || "",
+            city: data.user.city || who.user.city || "",
+          });
+        }
         setItems(data.items || []);
       }
       setLoading(false);
@@ -135,7 +143,7 @@ export default function AccountPage() {
             </label>
             <label className="block text-sm sm:col-span-2">
               شهر
-              <input value={city} onChange={(e) => setCity(e.target.value)} className="mt-1 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5" required />
+              <CityField id="account-city" value={city} onChange={setCity} className="mt-1 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5" />
             </label>
             <div className="sm:col-span-2">
               <button disabled={saving} className="btn-green rounded-full px-6 py-2.5 text-sm">{saving ? "در حال ذخیره..." : "ذخیره اطلاعات"}</button>
