@@ -1,16 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --fadak-green: #0b3d2e;
-  --fadak-green-dark: #072a1f;
-  --fadak-teal: #0e7c7b;
+  --fadak-black: #0a0a0a;
+  --fadak-dark: #111111;
+  --fadak-card: #1a1a1a;
+  --fadak-red: #dc2626;
+  --fadak-red-light: #ef4444;
   --fadak-gold: #c9a227;
-  --fadak-gold-light: #e8c766;
-  --fadak-cream: #f7f3e8;
-  --fadak-ivory: #fdfbf5;
-  --fadak-brown: #3d2b1f;
-  --fadak-charcoal: #2a2a2a;
-  --fadak-copper: #b87333;
+  --fadak-cream: #f5f5f5;
 }
 
 @theme inline {
@@ -22,38 +19,34 @@ html {
 }
 
 body {
-  background-color: var(--fadak-cream);
-  color: #1a2e28;
+  background-color: var(--fadak-black);
+  color: #f5f5f5;
   font-family: var(--font-vazirmatn), system-ui, sans-serif;
 }
 
-/* الگوی کاشی‌کاری اسلامی */
-.islamic-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23C9A227' stroke-opacity='0.12'%3E%3Cpath d='M30 0l7 23 23 7-23 7-7 23-7-23-23-7 23-7z'/%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/svg%3E");
-}
-
+/* الگوی اسلامی تیره */
 .islamic-pattern-dark {
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23F7F3E8' stroke-opacity='0.08'%3E%3Cpath d='M30 0l7 23 23 7-23 7-7 23-7-23-23-7 23-7z'/%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.05'%3E%3Cpath d='M30 0l7 23 23 7-23 7-7 23-7-23-23-7 23-7z'/%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/svg%3E");
 }
 
-.islamic-pattern-subtle {
-  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%230B3D2E' stroke-opacity='0.05'%3E%3Cpath d='M40 0l10 30 30 10-30 10-10 30-10-30-30-10 30-10z'/%3E%3C/g%3E%3C/svg%3E");
+.islamic-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23dc2626' stroke-opacity='0.08'%3E%3Cpath d='M30 0l7 23 23 7-23 7-7 23-7-23-23-7 23-7z'/%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 .gold-frame {
-  border: 1px solid rgba(201, 162, 39, 0.45);
-  box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.05);
 }
 
 .paper-texture {
-  background-image: radial-gradient(rgba(61, 43, 31, 0.04) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 22px 22px;
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* انیمیشن‌های نرم */
+/* انیمیشن‌ها */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -64,28 +57,14 @@ body {
   to { opacity: 1; }
 }
 
-@keyframes pulse-gold {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(201, 162, 39, 0); }
-}
+.animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
+.animate-fade-in { animation: fadeIn 0.4s ease-out; }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.4s ease-out;
-}
-
-.animate-pulse-gold {
-  animation: pulse-gold 2s infinite;
-}
-
-/* کارت‌های شیشه‌ای */
+/* کارت شیشه‌ای تیره */
 .glass-card {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* تایپوگرافی اشعار */
@@ -95,7 +74,7 @@ body {
   letter-spacing: 0.01em;
 }
 
-/* ریلز تمام‌صفحه */
+/* ریلز */
 .reels-container {
   scroll-snap-type: y mandatory;
   height: 100vh;
@@ -107,42 +86,38 @@ body {
   height: 100vh;
 }
 
-/* پخش‌کننده صوتی */
-.audio-progress {
-  background: linear-gradient(to left, #c9a227 var(--progress, 0%), rgba(255,255,255,0.2) var(--progress, 0%));
-}
-
-/* دکمه‌های اصلی */
-.btn-gold {
-  background: linear-gradient(135deg, #c9a227 0%, #e8c766 100%);
-  color: #0b3d2e;
+/* دکمه‌ها */
+.btn-red {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  color: white;
   font-weight: 700;
   transition: all 0.3s ease;
 }
 
-.btn-gold:hover {
+.btn-red:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(201, 162, 39, 0.4);
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
 }
 
-.btn-green {
-  background: linear-gradient(135deg, #0b3d2e 0%, #0e7c7b 100%);
-  color: #f7f3e8;
+.btn-dark {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  color: white;
   font-weight: 700;
   transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
-.btn-green:hover {
+.btn-dark:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(11, 61, 46, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
 }
 
-/* هاور کارت‌ها */
+/* هاور کارت */
 .card-hover {
   transition: all 0.3s ease;
 }
 
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
 }

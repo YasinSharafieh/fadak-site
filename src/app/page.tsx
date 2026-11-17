@@ -45,62 +45,63 @@ export default function Home() {
 
   return (
     <div>
-      {/* بنر اطلاعیه — عین نوریه */}
-      <section className="bg-[#0B3D2E]">
-        <div className="mx-auto max-w-7xl px-4 py-10 text-center text-[#F7F3E8]">
-          <span className="text-sm text-[#C9A227]">اطلاعیه</span>
-          <h1 className="mt-2 text-3xl font-extrabold md:text-4xl">مجلس روضه هفتگی</h1>
-          <p className="mt-2 text-white/80">سه‌شنبه ۲۱ آبان ۱۴۰۵ — حسینیه سیدالشهدا (ع)</p>
-          <Link href="/archive" className="mt-5 inline-block rounded-full bg-[#C9A227] px-8 py-3 font-bold text-[#0B3D2E] hover:bg-[#e8c766] transition">
+      {/* بنر اطلاعیه */}
+      <section className="relative bg-black">
+        <div className="islamic-pattern-dark absolute inset-0" />
+        <div className="relative mx-auto max-w-7xl px-4 py-16 text-center text-white">
+          <span className="text-sm font-medium text-[#ef4444]">اطلاعیه</span>
+          <h1 className="mt-3 text-3xl font-extrabold md:text-5xl">مجلس روضه هفتگی</h1>
+          <p className="mt-3 text-white/70">سه‌شنبه ۲۱ آبان ۱۴۰۵ — حسینیه سیدالشهدا (ع)</p>
+          <Link href="/archive" className="btn-red mt-6 inline-block rounded-full px-8 py-3">
             آرشیو مراسمات
           </Link>
         </div>
       </section>
 
-      {/* آخرین مراسم‌ها — عین نوریه */}
+      {/* آخرین مراسم‌ها */}
       <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-2xl font-extrabold text-[#0B3D2E]">آخرین مراسم‌ها</h2>
-            <p className="mt-1 text-sm text-[#3D2B1F]/70">جدیدترین مراسم‌های ثبت‌شده در آرشیو فدک را مشاهده و دنبال کنید.</p>
+            <h2 className="text-2xl font-extrabold text-white">آخرین مراسم‌ها</h2>
+            <p className="mt-1 text-sm text-white/60">جدیدترین مراسم‌های ثبت‌شده در آرشیو فدک را مشاهده و دنبال کنید.</p>
           </div>
-          <Link href="/archive" className="shrink-0 text-sm text-[#0E7C7B] hover:underline">همه مراسم‌ها</Link>
+          <Link href="/archive" className="shrink-0 text-sm text-[#ef4444] hover:underline">همه مراسم‌ها</Link>
         </div>
 
         <div className="mt-5 flex gap-4 overflow-x-auto pb-3 no-scrollbar">
           {loading ? (
-            <p className="text-sm text-[#3D2B1F]/60">در حال بارگذاری...</p>
+            <p className="text-sm text-white/50">در حال بارگذاری...</p>
           ) : events.map((e) => (
-            <Link key={e.id} href={`/archive/${e.slug}`} className="group w-80 shrink-0 overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-md transition">
-              <div className="relative h-48 bg-gradient-to-br from-[#0B3D2E] to-[#0E7C7B]">
+            <Link key={e.id} href={`/archive/${e.slug}`} className="group w-80 shrink-0 overflow-hidden rounded-2xl bg-[#1a1a1a] hover:bg-[#222222] transition">
+              <div className="relative h-48 bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a]">
                 <div className="islamic-pattern-dark absolute inset-0" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-6xl text-white/90">🕌</span>
+                  <span className="text-6xl text-white/20">🕌</span>
                 </div>
-                <div className="absolute bottom-3 right-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#C9A227] text-xl font-extrabold text-[#0B3D2E] shadow-lg">ف</div>
+                <div className="absolute bottom-3 right-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#dc2626] text-xl font-extrabold text-white shadow-lg">ف</div>
               </div>
               <div className="p-4">
-                {e.date_hijri && <p className="text-xs text-[#0E7C7B]">{e.date_hijri}</p>}
-                <h3 className="mt-1 font-bold leading-6 group-hover:text-[#0E7C7B] transition">{e.title}</h3>
-                {e.maddah && <p className="mt-2 text-xs leading-5 text-[#3D2B1F]/70">{e.maddah}</p>}
-                <p className="mt-2 text-xs text-[#3D2B1F]/60">{e.date_fa}</p>
+                {e.date_hijri && <p className="text-xs text-[#ef4444]">{e.date_hijri}</p>}
+                <h3 className="mt-1 font-bold leading-6 group-hover:text-[#ef4444] transition">{e.title}</h3>
+                {e.maddah && <p className="mt-2 text-xs leading-5 text-white/60">{e.maddah}</p>}
+                <p className="mt-2 text-xs text-white/50">{e.date_fa}</p>
               </div>
             </Link>
           ))}
         </div>
-        <p className="mt-1 text-xs text-[#3D2B1F]/50">برای مشاهده بیشتر بکشید ←</p>
+        <p className="mt-1 text-xs text-white/40">برای مشاهده بیشتر بکشید ←</p>
       </section>
 
-      {/* جدیدترین نماهنگ‌ها — عین نوریه */}
-      <section className="bg-white py-10">
+      {/* جدیدترین نماهنگ‌ها */}
+      <section className="bg-[#111111] py-10">
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs text-[#0E7C7B]">ویدئو</span>
-              <h2 className="mt-1 text-2xl font-extrabold text-[#0B3D2E]">جدیدترین نماهنگ‌ها</h2>
-              <p className="mt-1 text-sm text-[#3D2B1F]/70">جدیدترین نماهنگ‌ها و کلیپ‌های منتشرشده از مراسمات هیئت.</p>
+              <span className="text-xs text-[#ef4444]">ویدئو</span>
+              <h2 className="mt-1 text-2xl font-extrabold text-white">جدیدترین نماهنگ‌ها</h2>
+              <p className="mt-1 text-sm text-white/60">جدیدترین نماهنگ‌ها و کلیپ‌های منتشرشده از مراسمات هیئت.</p>
             </div>
-            <Link href="/videos" className="shrink-0 text-sm text-[#0E7C7B] hover:underline">همه نماهنگ‌ها</Link>
+            <Link href="/videos" className="shrink-0 text-sm text-[#ef4444] hover:underline">همه نماهنگ‌ها</Link>
           </div>
 
           <div className="mt-5 flex gap-4 overflow-x-auto pb-3 no-scrollbar">
@@ -110,39 +111,39 @@ export default function Home() {
                 href={`https://www.aparat.com/v/${v.aparat_id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group w-72 shrink-0 overflow-hidden rounded-2xl bg-[#F7F3E8] hover:shadow-md transition"
+                className="group w-72 shrink-0 overflow-hidden rounded-2xl bg-[#1a1a1a] hover:bg-[#222222] transition"
               >
                 <div className="relative aspect-video bg-black">
                   {v.thumbnail ? (
                     <img src={v.thumbnail} alt={v.title} className="h-full w-full object-cover" />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0B3D2E] to-[#0E7C7B] text-4xl text-white/50">🎬</div>
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] text-4xl text-white/20">🎬</div>
                   )}
                   {v.duration && (
-                    <span className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">{v.duration}</span>
+                    <span className="absolute bottom-2 left-2 rounded bg-black/80 px-2 py-1 text-xs text-white">{v.duration}</span>
                   )}
-                  <span className="absolute top-2 right-2 rounded bg-[#C9A227] px-2 py-1 text-[10px] font-bold text-[#0B3D2E]">نماهنگ</span>
+                  <span className="absolute top-2 right-2 rounded bg-[#dc2626] px-2 py-1 text-[10px] font-bold text-white">نماهنگ</span>
                 </div>
                 <div className="p-3">
                   <h3 className="text-sm font-bold leading-5">{v.title}</h3>
-                  <p className="mt-1 text-xs text-[#3D2B1F]/60">کربلایی حسین طاهری</p>
+                  <p className="mt-1 text-xs text-white/50">کربلایی حسین طاهری</p>
                 </div>
               </a>
             ))}
           </div>
-          <p className="mt-1 text-xs text-[#3D2B1F]/50">برای مشاهده ویدئوهای بیشتر بکشید ←</p>
+          <p className="mt-1 text-xs text-white/40">برای مشاهده ویدئوهای بیشتر بکشید ←</p>
         </div>
       </section>
 
-      {/* مجموعه‌ها — عین نوریه */}
+      {/* مجموعه‌ها */}
       <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="flex items-start justify-between">
           <div>
-            <span className="text-xs text-[#0E7C7B]">آرشیو</span>
-            <h2 className="mt-1 text-2xl font-extrabold text-[#0B3D2E]">مجموعه‌ها</h2>
-            <p className="mt-1 text-sm text-[#3D2B1F]/70">دسترسی سریع به آرشیو مناسبت‌های مختلف هیئت</p>
+            <span className="text-xs text-[#ef4444]">آرشیو</span>
+            <h2 className="mt-1 text-2xl font-extrabold text-white">مجموعه‌ها</h2>
+            <p className="mt-1 text-sm text-white/60">دسترسی سریع به آرشیو مناسبت‌های مختلف هیئت</p>
           </div>
-          <Link href="/collections" className="shrink-0 text-sm text-[#0E7C7B] hover:underline">همه مجموعه‌ها</Link>
+          <Link href="/collections" className="shrink-0 text-sm text-[#ef4444] hover:underline">همه مجموعه‌ها</Link>
         </div>
 
         <div className="mt-5 flex flex-wrap gap-3">
@@ -150,7 +151,7 @@ export default function Home() {
             <Link
               key={col.slug}
               href={`/collections/${col.slug}`}
-              className="rounded-full bg-[#0B3D2E] px-6 py-3 font-bold text-white hover:bg-[#0E7C7B] transition"
+              className="rounded-full bg-[#1a1a1a] px-6 py-3 font-bold text-white hover:bg-[#dc2626] transition"
             >
               {col.name}
             </Link>
@@ -158,16 +159,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* محبوب‌ترین ویدئوها — عین نوریه */}
-      <section className="bg-white py-10">
+      {/* محبوب‌ترین ویدئوها */}
+      <section className="bg-[#111111] py-10">
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs text-[#0E7C7B]">ویدئوهای برگزیده</span>
-              <h2 className="mt-1 text-2xl font-extrabold text-[#0B3D2E]">محبوب‌ترین ویدئوها</h2>
-              <p className="mt-1 text-sm text-[#3D2B1F]/70">ویدئوهای منتخب کانال فدک در آپارات.</p>
+              <span className="text-xs text-[#ef4444]">ویدئوهای برگزیده</span>
+              <h2 className="mt-1 text-2xl font-extrabold text-white">محبوب‌ترین ویدئوها</h2>
+              <p className="mt-1 text-sm text-white/60">ویدئوهای منتخب کانال فدک در آپارات.</p>
             </div>
-            <Link href="/videos" className="shrink-0 text-sm text-[#0E7C7B] hover:underline">همه ویدئوها</Link>
+            <Link href="/videos" className="shrink-0 text-sm text-[#ef4444] hover:underline">همه ویدئوها</Link>
           </div>
 
           <div className="mt-5 flex gap-4 overflow-x-auto pb-3 no-scrollbar">
@@ -177,18 +178,18 @@ export default function Home() {
                 href={`https://www.aparat.com/v/${v.aparat_id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group w-72 shrink-0 overflow-hidden rounded-2xl bg-[#F7F3E8] hover:shadow-md transition"
+                className="group w-72 shrink-0 overflow-hidden rounded-2xl bg-[#1a1a1a] hover:bg-[#222222] transition"
               >
                 <div className="relative aspect-video bg-black">
                   {v.thumbnail ? (
                     <img src={v.thumbnail} alt={v.title} className="h-full w-full object-cover" />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0B3D2E] to-[#0E7C7B] text-4xl text-white/50">🎬</div>
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] text-4xl text-white/20">🎬</div>
                   )}
                   {v.duration && (
-                    <span className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">{v.duration}</span>
+                    <span className="absolute bottom-2 left-2 rounded bg-black/80 px-2 py-1 text-xs text-white">{v.duration}</span>
                   )}
-                  <span className="absolute top-2 right-2 rounded bg-black/70 px-2 py-1 text-[10px] text-white">آپارات</span>
+                  <span className="absolute top-2 right-2 rounded bg-black/80 px-2 py-1 text-[10px] text-white">آپارات</span>
                 </div>
                 <div className="p-3">
                   <h3 className="text-sm font-bold leading-5">{v.title}</h3>
@@ -196,54 +197,54 @@ export default function Home() {
               </a>
             ))}
           </div>
-          <p className="mt-1 text-xs text-[#3D2B1F]/50">برای مشاهده ویدئوهای بیشتر بکشید ←</p>
+          <p className="mt-1 text-xs text-white/40">برای مشاهده ویدئوهای بیشتر بکشید ←</p>
         </div>
       </section>
 
-      {/* حمایت — عین نوریه */}
+      {/* حمایت */}
       <section className="mx-auto max-w-7xl px-4 py-10">
-        <div className="rounded-3xl bg-[#0B3D2E] p-8 md:p-10 text-center text-white">
-          <p className="text-sm text-[#C9A227]">یک قدم برای ساختن یک خانه ماندگار</p>
+        <div className="rounded-3xl bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] p-8 md:p-10 text-center text-white border border-white/10">
+          <p className="text-sm text-[#ef4444]">یک قدم برای ساختن یک خانه ماندگار</p>
           <h2 className="mt-2 text-2xl font-extrabold md:text-3xl">با هم، آینده حسینیه را بسازیم</h2>
-          <p className="mx-auto mt-3 max-w-2xl leading-7 text-white/80">
+          <p className="mx-auto mt-3 max-w-2xl leading-7 text-white/70">
             ساخت حسینیه با همراهی دل‌های مهربان شکل می‌گیرد. چه با کمک در مسیر ساخت‌وساز و چه با اهدای نذورات، سهم شما می‌تواند بخشی از این بنای ماندگار باشد.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link href="/donate" className="rounded-full bg-[#C9A227] px-6 py-3 font-bold text-[#0B3D2E] hover:bg-[#e8c766] transition">مشارکت در ساخت</Link>
-            <Link href="/donate" className="rounded-full border border-white/30 px-6 py-3 hover:bg-white/10 transition">اهدای نذورات</Link>
+            <Link href="/donate" className="btn-red rounded-full px-6 py-3">مشارکت در ساخت</Link>
+            <Link href="/donate" className="rounded-full border border-white/20 px-6 py-3 hover:bg-white/10 transition">اهدای نذورات</Link>
           </div>
           <div className="mt-8 grid gap-3 sm:grid-cols-3 text-sm">
-            <div className="rounded-2xl bg-white/10 p-4">این بنا، با همراهی شما ساخته می‌شود</div>
-            <div className="rounded-2xl bg-white/10 p-4">مشارکت به اندازه توان شما</div>
-            <div className="rounded-2xl bg-white/10 p-4">همراهی در یک کار ماندگار</div>
+            <div className="rounded-2xl bg-white/5 p-4">این بنا، با همراهی شما ساخته می‌شود</div>
+            <div className="rounded-2xl bg-white/5 p-4">مشارکت به اندازه توان شما</div>
+            <div className="rounded-2xl bg-white/5 p-4">همراهی در یک کار ماندگار</div>
           </div>
         </div>
       </section>
 
-      {/* موقعیت — عین نوریه */}
+      {/* موقعیت */}
       <section className="mx-auto max-w-7xl px-4 pb-10">
         <div className="grid gap-6 md:grid-cols-2">
-          <div className="rounded-3xl bg-white p-8 shadow-sm">
-            <span className="text-xs text-[#0E7C7B]">موقعیت حسینیه</span>
-            <h2 className="mt-2 text-2xl font-extrabold text-[#0B3D2E]">حسینیه سیدالشهدا (ع)</h2>
-            <p className="mt-3 leading-7 text-[#3D2B1F]/80">
+          <div className="rounded-3xl bg-[#1a1a1a] p-8 border border-white/10">
+            <span className="text-xs text-[#ef4444]">موقعیت حسینیه</span>
+            <h2 className="mt-2 text-2xl font-extrabold text-white">حسینیه سیدالشهدا (ع)</h2>
+            <p className="mt-3 leading-7 text-white/70">
               برای حضور در مراسم‌ها و برنامه‌های حسینیه، می‌توانید موقعیت مجموعه را روی نقشه مشاهده کنید.
             </p>
             <div className="mt-4">
               <p className="text-sm font-bold">آدرس</p>
-              <p className="mt-1 text-sm leading-6 text-[#3D2B1F]/70">
+              <p className="mt-1 text-sm leading-6 text-white/60">
                 تهران، میدان هفتم تیر، خیابان مفتح جنوبی، خیابان ورزنده (جنب ورزشگاه شهید شیرودی)، خیابان ملک الشعراء بهار
               </p>
             </div>
-            <a href="https://www.openstreetmap.org/?mlat=35.725616&mlon=51.445673#map=16/35.725616/51.445673" target="_blank" rel="noopener noreferrer" className="mt-5 inline-block rounded-full bg-[#0B3D2E] px-6 py-3 font-bold text-white hover:bg-[#0E7C7B] transition">
+            <a href="https://www.openstreetmap.org/?mlat=35.725616&mlon=51.445673#map=16/35.725616/51.445673" target="_blank" rel="noopener noreferrer" className="btn-red mt-5 inline-block rounded-full px-6 py-3">
               مسیریابی
             </a>
           </div>
-          <div className="islamic-pattern flex items-center justify-center rounded-3xl bg-gradient-to-br from-[#0B3D2E] to-[#0E7C7B] p-8 text-center text-white">
+          <div className="islamic-pattern flex items-center justify-center rounded-3xl bg-gradient-to-br from-[#1a1a1a] to-[#2a2a2a] p-8 text-center text-white border border-white/10">
             <div>
               <div className="text-6xl">🕌</div>
               <h3 className="mt-3 text-xl font-extrabold">حسینیه سیدالشهدا (ع)</h3>
-              <p className="mt-2 text-sm text-white/70">مراسم‌های روضه هفتگی هر سه‌شنبه برگزار می‌شود</p>
+              <p className="mt-2 text-sm text-white/60">مراسم‌های روضه هفتگی هر سه‌شنبه برگزار می‌شود</p>
             </div>
           </div>
         </div>
