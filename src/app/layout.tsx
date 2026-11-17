@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { VideoPlayerProvider } from "@/context/VideoPlayerContext";
 import GlobalVideoPlayer from "@/components/GlobalVideoPlayer";
 import ScrollToTop from "@/components/ScrollToTop";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const vazirmatn = Vazirmatn({
   subsets: ["arabic"],
@@ -28,14 +29,23 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fa" dir="rtl" className={vazirmatn.variable}>
+    <html lang="fa" dir="rtl" data-theme="dark" className={vazirmatn.variable}>
       <body className="min-h-screen bg-[#0a0a0a] font-sans text-white antialiased pb-20">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "try{localStorage.removeItem('fadak-theme');document.documentElement.setAttribute('data-theme','dark')}catch(e){}",
+          }}
+        />
         <VideoPlayerProvider>
-          <ScrollToTop />
-          <Header />
-          <main>{children}</main>
-          <Footer />
-          <GlobalVideoPlayer />
+          <ThemeProvider>
+            <ScrollToTop />
+            <div className="site-shell">
+              <Header />
+              <main>{children}</main>
+              <Footer />
+            </div>
+            <GlobalVideoPlayer />
+          </ThemeProvider>
         </VideoPlayerProvider>
       </body>
     </html>

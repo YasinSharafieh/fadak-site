@@ -193,3 +193,83 @@ input:focus, select:focus, textarea:focus {
   border-color: #0e7c7b !important;
   box-shadow: 0 0 0 3px rgba(14, 124, 123, 0.2);
 }
+
+/* تم روز فقط وقتی data-theme=light است. حالت پیش‌فرض شب دست نمی‌خورد. */
+html { color-scheme: dark; }
+html[data-theme="light"] { color-scheme: light; }
+
+html[data-theme="light"] body {
+  background-color: #f4f0e8 !important;
+  color: #1c1915 !important;
+}
+
+html[data-theme="light"] .site-shell .bg-black,
+html[data-theme="light"] .site-shell .bg-\[\#0a0a0a\] {
+  background-color: #f4f0e8 !important;
+}
+html[data-theme="light"] .site-shell .bg-black\/95 {
+  background-color: rgba(255, 253, 249, 0.94) !important;
+}
+html[data-theme="light"] .site-shell .bg-\[\#111111\],
+html[data-theme="light"] .site-shell .bg-\[\#111\] {
+  background-color: #efeae2 !important;
+}
+html[data-theme="light"] .site-shell .bg-\[\#1a1a1a\] {
+  background-color: #fffdf9 !important;
+}
+html[data-theme="light"] .site-shell .bg-white\/10 {
+  background-color: rgba(28, 25, 21, 0.06) !important;
+}
+html[data-theme="light"] .site-shell .border-white\/5,
+html[data-theme="light"] .site-shell .border-white\/10,
+html[data-theme="light"] .site-shell .border-white\/15,
+html[data-theme="light"] .site-shell .border-white\/20 {
+  border-color: rgba(28, 25, 21, 0.12) !important;
+}
+html[data-theme="light"] .site-shell .text-white { color: #1c1915 !important; }
+html[data-theme="light"] .site-shell .text-white\/90,
+html[data-theme="light"] .site-shell .text-white\/80 { color: rgba(28, 25, 21, 0.82) !important; }
+html[data-theme="light"] .site-shell .text-white\/70,
+html[data-theme="light"] .site-shell .text-white\/60 { color: rgba(28, 25, 21, 0.68) !important; }
+html[data-theme="light"] .site-shell .text-white\/50,
+html[data-theme="light"] .site-shell .text-white\/40 { color: rgba(28, 25, 21, 0.52) !important; }
+
+html[data-theme="light"] .site-shell input,
+html[data-theme="light"] .site-shell textarea,
+html[data-theme="light"] .site-shell select {
+  background-color: #fff !important;
+  color: #1c1915 !important;
+  border-color: rgba(28, 25, 21, 0.16) !important;
+}
+html[data-theme="light"] .site-shell input::placeholder,
+html[data-theme="light"] .site-shell textarea::placeholder {
+  color: rgba(28, 25, 21, 0.45) !important;
+}
+
+/* بلوک‌های تیرهٔ عمدی: دایره تاریخ، بنر کمک، کارت مجموعه، دکمه‌ها و نشانه‌های روی عکس */
+html[data-theme="light"] .site-shell .keep-contrast,
+html[data-theme="light"] .site-shell .keep-contrast.text-white,
+html[data-theme="light"] .site-shell .keep-contrast .text-white,
+html[data-theme="light"] .site-shell .keep-contrast .text-white\/80,
+html[data-theme="light"] .site-shell .keep-contrast .text-white\/70,
+html[data-theme="light"] .site-shell .keep-contrast .text-white\/60,
+html[data-theme="light"] .site-shell .bg-\[\#0e7c7b\].text-white,
+html[data-theme="light"] .site-shell .bg-\[\#0e7c7b\] .text-white,
+html[data-theme="light"] .site-shell .bg-\[\#0b3d2e\].text-white,
+html[data-theme="light"] .site-shell .bg-\[\#0b3d2e\] .text-white,
+html[data-theme="light"] .site-shell .bg-black\/80.text-white,
+html[data-theme="light"] .site-shell .bg-black\/80 .text-white,
+html[data-theme="light"] .site-shell .btn-green,
+html[data-theme="light"] .site-shell .btn-dark {
+  color: #fff !important;
+}
+html[data-theme="light"] .site-shell .keep-contrast .bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+html[data-theme="light"] .site-shell .keep-contrast .border-white\/30,
+html[data-theme="light"] .site-shell .keep-contrast.border-\[\#c9a227\]\/40 {
+  border-color: rgba(201, 162, 39, 0.45) !important;
+}
+html[data-theme="light"] .site-shell .keep-contrast .border-white\/30 {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}

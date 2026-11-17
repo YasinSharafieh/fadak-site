@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { fadakMapUrl } from "@/data/mock";
+import ThemeImage from "@/components/ThemeImage";
 
 export default function Footer() {
   return (
@@ -7,9 +8,9 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="grid gap-8 md:grid-cols-4">
           <div>
-            <img src="/brand/fadak-wordmark.png" alt="فدک" className="h-16 w-auto max-w-full object-contain" />
+            <ThemeImage darkSrc="/brand/fadak-wordmark.png" lightSrc="/brand/fadak-wordmark-ink.png" alt="فدک" className="h-16 w-auto max-w-full object-contain" />
             <p className="mt-3 text-xs text-white/60">حفظ و نشر آثار کربلایی حسین طاهری</p>
-            <img src="/brand/heyat-mark.png" alt="هیئت فدائیان حضرت زهرا (س)" className="mt-6 h-40 w-auto max-w-[220px] object-contain" />
+            <ThemeImage darkSrc="/brand/heyat-mark.png" lightSrc="/brand/heyat-mark-ink.png" alt="هیئت فدائیان حضرت زهرا (س)" className="mt-6 h-40 w-auto max-w-[220px] object-contain" />
             <p className="mt-4 text-sm leading-6 text-white/70">
               پایگاه حفظ و نشر آثار کربلایی حسین طاهری و هیأت فدائیان حضرت زهرا (س) — آرشیو زنده و مرجع دیجیتال.
             </p>

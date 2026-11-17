@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 type Props = {
   children: ReactNode;
@@ -23,6 +23,12 @@ export default function CarouselRow({ children, className = "" }: Props) {
     const abs = Math.abs(el.scrollLeft);
     setCanPrev(abs > 4);
     setCanNext(abs < max - 4);
+  }, []);
+
+  // با هر بار بالا آمدن صفحه، ردیف از اول لیست شروع می‌شود. موقعیت اسکرول ذخیره نمی‌شود.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (el) el.scrollLeft = 0;
   }, []);
 
   // به‌روزرسانی وضعیت دکمه‌ها هنگام اسکرول/ریسایز/تغییر محتوا

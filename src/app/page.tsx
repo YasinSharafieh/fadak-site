@@ -6,7 +6,10 @@ import { supabase } from "@/lib/supabase";
 import { collections, fadakAddress, fadakMapEmbed, fadakMapUrl } from "@/data/mock";
 import { popularIds, popularViews } from "@/data/popular-videos";
 import CarouselRow from "@/components/CarouselRow";
-import { artistFromTitle, comparePersianDates, formatViews, nextWeeklyMajles, parsePersianDate, toPersianDigits, type NextMajles } from "@/lib/jalali";
+import CeremonyCard from "@/components/CeremonyCard";
+import ThemeImage from "@/components/ThemeImage";
+import { ceremonyCardTitle, coverByEvent, shortPersianDate } from "@/lib/ceremony";
+import { artistFromTitle, comparePersianDates, formatViews, nextWeeklyMajles, toPersianDigits, type NextMajles } from "@/lib/jalali";
 
 type Event = {
   id: string;
@@ -41,6 +44,7 @@ export default function Home() {
   const [events, setEvents] = useState<Event[]>([]);
   const [namahang, setNamahang] = useState<Video[]>([]);
   const [popular, setPopular] = useState<Video[]>([]);
+  const [covers, setCovers] = useState<Record<string, string>>({});
   const [nextMajles, setNextMajles] = useState<NextMajles | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -48,14 +52,17 @@ export default function Home() {
     setNextMajles(nextWeeklyMajles());
     async function load() {
       if (supabase) {
-        const [ev, nm, pop] = await Promise.all([
+        const [ev, nm, pop, ph] = await Promise.all([
           supabase.from("events").select("*").order("created_at", { ascending: false }).limit(8),
+          // ثابت: ۱۰ نماهنگ تازه، مرتب بر اساس تاریخ انتشار. تعداد و ترتیب را کم نکن.
           supabase.from("videos").select("*").ilike("title", "%نماهنگ%").order("created_at", { ascending: false }).limit(10),
           supabase.from("videos").select("*").in("aparat_id", popularIds),
+          supabase.from("photos").select("event_id,url,caption,created_at").order("created_at", { ascending: true }),
         ]);
         const sortedEvents = [...(ev.data || [])].sort((a, b) => comparePersianDates(a.date_fa || "", b.date_fa || ""));
         const sortedPopular = [...(pop.data || [])].sort((a, b) => (popularViews[b.aparat_id] || 0) - (popularViews[a.aparat_id] || 0));
         setEvents(sortedEvents);
+        setCovers(coverByEvent(ph.data || []));
         setNamahang(nm.data || []);
         setPopular(sortedPopular);
       }
@@ -73,8 +80,8 @@ export default function Home() {
         <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-4 py-14 md:grid-cols-[1.4fr_0.8fr] md:py-20">
           <div className="text-center md:text-right">
             <div className="mb-6 flex flex-wrap items-center justify-center gap-4 md:justify-start">
-              <img src="/brand/heyat-mark.png" alt="هیئت فدائیان حضرت زهرا" className="h-28 w-auto object-contain sm:h-36" />
-              <img src="/brand/fadak-wordmark.png" alt="فدک" className="h-14 w-auto max-w-[16rem] object-contain sm:h-16" />
+              <ThemeImage darkSrc="/brand/heyat-mark.png" lightSrc="/brand/heyat-mark-ink.png" alt="هیئت فدائیان حضرت زهرا" className="h-28 w-auto object-contain sm:h-36" />
+              <ThemeImage darkSrc="/brand/fadak-wordmark.png" lightSrc="/brand/fadak-wordmark-ink.png" alt="فدک" className="h-14 w-auto max-w-[16rem] object-contain sm:h-16" />
             </div>
             <span className="text-sm font-medium text-[#c9a227]">اطلاعیه</span>
             <h1 className="mt-3 text-3xl font-extrabold text-white md:text-5xl">مجلس روضه هفتگی</h1>
@@ -85,7 +92,7 @@ export default function Home() {
               <Link href="/archive" className="rounded-full border border-white/20 px-8 py-3 text-white hover:bg-white/10">آرشیو مراسمات</Link>
             </div>
           </div>
-          <div className="mx-auto flex h-52 w-52 flex-col items-center justify-center rounded-full border border-[#c9a227]/40 bg-[#0b3d2e]/80 text-center shadow-2xl md:h-64 md:w-64">
+          <div className="keep-contrast mx-auto flex h-52 w-52 flex-col items-center justify-center rounded-full border border-[#c9a227]/40 bg-[#0b3d2e]/80 text-center text-white shadow-2xl md:h-64 md:w-64">
             <p className="text-sm text-[#c9a227]">{nextMajles?.weekday || "سه‌شنبه"}</p>
             <p className="text-6xl font-extrabold text-white">{nextMajles?.day || "—"}</p>
             <p className="text-sm text-white/70">{nextMajles ? `${nextMajles.month} ${nextMajles.year}` : "هر هفته"}</p>
@@ -105,33 +112,16 @@ export default function Home() {
         <CarouselRow className="mt-5 gap-4">
           {loading ? (
             <p className="text-sm text-white/50">در حال بارگذاری...</p>
-          ) : events.map((e) => {
-            const parsed = parsePersianDate(e.date_fa || "");
-            return (
-              <Link key={e.id} href={`/archive/${e.slug}`} className="card-hover group w-80 shrink-0 overflow-hidden rounded-2xl border border-white/5 bg-[#1a1a1a]">
-                <div className="relative h-48 bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b]">
-                  {e.poster_url ? (
-                    <img src={e.poster_url} alt={e.title} className="h-full w-full object-cover" />
-                  ) : (
-                    <>
-                      <div className="islamic-pattern-dark absolute inset-0" />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                        <span className="text-5xl font-extrabold">{parsed ? toPersianDigits(parsed.d) : "ف"}</span>
-                        <span className="mt-1 text-sm text-white/80">{parsed ? ["", "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"][parsed.m] : ""}</span>
-                      </div>
-                    </>
-                  )}
-                  <img src="/brand/fadak-mark.png" alt="" className="absolute bottom-3 right-3 h-12 w-12 rounded-full object-cover shadow-lg ring-2 ring-[#c9a227]" />
-                </div>
-                <div className="p-4">
-                  {e.date_hijri && <p className="text-xs text-[#14a3a2]">{e.date_hijri}</p>}
-                  <h3 className="mt-1 font-bold leading-6 transition group-hover:text-[#14a3a2]">{e.title.replace(/\u200c/g, " ")}</h3>
-                  {e.maddah && <p className="mt-2 text-xs leading-5 text-white/60">{e.maddah}</p>}
-                  <p className="mt-2 text-xs text-white/50">{e.date_fa}</p>
-                </div>
-              </Link>
-            );
-          })}
+          ) : events.map((e) => (
+              <CeremonyCard
+                key={e.id}
+                href={`/archive/${e.slug}`}
+                title={ceremonyCardTitle(e.title, e.date_fa)}
+                dateLabel={shortPersianDate(e.date_fa)}
+                coverUrl={e.poster_url || covers[e.id]}
+                className="w-[210px] shrink-0 sm:w-[230px]"
+              />
+            ))}
         </CarouselRow>
         <p className="mt-1 text-xs text-white/40">برای مشاهده بیشتر بکشید ←</p>
       </section>
@@ -197,7 +187,7 @@ export default function Home() {
               <Link key={col.slug} href={`/collections/${col.slug}`} className="card-hover group relative h-44 w-56 shrink-0 overflow-hidden rounded-3xl border border-white/10">
                 <div className="absolute inset-0" style={{ background: `linear-gradient(145deg, ${style.from}, ${style.to})` }} />
                 <div className="islamic-pattern-dark absolute inset-0" />
-                <div className="relative flex h-full flex-col justify-between p-5 text-white">
+                <div className="keep-contrast relative flex h-full flex-col justify-between p-5 text-white">
                   <span className="text-3xl font-extrabold text-[#c9a227]">{style.mark}</span>
                   <div>
                     <h3 className="text-xl font-extrabold">{col.name}</h3>
@@ -249,7 +239,7 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-10">
-        <div className="rounded-3xl bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b] p-8 text-center text-white md:p-10">
+        <div className="keep-contrast rounded-3xl bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b] p-8 text-center text-white md:p-10">
           <p className="text-sm text-[#c9a227]">یک قدم برای ساختن یک خانه ماندگار</p>
           <h2 className="mt-2 text-2xl font-extrabold md:text-3xl">با هم، آینده حسینیه را بسازیم</h2>
           <p className="mx-auto mt-3 max-w-2xl leading-7 text-white/80">
