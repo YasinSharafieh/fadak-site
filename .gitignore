@@ -2,3 +2,8 @@ node_modules
 .next
 .env*.local
 .DS_Store
+tools/fadak_import/.env
+tools/fadak_import/session.string
+tools/fadak_import/phone_code_hash.txt
+tools/fadak_import/__pycache__/
+tools/fadak_import/ledger.json
