@@ -1,5 +1,4 @@
 import { createHash, randomBytes, randomInt, scryptSync, timingSafeEqual } from "node:crypto";
-import { canonicalCity } from "@/data/iran-cities";
 import { normalizeIranMobile } from "@/lib/phone";
 import type { EngageBox } from "@/lib/engage-box";
 
@@ -357,10 +356,9 @@ export async function finishSignup(
   const username = normalizeUsername(rawUsername);
   const name = cleanLabel(rawName, 40);
   const family = cleanLabel(rawFamily, 40);
-  const city = canonicalCity(rawCity);
+  const city = "";
   if (!name) return { ok: false as const, error: "نام را وارد کنید." };
   if (!family) return { ok: false as const, error: "نام خانوادگی را وارد کنید." };
-  if (!city) return { ok: false as const, error: "شهر را از فهرست شهرهای ایران انتخاب کنید." };
   if (!username) return { ok: false as const, error: "نام کاربری معتبر نیست." };
   if (password.length < 6 || password.length > 72) return { ok: false as const, error: "رمز عبور باید حداقل ۶ حرف باشد." };
   const pending = await readJson<SignupFile>(`signup/${sha(ticket)}.json`);
@@ -526,9 +524,8 @@ export async function updateProfile(userId: string, input: { name?: string; fami
   if (!profile) return { ok: false as const, error: "ذخیره انجام نشد." };
   const name = cleanLabel(input.name ?? profile.name ?? "", 40);
   const family = cleanLabel(input.family ?? profile.family ?? "", 40);
-  const city = canonicalCity(input.city ?? profile.city ?? "");
+  const city = profile.city || "";
   if (!name || !family) return { ok: false as const, error: "نام و نام خانوادگی را کامل وارد کنید." };
-  if (!city) return { ok: false as const, error: "شهر را از فهرست شهرهای ایران انتخاب کنید." };
   const next = keptProfile(profile, { id: profile.id, name, family, city });
   await writeJson(`profiles/${userId}.json`, next);
   return { ok: true as const, user: publicUser(next) };

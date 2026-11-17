@@ -1,6 +1,5 @@
 import { connection } from "next/server";
 import { NextResponse } from "next/server";
-import { canonicalCity } from "@/data/iran-cities";
 import { cleanLabel, updateProfile } from "@/lib/account-store";
 import { signedInAccount } from "@/lib/current-account";
 import {
@@ -37,14 +36,12 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const name = cleanLabel(String(body.name || ""), 40);
   const family = cleanLabel(String(body.family || ""), 40);
-  const city = canonicalCity(String(body.city || ""));
   if (!name || !family) return NextResponse.json({ ok: false, error: "نام و نام خانوادگی را کامل وارد کنید." }, { status: 400 });
-  if (!city) return NextResponse.json({ ok: false, error: "شهر را از فهرست شهرهای ایران انتخاب کنید." }, { status: 400 });
 
   let stored: Awaited<ReturnType<typeof updateProfile>> | null = null;
   if (user) {
     try {
-      stored = await updateProfile(user.id, { name, family, city });
+      stored = await updateProfile(user.id, { name, family });
     } catch {
       stored = null;
     }
@@ -54,11 +51,11 @@ export async function POST(req: Request) {
     phone: user?.phone || "",
     name,
     family,
-    city,
+    city: user?.city || "",
     username: user?.username || identity?.username || "",
     role: user?.role || identity?.role || "user",
   };
   const res = NextResponse.json({ ok: true, user: saved });
-  res.cookies.set(PROFILE_COOKIE, encodeSavedProfile({ name, family, city }), identityCookieOptions());
+  res.cookies.set(PROFILE_COOKIE, encodeSavedProfile({ name, family, city: user?.city || "" }), identityCookieOptions());
   return res;
 }

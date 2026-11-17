@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import CityField from "@/components/CityField";
 import { rememberEngage } from "@/components/EngageBar";
 import { displayIranMobile } from "@/lib/phone";
 
@@ -22,7 +21,6 @@ export default function AccountPage() {
   const [items, setItems] = useState<Saved[]>([]);
   const [name, setName] = useState("");
   const [family, setFamily] = useState("");
-  const [city, setCity] = useState("");
   const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -58,7 +56,6 @@ export default function AccountPage() {
     setUser(next);
     setName(next.name || "");
     setFamily(next.family || "");
-    setCity(next.city || "");
   }
 
   async function saveProfile(e: React.FormEvent) {
@@ -68,11 +65,11 @@ export default function AccountPage() {
     const res = await fetch("/api/auth/profile", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, family, city }),
+      body: JSON.stringify({ name, family }),
     });
     const data = await res.json().catch(() => ({}));
     setSaving(false);
-    if (!res.ok || !data.user?.name || !data.user?.family || !data.user?.city) {
+    if (!res.ok || !data.user?.name || !data.user?.family) {
       setNotice(data.error || "ذخیره انجام نشد.");
       return;
     }
@@ -102,7 +99,7 @@ export default function AccountPage() {
   if (!user) return null;
 
   const fullName = [user.name, user.family].filter(Boolean).join(" ");
-  const profileReady = Boolean(user.name && user.family && user.city);
+  const profileReady = Boolean(user.name && user.family);
   const videos = items.filter((item) => item.key.startsWith("video:") || item.key.startsWith("reel:"));
   const audios = items.filter((item) => item.key.startsWith("audio:"));
   const rest = items.filter((item) => !videos.includes(item) && !audios.includes(item));
@@ -128,7 +125,6 @@ export default function AccountPage() {
           <dl className="mt-4 grid gap-3 sm:grid-cols-2">
             <Info label="نام" value={user.name} />
             <Info label="نام خانوادگی" value={user.family} />
-            <Info label="شهر" value={user.city} />
             <Info label="نام کاربری" value={user.username} />
           </dl>
         ) : (
@@ -140,10 +136,6 @@ export default function AccountPage() {
             <label className="block text-sm">
               نام خانوادگی
               <input value={family} onChange={(e) => setFamily(e.target.value)} className="mt-1 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5" required />
-            </label>
-            <label className="block text-sm sm:col-span-2">
-              شهر
-              <CityField id="account-city" value={city} onChange={setCity} className="mt-1 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5" />
             </label>
             <div className="sm:col-span-2">
               <button disabled={saving} className="btn-green rounded-full px-6 py-2.5 text-sm">{saving ? "در حال ذخیره..." : "ذخیره اطلاعات"}</button>

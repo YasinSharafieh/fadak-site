@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import CityField from "@/components/CityField";
 import ThemeImage from "@/components/ThemeImage";
 
 function safeNext() {
@@ -17,7 +16,6 @@ export default function SignupPage() {
   const [ticket, setTicket] = useState("");
   const [name, setName] = useState("");
   const [family, setFamily] = useState("");
-  const [city, setCity] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [again, setAgain] = useState("");
@@ -72,7 +70,7 @@ export default function SignupPage() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ticket, name, family, city, username, password }),
+      body: JSON.stringify({ ticket, name, family, username, password }),
     });
     const data = await res.json();
     setLoading(false);
@@ -151,13 +149,6 @@ export default function SignupPage() {
                 onChange={(e) => setFamily(e.target.value)}
                 className="w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-white"
                 required
-              />
-              <label className="block text-sm font-bold text-white" htmlFor="city">شهر</label>
-              <CityField
-                id="city"
-                value={city}
-                onChange={setCity}
-                className="w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-white"
               />
               <label className="block text-sm font-bold text-white" htmlFor="username">نام کاربری</label>
               <input

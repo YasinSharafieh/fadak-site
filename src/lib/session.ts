@@ -64,8 +64,8 @@ export function decodeSavedProfile(raw: string | undefined): SavedProfile | null
   if (!raw) return null;
   try {
     const data = JSON.parse(Buffer.from(raw, "base64url").toString("utf8")) as Partial<SavedProfile>;
-    if (!data.name || !data.family || !data.city) return null;
-    return { name: String(data.name).slice(0, 80), family: String(data.family).slice(0, 80), city: String(data.city).slice(0, 80) };
+    if (!data.name || !data.family) return null;
+    return { name: String(data.name).slice(0, 80), family: String(data.family).slice(0, 80), city: String(data.city || "").slice(0, 80) };
   } catch {
     return null;
   }
