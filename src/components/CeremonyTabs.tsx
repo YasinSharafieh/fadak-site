@@ -70,7 +70,7 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
                 <div key={v.id} className="overflow-hidden rounded-3xl bg-[#1a1a1a] shadow">
                   <div className="relative aspect-video w-full bg-black">
                     {playingId === v.id && v.aparat_id ? (
-                      <VideoPlayer aparatId={v.aparat_id} title={v.title} thumbnail={v.thumbnail} />
+                      <VideoPlayer aparatId={v.aparat_id} title={v.title} thumbnail={v.thumbnail} videoId={v.id} />
                     ) : (
                       <button onClick={() => setPlayingId(v.id)} className="absolute inset-0 block w-full">
                         {v.thumbnail ? (

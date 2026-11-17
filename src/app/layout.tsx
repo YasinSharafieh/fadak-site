@@ -3,6 +3,8 @@ import { Vazirmatn } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { VideoPlayerProvider } from "@/context/VideoPlayerContext";
+import GlobalVideoPlayer from "@/components/GlobalVideoPlayer";
 
 const vazirmatn = Vazirmatn({
   subsets: ["arabic"],
@@ -27,9 +29,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fa" dir="rtl" className={vazirmatn.variable}>
       <body className="min-h-screen bg-[#0a0a0a] font-sans text-white antialiased pb-20">
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <VideoPlayerProvider>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+          <GlobalVideoPlayer />
+        </VideoPlayerProvider>
       </body>
     </html>
   );

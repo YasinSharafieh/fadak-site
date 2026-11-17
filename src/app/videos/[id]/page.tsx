@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import VideoPlayer from "@/components/VideoPlayer";
+import ShareButton from "@/components/ShareButton";
 
 export const instant = false;
 
@@ -42,7 +43,7 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
       {/* پلیر آپارات */}
       <div className="mt-6 overflow-hidden rounded-3xl bg-black shadow-2xl">
         {video.aparat_id ? (
-          <VideoPlayer aparatId={video.aparat_id} title={video.title} thumbnail={video.thumbnail} />
+          <VideoPlayer aparatId={video.aparat_id} title={video.title} thumbnail={video.thumbnail} videoId={video.id} />
         ) : (
           <div className="flex aspect-video items-center justify-center text-white/50">
             ویدیویی در دسترس نیست
@@ -67,9 +68,7 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
           >
             مشاهده در آپارات
           </a>
-          <button className="rounded-full border border-white/20 px-5 py-2 text-sm hover:bg-white/10 transition">
-            📤 اشتراک‌گذاری
-          </button>
+          <ShareButton title={video.title} path={`/videos/${video.id}`} />
         </div>
       </div>
 
