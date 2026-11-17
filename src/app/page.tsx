@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { collections } from "@/data/mock";
+import CarouselRow from "@/components/CarouselRow";
 
 type Event = {
   id: string;
@@ -71,7 +72,7 @@ export default function Home() {
           <Link href="/archive" className="shrink-0 text-sm text-[#14a3a2] hover:underline">همه مراسم‌ها</Link>
         </div>
 
-        <div className="mt-5 flex gap-4 overflow-x-auto pb-3 no-scrollbar">
+        <CarouselRow className="mt-5 gap-4">
           {loading ? (
             <p className="text-sm text-white/50">در حال بارگذاری...</p>
           ) : events.map((e) => (
@@ -91,7 +92,7 @@ export default function Home() {
               </div>
             </Link>
           ))}
-        </div>
+        </CarouselRow>
         <p className="mt-1 text-xs text-white/40">برای مشاهده بیشتر بکشید ←</p>
       </section>
 
@@ -107,7 +108,7 @@ export default function Home() {
             <Link href="/videos" className="shrink-0 text-sm text-[#14a3a2] hover:underline">همه نماهنگ‌ها</Link>
           </div>
 
-          <div className="mt-5 flex gap-3 overflow-x-auto pb-3 no-scrollbar">
+          <CarouselRow className="mt-5">
             {namahang.map((v) => (
               <Link
                 key={v.id}
@@ -135,7 +136,7 @@ export default function Home() {
                 </div>
               </Link>
             ))}
-          </div>
+          </CarouselRow>
           <p className="mt-1 text-xs text-white/40">برای مشاهده ویدئوهای بیشتر بکشید ←</p>
         </div>
       </section>
@@ -176,7 +177,7 @@ export default function Home() {
             <Link href="/videos" className="shrink-0 text-sm text-[#14a3a2] hover:underline">همه ویدئوها</Link>
           </div>
 
-          <div className="mt-5 flex gap-3 overflow-x-auto pb-3 no-scrollbar">
+          <CarouselRow className="mt-5">
             {videos.slice(0, 5).map((v) => (
               <Link
                 key={v.id}
@@ -203,7 +204,7 @@ export default function Home() {
                 </div>
               </Link>
             ))}
-          </div>
+          </CarouselRow>
           <p className="mt-1 text-xs text-white/40">برای مشاهده ویدئوهای بیشتر بکشید ←</p>
         </div>
       </section>
