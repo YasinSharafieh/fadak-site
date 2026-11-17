@@ -43,6 +43,8 @@ export default function Home() {
     load();
   }, []);
 
+  const namahang = videos.filter((v) => v.title.startsWith("نماهنگ")).slice(0, 5);
+
   return (
     <div>
       {/* بنر اطلاعیه */}
@@ -92,7 +94,7 @@ export default function Home() {
         <p className="mt-1 text-xs text-white/40">برای مشاهده بیشتر بکشید ←</p>
       </section>
 
-      {/* جدیدترین نماهنگ‌ها */}
+      {/* جدیدترین نماهنگ‌ها — با افکت هاور عریض شدن */}
       <section className="bg-[#111111] py-10">
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex items-start justify-between">
@@ -104,31 +106,33 @@ export default function Home() {
             <Link href="/videos" className="shrink-0 text-sm text-[#14a3a2] hover:underline">همه نماهنگ‌ها</Link>
           </div>
 
-          <div className="mt-5 flex gap-4 overflow-x-auto pb-3 no-scrollbar">
-            {videos.map((v) => (
-              <a
+          <div className="mt-5 flex gap-3 overflow-x-auto pb-3 no-scrollbar">
+            {namahang.map((v) => (
+              <Link
                 key={v.id}
-                href={`https://www.aparat.com/v/${v.aparat_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="card-hover group w-72 shrink-0 overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/5"
+                href={`/videos/${v.id}`}
+                className="group relative w-64 shrink-0 overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/5 transition-all duration-500 hover:w-80 hover:border-[#0e7c7b]/50"
               >
                 <div className="relative aspect-video bg-black">
                   {v.thumbnail ? (
-                    <img src={v.thumbnail} alt={v.title} className="h-full w-full object-cover" />
+                    <img src={v.thumbnail} alt={v.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b] text-4xl text-white/20">🎬</div>
                   )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition duration-500 group-hover:opacity-100" />
+                  <span className="absolute inset-0 flex items-center justify-center opacity-0 transition duration-500 group-hover:opacity-100">
+                    <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#0e7c7b] text-2xl text-white shadow-2xl">▶</span>
+                  </span>
                   {v.duration && (
                     <span className="absolute bottom-2 left-2 rounded bg-black/80 px-2 py-1 text-xs text-white">{v.duration}</span>
                   )}
                   <span className="absolute top-2 right-2 rounded bg-[#0e7c7b] px-2 py-1 text-[10px] font-bold text-white">نماهنگ</span>
                 </div>
                 <div className="p-3">
-                  <h3 className="text-sm font-bold leading-5">{v.title}</h3>
+                  <h3 className="text-sm font-bold leading-5 group-hover:text-[#14a3a2] transition">{v.title}</h3>
                   <p className="mt-1 text-xs text-white/50">کربلایی حسین طاهری</p>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
           <p className="mt-1 text-xs text-white/40">برای مشاهده ویدئوهای بیشتر بکشید ←</p>
@@ -171,30 +175,32 @@ export default function Home() {
             <Link href="/videos" className="shrink-0 text-sm text-[#14a3a2] hover:underline">همه ویدئوها</Link>
           </div>
 
-          <div className="mt-5 flex gap-4 overflow-x-auto pb-3 no-scrollbar">
+          <div className="mt-5 flex gap-3 overflow-x-auto pb-3 no-scrollbar">
             {videos.slice(0, 5).map((v) => (
-              <a
+              <Link
                 key={v.id}
-                href={`https://www.aparat.com/v/${v.aparat_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="card-hover group w-72 shrink-0 overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/5"
+                href={`/videos/${v.id}`}
+                className="group relative w-64 shrink-0 overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/5 transition-all duration-500 hover:w-80 hover:border-[#0e7c7b]/50"
               >
                 <div className="relative aspect-video bg-black">
                   {v.thumbnail ? (
-                    <img src={v.thumbnail} alt={v.title} className="h-full w-full object-cover" />
+                    <img src={v.thumbnail} alt={v.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b] text-4xl text-white/20">🎬</div>
                   )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition duration-500 group-hover:opacity-100" />
+                  <span className="absolute inset-0 flex items-center justify-center opacity-0 transition duration-500 group-hover:opacity-100">
+                    <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#0e7c7b] text-2xl text-white shadow-2xl">▶</span>
+                  </span>
                   {v.duration && (
                     <span className="absolute bottom-2 left-2 rounded bg-black/80 px-2 py-1 text-xs text-white">{v.duration}</span>
                   )}
                   <span className="absolute top-2 right-2 rounded bg-black/80 px-2 py-1 text-[10px] text-white">آپارات</span>
                 </div>
                 <div className="p-3">
-                  <h3 className="text-sm font-bold leading-5">{v.title}</h3>
+                  <h3 className="text-sm font-bold leading-5 group-hover:text-[#14a3a2] transition">{v.title}</h3>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
           <p className="mt-1 text-xs text-white/40">برای مشاهده ویدئوهای بیشتر بکشید ←</p>
