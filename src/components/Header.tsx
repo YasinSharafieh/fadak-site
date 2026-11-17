@@ -18,13 +18,22 @@ const navItems = [
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+    }
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-black/95 backdrop-blur border-b border-white/10 text-white">
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between py-3">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#dc2626] text-xl font-extrabold text-white">ف</div>
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0e7c7b] text-xl font-extrabold text-white transition group-hover:bg-[#14a3a2] group-hover:scale-105">ف</div>
             <div>
               <div className="text-lg font-extrabold leading-none">فدک</div>
               <div className="text-[10px] text-white/60">حفظ و نشر آثار کربلایی حسین طاهری</div>
@@ -36,7 +45,7 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-full px-3 py-2 text-sm hover:bg-white/10 transition"
+                className="rounded-full px-3 py-2 text-sm hover:bg-white/10 hover:text-[#14a3a2] transition"
               >
                 {item.label}
               </Link>
@@ -44,10 +53,14 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link href="/search" className="rounded-full p-2 hover:bg-white/10 transition" title="جستجو">
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              className="rounded-full p-2 hover:bg-white/10 hover:text-[#14a3a2] transition"
+              title="جستجو"
+            >
               🔍
-            </Link>
-            <Link href="/donate" className="btn-red hidden sm:block rounded-full px-5 py-2 text-sm">
+            </button>
+            <Link href="/donate" className="btn-green hidden sm:block rounded-full px-5 py-2 text-sm">
               کمک به هیئت
             </Link>
             <button
@@ -59,6 +72,25 @@ export default function Header() {
           </div>
         </div>
 
+        {/* جستجو */}
+        {searchOpen && (
+          <form onSubmit={handleSearch} className="border-t border-white/10 py-4">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="جستجو در مراسم‌ها، صوت‌ها، ویدیوها..."
+                className="flex-1 rounded-full bg-white/10 border border-white/20 px-5 py-3 text-white placeholder-white/50"
+                autoFocus
+              />
+              <button type="submit" className="btn-green rounded-full px-6 py-3">
+                جستجو
+              </button>
+            </div>
+          </form>
+        )}
+
         {mobileOpen && (
           <nav className="border-t border-white/10 py-4 lg:hidden">
             <div className="grid grid-cols-2 gap-2">
@@ -67,7 +99,7 @@ export default function Header() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-xl bg-white/10 px-4 py-3 text-sm hover:bg-white/20 transition"
+                  className="rounded-xl bg-white/10 px-4 py-3 text-sm hover:bg-[#0e7c7b] hover:text-white transition"
                 >
                   {item.label}
                 </Link>

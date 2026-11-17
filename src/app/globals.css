@@ -4,8 +4,8 @@
   --fadak-black: #0a0a0a;
   --fadak-dark: #111111;
   --fadak-card: #1a1a1a;
-  --fadak-red: #dc2626;
-  --fadak-red-light: #ef4444;
+  --fadak-green: #0b3d2e;
+  --fadak-green-light: #0e7c7b;
   --fadak-gold: #c9a227;
   --fadak-cream: #f5f5f5;
 }
@@ -30,12 +30,12 @@ body {
 }
 
 .islamic-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23dc2626' stroke-opacity='0.08'%3E%3Cpath d='M30 0l7 23 23 7-23 7-7 23-7-23-23-7 23-7z'/%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%230e7c7b' stroke-opacity='0.08'%3E%3Cpath d='M30 0l7 23 23 7-23 7-7 23-7-23-23-7 23-7z'/%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 .gold-frame {
-  border: 1px solid rgba(220, 38, 38, 0.3);
-  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.05);
+  border: 1px solid rgba(14, 124, 123, 0.3);
+  box-shadow: 0 0 0 4px rgba(14, 124, 123, 0.05);
 }
 
 .paper-texture {
@@ -86,17 +86,30 @@ body {
   height: 100vh;
 }
 
-/* دکمه‌ها */
-.btn-red {
-  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+/* دکمه‌ها — سبز */
+.btn-green {
+  background: linear-gradient(135deg, #0b3d2e 0%, #0e7c7b 100%);
   color: white;
   font-weight: 700;
   transition: all 0.3s ease;
 }
 
-.btn-red:hover {
+.btn-green:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+  box-shadow: 0 8px 25px rgba(14, 124, 123, 0.4);
+  background: linear-gradient(135deg, #0e7c7b 0%, #14a3a2 100%);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #c9a227 0%, #e8c766 100%);
+  color: #0b3d2e;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(201, 162, 39, 0.4);
 }
 
 .btn-dark {
@@ -110,14 +123,73 @@ body {
 .btn-dark:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  border-color: rgba(14, 124, 123, 0.5);
 }
 
-/* هاور کارت */
+/* هاور کارت — با تغییر رنگ */
 .card-hover {
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(14, 124, 123, 0.1) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .card-hover:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  border-color: rgba(14, 124, 123, 0.4);
+}
+
+.card-hover:hover::before {
+  opacity: 1;
+}
+
+/* هاور لینک‌ها */
+a {
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: #14a3a2;
+}
+
+/* هاور دکمه‌های ناوبری */
+nav a {
+  position: relative;
+}
+
+nav a::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 50%;
+  transform: translateX(50%);
+  width: 0;
+  height: 2px;
+  background: #0e7c7b;
+  transition: width 0.3s ease;
+}
+
+nav a:hover::after {
+  width: 80%;
+}
+
+/* ورودی‌ها */
+input, select, textarea {
+  transition: all 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #0e7c7b !important;
+  box-shadow: 0 0 0 3px rgba(14, 124, 123, 0.2);
 }
