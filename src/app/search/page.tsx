@@ -118,13 +118,21 @@ export default function SearchPage() {
 
       <form onSubmit={handleSubmit} className="mt-8">
         <div className="flex gap-2">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="نام مراسم، مداح، عنوان صوت..."
-            className="flex-1 rounded-full border border-[#0e7c7b]/40 bg-[#1a1a1a] px-6 py-4 text-lg"
-          />
+          <div className="relative min-w-0 flex-1">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="نام مراسم، مداح، عنوان صوت..."
+              className="w-full rounded-full border border-[#0e7c7b]/40 bg-[#1a1a1a] py-4 pe-16 ps-6 text-lg"
+            />
+            <button type="submit" aria-label="جستجو" title="جستجو" className="absolute end-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#0e7c7b] text-white shadow-lg transition hover:bg-[#14a3a2]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-3.5-3.5" />
+              </svg>
+            </button>
+          </div>
           <button type="submit" className="btn-gold rounded-full px-8 py-4">
             جستجو
           </button>

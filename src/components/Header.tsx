@@ -64,13 +64,21 @@ export default function Header() {
           <div className="flex items-center gap-1.5 sm:gap-2">
             <form onSubmit={handleSearch} className="hidden min-[480px]:block">
               <label htmlFor="header-search" className="sr-only">جستجو</label>
-              <input
-                id="header-search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="جستجو..."
-                className="header-search w-28 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs text-white outline-none placeholder:text-white/50 sm:w-36 md:w-44"
-              />
+              <div className="relative">
+                <input
+                  id="header-search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="جستجو..."
+                  className="header-search w-32 rounded-full border border-white/15 bg-white/10 py-1.5 pe-8 ps-3 text-xs text-white outline-none placeholder:text-white/50 sm:w-40 md:w-48"
+                />
+                <button type="submit" aria-label="جستجو" title="جستجو" className="absolute end-1 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-[#14a3a2] transition hover:bg-[#0e7c7b] hover:text-white">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="M20 20l-3.5-3.5" />
+                  </svg>
+                </button>
+              </div>
             </form>
             <button
               type="button"
@@ -122,13 +130,21 @@ export default function Header() {
 
         {searchOpen && (
           <form onSubmit={handleSearch} className="pb-3 min-[480px]:hidden">
-            <input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="جستجو..."
-              className="w-full max-w-xs rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-white placeholder:text-white/50"
-              autoFocus
-            />
+            <div className="relative max-w-xs">
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="جستجو..."
+                className="w-full rounded-full border border-white/15 bg-white/10 py-2 pe-10 ps-4 text-sm text-white placeholder:text-white/50"
+                autoFocus
+              />
+              <button type="submit" aria-label="جستجو" title="جستجو" className="absolute end-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-[#14a3a2] transition hover:bg-[#0e7c7b] hover:text-white">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M20 20l-3.5-3.5" />
+                </svg>
+              </button>
+            </div>
           </form>
         )}
 

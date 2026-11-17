@@ -7,6 +7,7 @@ import { VideoPlayerProvider } from "@/context/VideoPlayerContext";
 import GlobalVideoPlayer from "@/components/GlobalVideoPlayer";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ThemeProvider } from "@/context/ThemeContext";
+import PageLoader from "@/components/PageLoader";
 
 const vazirmatn = Vazirmatn({
   subsets: ["arabic"],
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <VideoPlayerProvider>
           <ThemeProvider>
             <ScrollToTop />
+            <PageLoader />
             <div className="site-shell">
               <Header />
               <main>{children}</main>
