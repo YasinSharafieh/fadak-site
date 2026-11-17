@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { collections, fadakAddress, fadakMapUrl } from "@/data/mock";
+import { collections, fadakAddress, fadakMapEmbed, fadakMapUrl } from "@/data/mock";
 import { popularIds, popularViews } from "@/data/popular-videos";
 import CarouselRow from "@/components/CarouselRow";
 import { artistFromTitle, comparePersianDates, formatViews, nextWeeklyMajles, parsePersianDate, toPersianDigits, type NextMajles } from "@/lib/jalali";
@@ -311,7 +311,7 @@ export default function Home() {
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#1a1a1a]">
             <iframe
               title="نقشه حسینیه سیدالشهدا"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=51.4356%2C35.7206%2C51.4557%2C35.7306&layer=mapnik&marker=35.725616%2C51.445673"
+              src={fadakMapEmbed}
               className="h-full min-h-72 w-full border-0"
             />
           </div>

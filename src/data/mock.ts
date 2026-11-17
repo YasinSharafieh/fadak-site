@@ -12,7 +12,11 @@ export type EventItem = {
 };
 
 export const fadakAddress = "تهران، میدان هفتم تیر، خیابان مفتح جنوبی، خیابان ورزنده (جنب ورزشگاه شهید شیرودی)، خیابان ملک الشعراء بهار، حسینیه سیدالشهدا (ع)";
-export const fadakMapUrl = "https://www.openstreetmap.org/?mlat=35.725616&mlon=51.445673#map=16/35.725616/51.445673";
+// ورودی خیابان ملک‌الشعرا بهار، جنب ورزشگاه شهید شیرودی — نه مختصات قبلی که حدود دو کیلومتر آن‌طرف‌تر بود.
+export const fadakLat = 35.709192;
+export const fadakLon = 51.427675;
+export const fadakMapUrl = `https://www.openstreetmap.org/?mlat=${fadakLat}&mlon=${fadakLon}#map=18/${fadakLat}/${fadakLon}`;
+export const fadakMapEmbed = `https://www.openstreetmap.org/export/embed.html?bbox=51.4248%2C35.7068%2C51.4304%2C35.7116&layer=mapnik&marker=${fadakLat}%2C${fadakLon}`;
 
 export const upcomingEvents: EventItem[] = [
   {

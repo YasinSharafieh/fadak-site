@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import CeremonyTabs from "@/components/CeremonyTabs";
 import { getAparatVideoInfo } from "@/lib/aparat";
+import { fadakMapUrl } from "@/data/mock";
 
 export const instant = false;
 
@@ -25,7 +26,7 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
   const location = event?.location || "حسینیه سیدالشهدا (ع)، تهران";
   const address = event?.address || "";
   const posterUrl = event?.poster_url || "";
-  const mapUrl = event?.map_url || "";
+  const mapUrl = event?.map_url || fadakMapUrl;
 
   let audios: any[] = [];
   let photos: any[] = [];

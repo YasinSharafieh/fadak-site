@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { fadakMapUrl } from "@/data/mock";
 
 export default function Footer() {
   return (
@@ -23,7 +24,7 @@ export default function Footer() {
             <p className="mt-3 text-sm leading-6 text-white/70">
               تهران، میدان هفتم تیر، خیابان مفتح جنوبی، خیابان ورزنده (جنب ورزشگاه شهید شیرودی)، خیابان ملک الشعراء بهار، حسینیه سیدالشهدا (ع)
             </p>
-            <a href="https://www.openstreetmap.org/?mlat=35.725616&mlon=51.445673#map=16/35.725616/51.445673" target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-sm text-[#14a3a2] hover:underline">
+            <a href={fadakMapUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-sm text-[#14a3a2] hover:underline">
               🗺️ مشاهده روی نقشه
             </a>
           </div>

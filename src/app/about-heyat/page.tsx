@@ -1,3 +1,5 @@
+import { fadakMapUrl } from "@/data/mock";
+
 export default function AboutHeyatPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 animate-fade-in">
@@ -27,7 +29,7 @@ export default function AboutHeyatPage() {
         <p className="mt-3 leading-7 text-white/70/80">
           تهران، میدان هفتم تیر، خیابان مفتح جنوبی، خیابان ورزنده (جنب ورزشگاه شهید شیرودی)، خیابان ملک الشعراء بهار، حسینیه سیدالشهدا (ع)
         </p>
-        <a href="https://www.openstreetmap.org/?mlat=35.725616&mlon=51.445673#map=16/35.725616/51.445673" target="_blank" rel="noopener noreferrer" className="btn-green mt-4 inline-block rounded-full px-6 py-3">
+        <a href={fadakMapUrl} target="_blank" rel="noopener noreferrer" className="btn-green mt-4 inline-block rounded-full px-6 py-3">
           🗺️ مسیریابی
         </a>
       </div>
