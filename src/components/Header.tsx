@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import ThemeImage from "@/components/ThemeImage";
+import TodayDates from "@/components/TodayDates";
 
 const navItems = [
   { href: "/", label: "خانه" },
@@ -67,6 +68,7 @@ export default function Header() {
       data-menu-open={mobileOpen || searchOpen ? "true" : "false"}
       className="site-header sticky top-0 z-40 border-b border-white/10 bg-black text-white"
     >
+      <TodayDates />
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between gap-3 py-2.5">
           <Link href="/" className="flex shrink-0 items-center">

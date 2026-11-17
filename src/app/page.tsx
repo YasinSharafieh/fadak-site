@@ -9,7 +9,6 @@ import CarouselRow from "@/components/CarouselRow";
 import CeremonyCard from "@/components/CeremonyCard";
 import HeroSlides from "@/components/HeroSlides";
 import ThemeImage from "@/components/ThemeImage";
-import TodayDates from "@/components/TodayDates";
 import { ceremonyCardTitle, coverByEvent, shortPersianDate } from "@/lib/ceremony";
 import { artistFromTitle, comparePersianDates, formatViews, nextWeeklyMajles, toPersianDigits, type NextMajles } from "@/lib/jalali";
 
@@ -79,12 +78,9 @@ export default function Home() {
     <div>
       <section className="relative overflow-hidden bg-black">
         <div className="islamic-pattern-dark absolute inset-0" />
-        <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-4 md:pb-12 md:pt-6">
-          <div className="grid items-start gap-6 lg:grid-cols-[0.92fr_1.08fr] lg:gap-x-8 lg:gap-y-5">
-            <div className="flex justify-end lg:col-start-2 lg:row-start-1">
-              <TodayDates />
-            </div>
-            <div className="text-center md:text-right lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:self-center">
+        <div className="relative mx-auto max-w-7xl px-4 py-8 md:py-12">
+          <div className="grid items-center gap-8 lg:grid-cols-[0.92fr_1.08fr]">
+            <div className="text-center md:text-right">
               <div className="mb-6 flex flex-wrap items-center justify-center gap-4 md:justify-start">
                 <ThemeImage darkSrc="/brand/heyat-mark.png" lightSrc="/brand/heyat-mark-ink.png" alt="هیئت فدائیان حضرت زهرا" className="h-28 w-auto object-contain sm:h-36" />
                 <ThemeImage darkSrc="/brand/fadak-wordmark.png" lightSrc="/brand/fadak-wordmark-ink.png" alt="فدک" className="h-14 w-auto max-w-[16rem] object-contain sm:h-16" />
@@ -98,18 +94,16 @@ export default function Home() {
                 <Link href="/archive" className="rounded-full border border-white/20 px-8 py-3 text-white hover:bg-white/10">آرشیو مراسمات</Link>
               </div>
             </div>
-            <div className="lg:col-start-2 lg:row-start-2">
-              <HeroSlides
-                nextMajles={nextMajles}
-                recent={events.slice(0, 2).map((event) => ({
-                  id: event.id,
-                  href: `/archive/${event.slug}`,
-                  title: ceremonyCardTitle(event.title, event.date_fa),
-                  date: shortPersianDate(event.date_fa),
-                  cover: event.poster_url || covers[event.id],
-                }))}
-              />
-            </div>
+            <HeroSlides
+              nextMajles={nextMajles}
+              recent={events.slice(0, 2).map((event) => ({
+                id: event.id,
+                href: `/archive/${event.slug}`,
+                title: ceremonyCardTitle(event.title, event.date_fa),
+                date: shortPersianDate(event.date_fa),
+                cover: event.poster_url || covers[event.id],
+              }))}
+            />
           </div>
         </div>
       </section>
