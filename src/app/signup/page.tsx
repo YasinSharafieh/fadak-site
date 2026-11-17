@@ -14,6 +14,9 @@ export default function SignupPage() {
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [ticket, setTicket] = useState("");
+  const [name, setName] = useState("");
+  const [family, setFamily] = useState("");
+  const [city, setCity] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [again, setAgain] = useState("");
@@ -68,7 +71,7 @@ export default function SignupPage() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ticket, username, password }),
+      body: JSON.stringify({ ticket, name, family, city, username, password }),
     });
     const data = await res.json();
     setLoading(false);
@@ -130,6 +133,33 @@ export default function SignupPage() {
 
           {step === "account" && (
             <form onSubmit={register} className="mt-6 space-y-4">
+              <label className="block text-sm font-bold text-white" htmlFor="name">نام</label>
+              <input
+                id="name"
+                autoComplete="given-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-white"
+                required
+              />
+              <label className="block text-sm font-bold text-white" htmlFor="family">نام خانوادگی</label>
+              <input
+                id="family"
+                autoComplete="family-name"
+                value={family}
+                onChange={(e) => setFamily(e.target.value)}
+                className="w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-white"
+                required
+              />
+              <label className="block text-sm font-bold text-white" htmlFor="city">شهر</label>
+              <input
+                id="city"
+                autoComplete="address-level2"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-white"
+                required
+              />
               <label className="block text-sm font-bold text-white" htmlFor="username">نام کاربری</label>
               <input
                 id="username"
@@ -139,6 +169,7 @@ export default function SignupPage() {
                 className="w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-white"
                 required
               />
+              <p className="text-xs text-white/50">برای ورودهای بعدی است و بالای سایت با همین نام دیده می‌شود. نام کاربری تکراری پذیرفته نمی‌شود.</p>
               <label className="block text-sm font-bold text-white" htmlFor="password">رمز عبور</label>
               <input
                 id="password"

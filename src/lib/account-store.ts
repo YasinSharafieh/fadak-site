@@ -1,9 +1,12 @@
 import { createHash, randomBytes, randomInt, scryptSync, timingSafeEqual } from "node:crypto";
 import { normalizeIranMobile } from "@/lib/phone";
+import type { EngageBox } from "@/lib/engage-box";
 
 const BUCKET = "accounts";
 const OTP_TTL_MS = 5 * 60 * 1000;
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const SIGNUP_TTL_MS = 15 * 60 * 1000;
+const CLAIM_TTL_MS = 2 * 60 * 1000;
 
 export type AccountRole = "user" | "admin";
 
@@ -11,6 +14,7 @@ export type AccountUser = {
   id: string;
   phone: string;
   name: string;
+  family: string;
   city: string;
   username: string;
   role: AccountRole;
@@ -20,6 +24,7 @@ type Profile = {
   id: string;
   phone: string;
   name: string;
+  family?: string;
   city: string;
   username?: string;
   passwordHash?: string;
@@ -33,8 +38,7 @@ type CountsFile = { version: number; items: Record<string, number> };
 type OtpFile = { hash: string; expires: number; attempts: number; sentAt: number };
 type SessionFile = { userId: string; expires: number };
 type SignupFile = { phone: string; expires: number };
-
-const SIGNUP_TTL_MS = 15 * 60 * 1000;
+type IndexFile = { userId: string; expires?: number };
 
 function serviceKey() {
   return process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -53,6 +57,11 @@ export function accountsConfigured() {
   return Boolean(serviceKey() && projectUrl());
 }
 
+function objectUrl(path: string) {
+  const encoded = path.split("/").map((part) => encodeURIComponent(part)).join("/");
+  return `${projectUrl()}/storage/v1/object/${BUCKET}/${encoded}`;
+}
+
 async function ensureBucket() {
   const res = await fetch(`${projectUrl()}/storage/v1/bucket`, {
     method: "POST",
@@ -68,7 +77,7 @@ async function ensureBucket() {
 }
 
 async function readJson<T>(path: string): Promise<T | null> {
-  const res = await fetch(`${projectUrl()}/storage/v1/object/${BUCKET}/${path}`, { headers: authHeaders(), cache: "no-store" });
+  const res = await fetch(objectUrl(path), { headers: authHeaders(), cache: "no-store" });
   if (res.status === 404 || res.status === 400) return null;
   if (!res.ok) return null;
   return (await res.json()) as T;
@@ -76,7 +85,7 @@ async function readJson<T>(path: string): Promise<T | null> {
 
 async function writeJson(path: string, value: unknown) {
   await ensureBucket();
-  const res = await fetch(`${projectUrl()}/storage/v1/object/${BUCKET}/${path}`, {
+  const res = await fetch(objectUrl(path), {
     method: "POST",
     headers: { ...authHeaders(), "Content-Type": "application/json", "x-upsert": "true" },
     body: JSON.stringify(value),
@@ -84,8 +93,18 @@ async function writeJson(path: string, value: unknown) {
   if (!res.ok) throw new Error(await res.text());
 }
 
+async function createExclusive(path: string, value: unknown) {
+  await ensureBucket();
+  const res = await fetch(objectUrl(path), {
+    method: "POST",
+    headers: { ...authHeaders(), "Content-Type": "application/json", "x-upsert": "false" },
+    body: JSON.stringify(value),
+  });
+  return res.ok;
+}
+
 async function removeObject(path: string) {
-  await fetch(`${projectUrl()}/storage/v1/object/${BUCKET}/${path}`, { method: "DELETE", headers: authHeaders() });
+  await fetch(objectUrl(path), { method: "DELETE", headers: authHeaders() });
 }
 
 function sha(value: string) {
@@ -97,9 +116,21 @@ function otpHash(phone: string, code: string) {
 }
 
 export function normalizeUsername(input: string) {
-  const value = input.trim().toLowerCase();
+  const value = input
+    .trim()
+    .toLowerCase()
+    .replace(/[يى]/g, "ی")
+    .replace(/ك/g, "ک")
+    .replace(/[\u200c\u200d\u200e\u200f\ufeff]/g, "")
+    .replace(/\s+/g, "");
   if (!/^[\u0600-\u06ffa-z0-9._]{3,32}$/.test(value)) return null;
-  if (value.startsWith(".") || value.endsWith(".")) return null;
+  if (value.startsWith(".") || value.endsWith(".") || value.includes("..")) return null;
+  return value;
+}
+
+export function cleanLabel(input: string, max = 40) {
+  const value = input.replace(/[\u200e\u200f\ufeff]/g, "").replace(/\s+/g, " ").trim().slice(0, max);
+  if (value.length < 2 || !/[\u0600-\u06ffa-zA-Z]/.test(value)) return null;
   return value;
 }
 
@@ -123,9 +154,26 @@ function publicUser(profile: Profile): AccountUser {
     id: profile.id,
     phone: profile.phone || "",
     name: profile.name || "",
+    family: profile.family || "",
     city: profile.city || "",
     username: profile.username || "",
     role: profile.role === "admin" ? "admin" : "user",
+  };
+}
+
+function keptProfile(current: Profile | null, patch: Partial<Profile> & { id: string }): Profile {
+  return {
+    id: patch.id,
+    phone: patch.phone ?? current?.phone ?? "",
+    name: patch.name ?? current?.name ?? "",
+    family: patch.family ?? current?.family ?? "",
+    city: patch.city ?? current?.city ?? "",
+    username: patch.username ?? current?.username ?? "",
+    passwordHash: patch.passwordHash ?? current?.passwordHash,
+    role: patch.role ?? current?.role ?? "user",
+    version: patch.version ?? (current?.version || 0) + 1,
+    likes: patch.likes ?? current?.likes ?? [],
+    saves: patch.saves ?? current?.saves ?? [],
   };
 }
 
@@ -133,13 +181,61 @@ export function itemKey(type: string, id: string) {
   return `${type}:${id}`;
 }
 
+function usernamePath(username: string) {
+  // کلید ذخیره‌سازی باید اسکی باشد؛ نام‌های فارسی با هش یکتا می‌شوند تا با yasin.json تداخل نکنند.
+  if (/^[a-z0-9._]+$/.test(username)) return `usernames/${username}.json`;
+  return `usernames/u-${sha(username)}.json`;
+}
+
+function isPending(file: IndexFile | null) {
+  return Boolean(file?.userId?.startsWith("pending:"));
+}
+
+function isStalePending(file: IndexFile | null) {
+  return isPending(file) && (!file?.expires || file.expires < Date.now());
+}
+
+function indexTaken(file: IndexFile | null, reservation: string) {
+  if (!file?.userId) return false;
+  if (file.userId === `pending:${reservation}`) return false;
+  if (isPending(file)) return !isStalePending(file);
+  return true;
+}
+
+async function claimIndex(path: string, reservation: string) {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const existing = await readJson<IndexFile>(path);
+    if (existing?.userId === `pending:${reservation}`) return true;
+    if (indexTaken(existing, reservation)) return false;
+    if (existing && isStalePending(existing)) await removeObject(path);
+    const created = await createExclusive(path, { userId: `pending:${reservation}`, expires: Date.now() + CLAIM_TTL_MS });
+    if (!created) continue;
+    const check = await readJson<IndexFile>(path);
+    if (check?.userId === `pending:${reservation}`) return true;
+  }
+  return false;
+}
+
+async function confirmClaim(path: string, reservation: string, userId: string) {
+  const existing = await readJson<IndexFile>(path);
+  if (existing?.userId && existing.userId !== `pending:${reservation}` && existing.userId !== userId) return false;
+  await writeJson(path, { userId });
+  const check = await readJson<IndexFile>(path);
+  return check?.userId === userId;
+}
+
+async function releaseOwned(path: string, reservation: string, userId: string) {
+  const existing = await readJson<IndexFile>(path);
+  if (!existing?.userId) return;
+  if (existing.userId === `pending:${reservation}` || (userId && existing.userId === userId)) await removeObject(path);
+}
+
 export async function sendLoginCode(rawPhone: string) {
   const phone = normalizeIranMobile(rawPhone);
   if (!phone) return { ok: false as const, error: "شماره موبایل معتبر نیست." };
   if (!accountsConfigured()) return { ok: false as const, error: "ارسال کد انجام نشد." };
-  if (await readJson<{ userId: string }>(`phones/${phone}.json`)) {
-    return { ok: false as const, error: "این شماره قبلاً ثبت شده است." };
-  }
+  const owner = await readJson<IndexFile>(`phones/${phone}.json`);
+  if (owner?.userId && !isPending(owner)) return { ok: false as const, error: "این شماره قبلاً ثبت شده است." };
 
   const existing = await readJson<OtpFile>(`otp/${phone}.json`);
   if (existing && Date.now() - existing.sentAt < 60_000) {
@@ -195,19 +291,34 @@ async function deliverSms(phone: string, code: string): Promise<{ ok: true } | {
   return { ok: false, error: "ارسال کد انجام نشد." };
 }
 
-async function createAuthUser(phone: string) {
+async function createAuthUser(phone: string, meta: { username: string; name: string; family: string; city: string }) {
   const res = await fetch(`${projectUrl()}/auth/v1/admin/users`, {
     method: "POST",
     headers: { ...authHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify({
       email: `${phone}@users.fadak.invalid`,
       email_confirm: true,
-      user_metadata: { phone, display_name: "" },
+      user_metadata: {
+        phone,
+        username: meta.username,
+        display_name: `${meta.name} ${meta.family}`.trim(),
+        family: meta.family,
+        city: meta.city,
+      },
     }),
   });
-  if (!res.ok) throw new Error(await res.text());
+  if (!res.ok) {
+    const text = await res.text();
+    if (/already|duplicate|exists/i.test(text)) throw new Error("phone-taken");
+    throw new Error(text);
+  }
   const user = await res.json();
   return user.id as string;
+}
+
+async function deleteAuthUser(userId: string) {
+  if (!userId) return;
+  await fetch(`${projectUrl()}/auth/v1/admin/users/${userId}`, { method: "DELETE", headers: authHeaders() });
 }
 
 async function checkOtp(phone: string, code: string) {
@@ -225,9 +336,8 @@ async function checkOtp(phone: string, code: string) {
 export async function openSignup(rawPhone: string, code: string) {
   const phone = normalizeIranMobile(rawPhone);
   if (!phone) return { ok: false as const, error: "شماره موبایل معتبر نیست." };
-  if (await readJson<{ userId: string }>(`phones/${phone}.json`)) {
-    return { ok: false as const, error: "این شماره قبلاً ثبت شده است." };
-  }
+  const owner = await readJson<IndexFile>(`phones/${phone}.json`);
+  if (owner?.userId && !isPending(owner)) return { ok: false as const, error: "این شماره قبلاً ثبت شده است." };
   const checked = await checkOtp(phone, code);
   if (!checked.ok) return checked;
   const ticket = randomBytes(32).toString("hex");
@@ -235,43 +345,84 @@ export async function openSignup(rawPhone: string, code: string) {
   return { ok: true as const, ticket };
 }
 
-export async function finishSignup(ticket: string, rawUsername: string, password: string) {
+export async function finishSignup(
+  ticket: string,
+  rawUsername: string,
+  password: string,
+  rawName: string,
+  rawFamily: string,
+  rawCity: string,
+) {
   const username = normalizeUsername(rawUsername);
+  const name = cleanLabel(rawName, 40);
+  const family = cleanLabel(rawFamily, 40);
+  const city = cleanLabel(rawCity, 40);
+  if (!name) return { ok: false as const, error: "نام را وارد کنید." };
+  if (!family) return { ok: false as const, error: "نام خانوادگی را وارد کنید." };
+  if (!city) return { ok: false as const, error: "شهر را وارد کنید." };
   if (!username) return { ok: false as const, error: "نام کاربری معتبر نیست." };
-  if (password.length < 6 || password.length > 72) return { ok: false as const, error: "رمز عبور کوتاه است." };
+  if (password.length < 6 || password.length > 72) return { ok: false as const, error: "رمز عبور باید حداقل ۶ حرف باشد." };
   const pending = await readJson<SignupFile>(`signup/${sha(ticket)}.json`);
   if (!pending || pending.expires < Date.now()) return { ok: false as const, error: "کد منقضی شده. دوباره درخواست کنید." };
-  if (await readJson<{ userId: string }>(`usernames/${username}.json`)) {
+
+  const reservation = randomBytes(16).toString("hex");
+  const namePath = usernamePath(username);
+  const phonePath = `phones/${pending.phone}.json`;
+  if (!(await claimIndex(namePath, reservation))) {
     return { ok: false as const, error: "این نام کاربری گرفته شده است." };
   }
-  if (await readJson<{ userId: string }>(`phones/${pending.phone}.json`)) {
+  if (!(await claimIndex(phonePath, reservation))) {
+    await releaseOwned(namePath, reservation, "");
     return { ok: false as const, error: "این شماره قبلاً ثبت شده است." };
   }
-  const userId = await createAuthUser(pending.phone);
-  const profile: Profile = {
-    id: userId,
-    phone: pending.phone,
-    name: "",
-    city: "",
-    username,
-    passwordHash: hashPassword(password),
-    role: "user",
-    version: 1,
-    likes: [],
-    saves: [],
-  };
-  await writeJson(`phones/${pending.phone}.json`, { userId });
-  await writeJson(`usernames/${username}.json`, { userId });
-  await writeJson(`profiles/${userId}.json`, profile);
-  await removeObject(`signup/${sha(ticket)}.json`);
-  const token = randomBytes(32).toString("hex");
-  await writeJson(`sessions/${sha(token)}.json`, { userId, expires: Date.now() + SESSION_TTL_MS } satisfies SessionFile);
-  return { ok: true as const, token, role: "user" as const };
+
+  let userId = "";
+  try {
+    userId = await createAuthUser(pending.phone, { username, name, family, city });
+    if (!(await confirmClaim(namePath, reservation, userId))) {
+      await releaseOwned(namePath, reservation, userId);
+      await releaseOwned(phonePath, reservation, userId);
+      await deleteAuthUser(userId);
+      return { ok: false as const, error: "این نام کاربری گرفته شده است." };
+    }
+    if (!(await confirmClaim(phonePath, reservation, userId))) {
+      await releaseOwned(namePath, reservation, userId);
+      await releaseOwned(phonePath, reservation, userId);
+      await deleteAuthUser(userId);
+      return { ok: false as const, error: "این شماره قبلاً ثبت شده است." };
+    }
+    const profile = keptProfile(null, {
+      id: userId,
+      phone: pending.phone,
+      name,
+      family,
+      city,
+      username,
+      passwordHash: hashPassword(password),
+      role: "user",
+      version: 1,
+      likes: [],
+      saves: [],
+    });
+    await writeJson(`profiles/${userId}.json`, profile);
+    await removeObject(`signup/${sha(ticket)}.json`);
+    const token = randomBytes(32).toString("hex");
+    await writeJson(`sessions/${sha(token)}.json`, { userId, expires: Date.now() + SESSION_TTL_MS } satisfies SessionFile);
+    return { ok: true as const, token, role: "user" as const, username };
+  } catch (error) {
+    await releaseOwned(namePath, reservation, userId);
+    await releaseOwned(phonePath, reservation, userId);
+    if (userId) await deleteAuthUser(userId);
+    if (error instanceof Error && error.message === "phone-taken") {
+      return { ok: false as const, error: "این شماره قبلاً ثبت شده است." };
+    }
+    return { ok: false as const, error: "ثبت نام انجام نشد." };
+  }
 }
 
 async function provisionOwner(password: string) {
-  const existing = await readJson<{ userId: string }>("usernames/yasin.json");
-  if (existing?.userId) return existing.userId;
+  const existing = await readJson<IndexFile>("usernames/yasin.json");
+  if (existing?.userId && !isPending(existing)) return existing.userId;
   const listed = await fetch(`${projectUrl()}/auth/v1/admin/users?page=1&per_page=200`, {
     headers: authHeaders(),
     cache: "no-store",
@@ -294,18 +445,15 @@ async function provisionOwner(password: string) {
   }
   await writeJson("usernames/yasin.json", { userId });
   const current = await readJson<Profile>(`profiles/${userId}.json`);
-  await writeJson(`profiles/${userId}.json`, {
-    id: userId,
-    phone: current?.phone || "",
-    name: current?.name || "",
-    city: current?.city || "",
-    username: "yasin",
-    passwordHash: current?.passwordHash && passwordMatches(password, current.passwordHash) ? current.passwordHash : hashPassword(password),
-    role: "admin",
-    version: (current?.version || 0) + 1,
-    likes: current?.likes || [],
-    saves: current?.saves || [],
-  } satisfies Profile);
+  await writeJson(
+    `profiles/${userId}.json`,
+    keptProfile(current, {
+      id: userId,
+      username: "yasin",
+      passwordHash: current?.passwordHash && passwordMatches(password, current.passwordHash) ? current.passwordHash : hashPassword(password),
+      role: "admin",
+    }),
+  );
   return userId;
 }
 
@@ -317,7 +465,7 @@ export async function loginWithPassword(rawUsername: string, password: string) {
     if (owner) return { ok: true as const, token: "", role: "admin" as const, username: "yasin" };
     return { ok: false as const, error: "ورود انجام نشد." };
   }
-  let userId = (await readJson<{ userId: string }>(`usernames/${username}.json`))?.userId;
+  let userId = await userIdByUsername(username);
   if (!userId && owner) {
     try {
       userId = await provisionOwner(password);
@@ -330,25 +478,19 @@ export async function loginWithPassword(rawUsername: string, password: string) {
   const matches = passwordMatches(password, profile?.passwordHash);
   if (!matches && !owner) return { ok: false as const, error: "نام کاربری یا رمز عبور اشتباه است." };
   if (owner && !matches) {
-    profile = {
+    profile = keptProfile(profile, {
       id: userId,
-      phone: profile?.phone || "",
-      name: profile?.name || "",
-      city: profile?.city || "",
       username: "yasin",
       passwordHash: hashPassword(password),
       role: "admin",
-      version: (profile?.version || 0) + 1,
-      likes: profile?.likes || [],
-      saves: profile?.saves || [],
-    };
+    });
     await writeJson(`profiles/${userId}.json`, profile);
   }
   if (!profile) return { ok: false as const, error: "ورود انجام نشد." };
   const token = randomBytes(32).toString("hex");
   await writeJson(`sessions/${sha(token)}.json`, { userId, expires: Date.now() + SESSION_TTL_MS } satisfies SessionFile);
-  const role: AccountRole = profile?.role === "admin" || owner ? "admin" : "user";
-  return { ok: true as const, token, role, username: profile?.username || username };
+  const role: AccountRole = profile.role === "admin" || owner ? "admin" : "user";
+  return { ok: true as const, token, role, username: profile.username || username };
 }
 
 export async function touchSession(token: string | undefined) {
@@ -363,7 +505,12 @@ export async function userFromToken(token: string | undefined) {
   if (!token || !accountsConfigured()) return null;
   const session = await readJson<SessionFile>(`sessions/${sha(token)}.json`);
   if (!session || session.expires < Date.now()) return null;
-  const profile = await readJson<Profile>(`profiles/${session.userId}.json`);
+  return userById(session.userId);
+}
+
+export async function userById(userId: string) {
+  if (!userId || !accountsConfigured()) return null;
+  const profile = await readJson<Profile>(`profiles/${userId}.json`);
   if (!profile) return null;
   return publicUser(profile);
 }
@@ -373,25 +520,25 @@ export async function destroySession(token: string | undefined) {
   await removeObject(`sessions/${sha(token)}.json`);
 }
 
-export async function updateProfile(userId: string, input: { name?: string; city?: string }) {
+export async function updateProfile(userId: string, input: { name?: string; family?: string; city?: string }) {
   const profile = await readJson<Profile>(`profiles/${userId}.json`);
-  if (!profile) return null;
-  const next: Profile = {
-    ...profile,
-    name: (input.name ?? profile.name).trim().slice(0, 80),
-    city: (input.city ?? profile.city).trim().slice(0, 40),
-    version: profile.version + 1,
-  };
+  if (!profile) return { ok: false as const, error: "ذخیره انجام نشد." };
+  const name = cleanLabel(input.name ?? profile.name ?? "", 40);
+  const family = cleanLabel(input.family ?? profile.family ?? "", 40);
+  const city = cleanLabel(input.city ?? profile.city ?? "", 40);
+  if (!name || !family || !city) return { ok: false as const, error: "نام، نام خانوادگی و شهر را کامل وارد کنید." };
+  const next = keptProfile(profile, { id: profile.id, name, family, city });
   await writeJson(`profiles/${userId}.json`, next);
-  return publicUser(next);
+  return { ok: true as const, user: publicUser(next) };
 }
 
 async function mutateProfile(userId: string, change: (profile: Profile) => Profile) {
   for (let attempt = 0; attempt < 6; attempt += 1) {
     const current = await readJson<Profile>(`profiles/${userId}.json`);
     if (!current) return null;
-    const next = change({ ...current, likes: [...current.likes], saves: [...current.saves] });
-    next.version = current.version + 1;
+    const next = change({ ...current, likes: [...(current.likes || [])], saves: [...(current.saves || [])] });
+    next.version = (current.version || 0) + 1;
+    next.family = next.family || "";
     await writeJson(`profiles/${userId}.json`, next);
     const check = await readJson<Profile>(`profiles/${userId}.json`);
     if (check?.version === next.version) return next;
@@ -416,11 +563,13 @@ async function adjustCount(key: string, delta: number) {
 export async function engagementFor(userId: string | null, keys: string[]) {
   const counts = (await readJson<CountsFile>("counts.json"))?.items || {};
   const profile = userId ? await readJson<Profile>(`profiles/${userId}.json`) : null;
+  const likes = profile?.likes || [];
+  const saves = profile?.saves || [];
   const mine: Record<string, { liked: boolean; saved: boolean }> = {};
   for (const key of keys) {
     mine[key] = {
-      liked: Boolean(profile?.likes.includes(key)),
-      saved: Boolean(profile?.saves.some((item) => item.key === key)),
+      liked: likes.includes(key),
+      saved: saves.some((item) => item.key === key),
     };
   }
   const picked: Record<string, number> = {};
@@ -462,9 +611,49 @@ export async function toggleEngagement(
   };
 }
 
-export async function userIdByUsername(username: string) {
+export async function absorbBox(userId: string, box: EngageBox) {
+  if (!userId || (box.likes.length === 0 && box.saves.length === 0)) return false;
+  const added: string[] = [];
+  const profile = await mutateProfile(userId, (current) => {
+    added.length = 0;
+    for (const key of box.likes) {
+      if (!current.likes.includes(key)) {
+        current.likes.push(key);
+        added.push(key);
+      }
+    }
+    for (const item of box.saves) {
+      if (!item?.key || current.saves.some((saved) => saved.key === item.key)) continue;
+      current.saves.push({
+        key: item.key,
+        title: item.title || "بدون عنوان",
+        href: item.href?.startsWith("/") ? item.href : "/",
+        thumb: item.thumb,
+      });
+    }
+    return current;
+  });
+  if (!profile) return false;
+  for (const key of added) await adjustCount(key, 1);
+  return true;
+}
+
+export async function removeSave(userId: string, key: string) {
+  if (!/^(video|audio|reel):[A-Za-z0-9_-]+$/.test(key)) return null;
+  const profile = await mutateProfile(userId, (current) => {
+    current.saves = current.saves.filter((item) => item.key !== key);
+    return current;
+  });
+  if (!profile) return null;
+  return profile.saves;
+}
+
+export async function userIdByUsername(raw: string) {
+  const username = normalizeUsername(raw);
   if (!accountsConfigured() || !username) return null;
-  return (await readJson<{ userId: string }>(`usernames/${username}.json`))?.userId || null;
+  const file = await readJson<IndexFile>(usernamePath(username));
+  if (!file?.userId || isPending(file)) return null;
+  return file.userId;
 }
 
 export async function favoritesOf(userId: string) {
@@ -476,16 +665,17 @@ export async function listAccounts() {
   const res = await fetch(`${projectUrl()}/auth/v1/admin/users?page=1&per_page=200`, { headers: authHeaders(), cache: "no-store" });
   if (!res.ok) return [];
   const body = await res.json();
-  const users = (body.users || []) as { id: string; created_at?: string; email?: string; user_metadata?: { phone?: string; display_name?: string; username?: string } }[];
+  const users = (body.users || []) as { id: string; created_at?: string; email?: string; user_metadata?: { phone?: string; display_name?: string; username?: string; family?: string } }[];
   const rows = [];
   for (const user of users) {
     const profile = await readJson<Profile>(`profiles/${user.id}.json`);
     if (!profile && !user.user_metadata?.phone && user.email !== "yasin@users.fadak.invalid") continue;
+    const name = [profile?.name, profile?.family].filter(Boolean).join(" ") || user.user_metadata?.display_name || "";
     rows.push({
       id: user.id,
       username: profile?.username || user.user_metadata?.username || "",
       phone: profile?.phone || user.user_metadata?.phone || "",
-      name: profile?.name || user.user_metadata?.display_name || "",
+      name,
       city: profile?.city || "",
       role: profile?.role === "admin" ? "admin" : "user",
       likes: profile?.likes.length || 0,
@@ -497,7 +687,8 @@ export async function listAccounts() {
 }
 
 export function adminPasswordOk(username: string | undefined, password: string | undefined) {
-  if (username !== "yasin" || !password) return false;
+  const normalized = username ? normalizeUsername(username) : null;
+  if (normalized !== "yasin" || !password) return false;
   const expected = Buffer.from("7a3e6e22ce88a71d828e2772049b725fa5e1db1ca870332feeba953001441299", "hex");
   const actual = scryptSync(password, "fadak-admin-salt-v1", 32);
   return actual.length === expected.length && timingSafeEqual(actual, expected);

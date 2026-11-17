@@ -1,29 +1,23 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { engagementFor, itemKey, toggleEngagement, userFromToken, userIdByUsername } from "@/lib/account-store";
+import { absorbBox, engagementFor, itemKey, toggleEngagement } from "@/lib/account-store";
+import { signedInAccount } from "@/lib/current-account";
 import { BOX_COOKIE, decodeBox, encodeBox, toggleBox } from "@/lib/engage-box";
 import {
   IDENTITY_COOKIE,
   decodeIdentity,
   identityCookieOptions,
   identityFresh,
-  readSessionToken,
 } from "@/lib/session";
 
 const types = new Set(["video", "audio", "reel"]);
 
 async function actor() {
-  const token = await readSessionToken();
-  const stored = await userFromToken(token);
+  const account = await signedInAccount();
+  if (account) return { id: account.id, box: false };
   const jar = await cookies();
   const identity = decodeIdentity(jar.get(IDENTITY_COOKIE)?.value);
-  const named = identity && identityFresh(identity) ? identity : null;
-  if (stored) return { id: stored.id, name: stored.name, box: false };
-  if (named) {
-    const id = await userIdByUsername(named.username);
-    if (id) return { id, name: named.username, box: false };
-    return { id: "", name: named.username, box: true };
-  }
+  if (identity && identityFresh(identity)) return { id: "", box: true };
   return null;
 }
 
@@ -37,6 +31,19 @@ function boxResponse(boxRaw: string | undefined, keys: string[]) {
     counts[key] = liked ? 1 : 0;
   }
   return { counts, mine };
+}
+
+async function movedBox(userId: string) {
+  const jar = await cookies();
+  const raw = jar.get(BOX_COOKIE)?.value;
+  if (!raw) return false;
+  const box = decodeBox(raw);
+  if (!box.likes.length && !box.saves.length) return false;
+  return absorbBox(userId, box);
+}
+
+function clearBox(res: NextResponse) {
+  res.cookies.set(BOX_COOKIE, "", { httpOnly: true, path: "/", maxAge: 0 });
 }
 
 export async function GET(req: Request) {
@@ -53,10 +60,13 @@ export async function GET(req: Request) {
     return NextResponse.json({ user: null, ...data });
   }
   if (!who.box) {
+    const moved = await movedBox(who.id);
     const data = await engagementFor(who.id, keys);
-    return NextResponse.json({ user: { id: who.id, name: who.name }, ...data });
+    const res = NextResponse.json({ user: { id: who.id }, ...data });
+    if (moved) clearBox(res);
+    return res;
   }
-  return NextResponse.json({ user: { id: "", name: who.name }, ...boxResponse(jar.get(BOX_COOKIE)?.value, keys) });
+  return NextResponse.json({ user: { id: "" }, ...boxResponse(jar.get(BOX_COOKIE)?.value, keys) });
 }
 
 export async function POST(req: Request) {
@@ -77,9 +87,12 @@ export async function POST(req: Request) {
     thumb: body.thumb ? String(body.thumb).slice(0, 400) : undefined,
   };
   if (!who.box) {
+    const moved = await movedBox(who.id);
     const result = await toggleEngagement(who.id, type as "video" | "audio" | "reel", id, action, meta);
     if (!result) return NextResponse.json({ ok: false }, { status: 500 });
-    return NextResponse.json({ ok: true, key, ...result });
+    const res = NextResponse.json({ ok: true, key, ...result });
+    if (moved) clearBox(res);
+    return res;
   }
   const jar = await cookies();
   const next = toggleBox(decodeBox(jar.get(BOX_COOKIE)?.value), key, action, meta);

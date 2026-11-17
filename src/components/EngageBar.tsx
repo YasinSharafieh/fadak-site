@@ -24,6 +24,16 @@ function keyOf(type: string, id: string) {
   return `${type}:${id}`;
 }
 
+export function rememberEngage(type: string, id: string, patch: Partial<State>) {
+  const key = keyOf(type, id);
+  const prev = cache.get(key) || { count: 0, liked: false, saved: false };
+  const next = { ...prev, ...patch };
+  cache.set(key, next);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("fadak-engage", { detail: { key, state: next } }));
+  }
+}
+
 function queue(type: string, id: string, setState: (state: State) => void) {
   const key = keyOf(type, id);
   const known = cache.get(key);
@@ -66,6 +76,13 @@ export default function EngageBar({ type, id, title, href, thumb, compact }: Pro
 
   useEffect(() => {
     queue(type, id, setState);
+    const key = keyOf(type, id);
+    const onSync = (event: Event) => {
+      const detail = (event as CustomEvent<{ key: string; state: State }>).detail;
+      if (detail?.key === key) setState(detail.state);
+    };
+    window.addEventListener("fadak-engage", onSync);
+    return () => window.removeEventListener("fadak-engage", onSync);
   }, [type, id]);
 
   async function act(action: "like" | "save") {

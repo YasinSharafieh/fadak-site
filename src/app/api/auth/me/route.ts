@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { destroySession, touchSession, userFromToken } from "@/lib/account-store";
-import { BOX_COOKIE } from "@/lib/engage-box";
+import { absorbBox, destroySession, touchSession, userById, userFromToken, userIdByUsername } from "@/lib/account-store";
+import { BOX_COOKIE, decodeBox } from "@/lib/engage-box";
 import {
   ADMIN_COOKIE,
   IDENTITY_COOKIE,
@@ -37,7 +37,11 @@ export async function GET() {
     return res;
   }
 
-  const stored = await userFromToken(token);
+  let stored = await userFromToken(token);
+  if (!stored && identity) {
+    const id = await userIdByUsername(identity.username);
+    if (id) stored = await userById(id);
+  }
   const username = stored?.username || identity?.username || "";
   if (!username) {
     const res = NextResponse.json({ user: null });
@@ -46,12 +50,24 @@ export async function GET() {
   }
 
   if (token && stored) await touchSession(token);
+  let moved = false;
+  if (stored) {
+    const box = decodeBox(jar.get(BOX_COOKIE)?.value);
+    if (box.likes.length || box.saves.length) {
+      try {
+        moved = await absorbBox(stored.id, box);
+      } catch {
+        moved = false;
+      }
+    }
+  }
   const role: Identity["role"] = stored?.role === "admin" || identity?.role === "admin" ? "admin" : "user";
   const res = NextResponse.json({
     user: {
       id: stored?.id || "",
       phone: stored?.phone || "",
       name: stored?.name || "",
+      family: stored?.family || "",
       city: stored?.city || "",
       username,
       role,
@@ -60,8 +76,7 @@ export async function GET() {
   res.cookies.set(IDENTITY_COOKIE, encodeIdentity({ username, role, seen: now }), identityCookieOptions());
   if (token) res.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
   if (role === "admin") res.cookies.set(ADMIN_COOKIE, "authenticated", adminCookieOptions());
-  const box = jar.get(BOX_COOKIE)?.value;
-  if (box) res.cookies.set(BOX_COOKIE, box, identityCookieOptions());
+  if (moved) res.cookies.set(BOX_COOKIE, "", { httpOnly: true, path: "/", maxAge: 0 });
   res.headers.set("Cache-Control", "no-store");
   return res;
 }

@@ -189,7 +189,7 @@ export default function Header() {
                 aria-label="قرار بی‌قرارها"
                 className="partner-mark partner-mark-square"
               >
-                <img src="/brand/gharar-mark.png" alt="" className="h-6 w-6 object-contain" />
+                <img src="/brand/gharar-mark.png" alt="" className="h-7 w-7 object-contain" />
                 <span className="partner-tip">قرار بی‌قرارها</span>
               </a>
             </div>
@@ -275,7 +275,7 @@ export default function Header() {
           backdrop-filter: blur(8px);
           transition: border-color .2s ease, background .2s ease, transform .2s ease;
         }
-        .partner-mark-square { width: 2rem; padding: 0; }
+        .partner-mark-square { width: 2.25rem; height: 2.25rem; padding: 0; }
         .partner-mark:hover,
         .partner-mark:focus-visible {
           border-color: rgba(201,162,39,.75);
