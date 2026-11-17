@@ -29,7 +29,6 @@ export default function VideosPage() {
   }, []);
 
   const namahang = videos.filter((v) => v.title.includes("نماهنگ"));
-  const others = videos.filter((v) => !v.title.includes("نماهنگ"));
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
@@ -80,42 +79,8 @@ export default function VideosPage() {
         </section>
       )}
 
-      {/* سایر ویدیوها */}
-      {others.length > 0 && (
-        <section className="mt-12">
-          <h2 className="text-2xl font-extrabold text-white">سایر ویدیوها</h2>
-          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {others.map((v) => (
-              <Link
-                key={v.id}
-                href={`/videos/${v.id}`}
-                className="card-hover group overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/5"
-              >
-                <div className="relative aspect-video bg-black">
-                  {v.thumbnail ? (
-                    <img src={v.thumbnail} alt={v.title} className="h-full w-full object-cover transition group-hover:scale-105" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b] text-4xl text-white/20">🎬</div>
-                  )}
-                  <span className="absolute inset-0 flex items-center justify-center">
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-black/60 text-2xl text-white transition group-hover:bg-[#0e7c7b] group-hover:scale-110">▶</span>
-                  </span>
-                  {v.duration && (
-                    <span className="absolute bottom-2 left-2 rounded bg-black/80 px-2 py-1 text-xs text-white">{v.duration}</span>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold leading-6 group-hover:text-[#14a3a2] transition">{v.title}</h3>
-                  <p className="mt-1 text-xs text-white/50">کربلایی حسین طاهری • آپارات</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
       <p className="mt-8 text-center text-sm text-white/50">
-        {videos.length} ویدیو
+        {namahang.length} نماهنگ
       </p>
     </div>
   );

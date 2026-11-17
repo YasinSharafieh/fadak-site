@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AudioPlayer from "./AudioPlayer";
+import VideoPlayer from "./VideoPlayer";
 
 type Props = {
   photos: { id: string; url: string; caption?: string }[];
@@ -69,13 +70,7 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
                 <div key={v.id} className="overflow-hidden rounded-3xl bg-[#1a1a1a] shadow">
                   <div className="relative aspect-video w-full bg-black">
                     {playingId === v.id && v.aparat_id ? (
-                      <iframe
-                        src={`https://www.aparat.com/video/video/embed/videohash/${v.aparat_id}/vt/frame`}
-                        allowFullScreen
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        className="absolute inset-0 h-full w-full"
-                        title={v.title}
-                      />
+                      <VideoPlayer aparatId={v.aparat_id} title={v.title} thumbnail={v.thumbnail} />
                     ) : (
                       <button onClick={() => setPlayingId(v.id)} className="absolute inset-0 block w-full">
                         {v.thumbnail ? (
