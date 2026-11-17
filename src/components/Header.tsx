@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import ThemeImage from "@/components/ThemeImage";
 
@@ -40,6 +40,19 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { theme, toggle } = useTheme();
+  const headerRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const node = headerRef.current;
+    if (!node) return;
+    const apply = () => {
+      document.documentElement.style.setProperty("--site-header-h", `${node.offsetHeight}px`);
+    };
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [mobileOpen, searchOpen]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +62,11 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-black/95 text-white backdrop-blur">
+    <header
+      ref={headerRef}
+      data-menu-open={mobileOpen || searchOpen ? "true" : "false"}
+      className="site-header sticky top-0 z-40 border-b border-white/10 bg-black text-white"
+    >
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between gap-3 py-2.5">
           <Link href="/" className="flex shrink-0 items-center">

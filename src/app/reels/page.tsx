@@ -84,7 +84,7 @@ export default function ReelsPage() {
 
   if (reels.length === 0) {
     return (
-      <div className="flex h-screen items-center justify-center bg-black text-white">
+      <div className="reels-container flex items-center justify-center bg-black text-white">
         <p>در حال بارگذاری ریلزها...</p>
       </div>
     );

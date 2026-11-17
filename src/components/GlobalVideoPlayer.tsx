@@ -35,17 +35,30 @@ export default function GlobalVideoPlayer() {
     const sync = () => {
       const container = containerRef.current;
       const slot = fullSlotRef.current;
+      const header = document.querySelector("header");
       if (container && slot) {
         const rect = slot.getBoundingClientRect();
         container.style.top = `${rect.top}px`;
         container.style.left = `${rect.left}px`;
         container.style.width = `${rect.width}px`;
         container.style.height = `${rect.height}px`;
+        container.style.visibility = "visible";
+        if (header instanceof HTMLElement) {
+          const headerRect = header.getBoundingClientRect();
+          const menuOpen = header.dataset.menuOpen === "true";
+          const overlaps = !menuOpen && headerRect.top <= 1 && rect.top < header.offsetHeight - 2 && rect.bottom > 8;
+          header.classList.toggle("header-covered", overlaps);
+          const clipTop = Math.max(0, headerRect.bottom - rect.top);
+          container.style.clipPath = clipTop > 0 ? `inset(${clipTop}px 0 0 0)` : "";
+        }
       }
       rafId = requestAnimationFrame(sync);
     };
     rafId = requestAnimationFrame(sync);
-    return () => cancelAnimationFrame(rafId);
+    return () => {
+      cancelAnimationFrame(rafId);
+      document.querySelector("header")?.classList.remove("header-covered");
+    };
   }, [current, minimized, fullSlotRef]);
 
   // هنگام ورود به حالت مینی: پاک کردن inline styleهای حالت کامل
@@ -57,7 +70,10 @@ export default function GlobalVideoPlayer() {
       c.style.left = "";
       c.style.width = "";
       c.style.height = "";
+      c.style.clipPath = "";
+      c.style.visibility = "";
     }
+    if (minimized) document.querySelector("header")?.classList.remove("header-covered");
   }, [minimized]);
 
   // توقف پخش هنگام ناوبری در حالت کامل (صفحه جدید slot ندارد)
@@ -78,7 +94,7 @@ export default function GlobalVideoPlayer() {
       className={
         minimized
           ? "fixed bottom-4 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl"
-          : "fixed z-40 bg-black"
+          : "fixed z-30 bg-black"
       }
       style={minimized ? undefined : { top: 0, left: 0 }}
     >

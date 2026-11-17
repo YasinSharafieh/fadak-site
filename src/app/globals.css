@@ -77,13 +77,152 @@ body {
 /* ریلز */
 .reels-container {
   scroll-snap-type: y mandatory;
-  height: 100vh;
+  height: calc(100dvh - var(--site-header-h, 7.5rem));
   overflow-y: scroll;
 }
 
 .reel-item {
   scroll-snap-align: start;
-  height: 100vh;
+  height: calc(100dvh - var(--site-header-h, 7.5rem));
+}
+
+/* نوار بالا روی ویدیو نمی‌آید: وقتی ویدیو به محدودهٔ نوار می‌رسد، نوار کنار می‌رود. */
+.site-header {
+  transition: transform 0.28s ease;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+.site-header.header-covered {
+  transform: translateY(-101%);
+  pointer-events: none;
+}
+
+/* لوح تاریخ گوشهٔ بالای صفحه — رنگ‌ها عمدی‌اند و با تم روز عوض نمی‌شوند. */
+.date-plaque {
+  position: relative;
+  width: min(100%, 21.5rem);
+  overflow: hidden;
+  border-radius: 1.35rem;
+  color: #f7f3e8;
+  background:
+    radial-gradient(90% 70% at 100% 0%, rgba(201, 162, 39, 0.2), transparent 42%),
+    linear-gradient(155deg, #16463b 0%, #0c1c19 55%, #07110f 100%);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.38),
+    inset 0 0 0 1px rgba(232, 199, 102, 0.72),
+    inset 0 0 0 6px rgba(7, 17, 15, 0.72),
+    inset 0 0 0 7px rgba(201, 162, 39, 0.35);
+}
+.date-plaque-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.date-plaque-arch {
+  position: absolute;
+  top: 1.6rem;
+  right: 0.85rem;
+  width: 4.6rem;
+  height: 5.6rem;
+  fill: none;
+  stroke: #e8c766;
+  stroke-width: 1.1;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.date-plaque-arch path:last-child {
+  stroke: #7dcec8;
+  stroke-width: 0.8;
+  opacity: 0.8;
+}
+.date-plaque-corner {
+  position: absolute;
+  z-index: 2;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-color: #f0d78a;
+  border-style: solid;
+  pointer-events: none;
+}
+.date-plaque-corner-tl { top: 0.45rem; right: 0.45rem; border-width: 2px 2px 0 0; }
+.date-plaque-corner-tr { top: 0.45rem; left: 0.45rem; border-width: 2px 0 0 2px; }
+.date-plaque-corner-bl { bottom: 0.45rem; right: 0.45rem; border-width: 0 2px 2px 0; }
+.date-plaque-corner-br { bottom: 0.45rem; left: 0.45rem; border-width: 0 0 2px 2px; }
+.date-plaque-body {
+  position: relative;
+  z-index: 1;
+  padding: 0.95rem 1rem 0.85rem;
+}
+.date-plaque-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  color: #e8c766;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.date-plaque-kicker svg { fill: #e8c766; }
+.date-plaque-main {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 0.35rem;
+}
+.date-plaque-day {
+  margin: 0;
+  min-width: 3.4rem;
+  color: #f6e7b0;
+  font-size: 3.15rem;
+  font-weight: 800;
+  line-height: 0.9;
+  text-shadow: 0 0 18px rgba(201, 162, 39, 0.35);
+}
+.date-plaque-weekday {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+.date-plaque-month {
+  margin: 0.1rem 0 0;
+  color: rgba(247, 243, 232, 0.86);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+.date-plaque-cal {
+  margin: 0.28rem 0 0;
+  width: fit-content;
+  border-radius: 999px;
+  border: 1px solid rgba(232, 199, 102, 0.45);
+  padding: 0.05rem 0.45rem;
+  color: #e8c766;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+.date-plaque-rule {
+  height: 1px;
+  margin: 0.7rem 0 0.55rem;
+  background: linear-gradient(90deg, transparent, rgba(232, 199, 102, 0.85), transparent);
+}
+.date-plaque-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  margin: 0.28rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+.date-plaque-line span {
+  width: 2.6rem;
+  flex: none;
+  color: #7dcec8;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+.date-plaque-line strong {
+  font-weight: 700;
 }
 
 /* دکمه‌ها — سبز */
