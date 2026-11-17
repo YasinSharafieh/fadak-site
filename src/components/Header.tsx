@@ -164,20 +164,35 @@ export default function Header() {
             >
               {theme === "dark" ? <SunIcon /> : <MoonIcon />}
             </button>
-            <a
-              href="https://noorieh.ir/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="پایگاه اطلاع‌رسانی نوریه"
-              className="flex shrink-0 items-center transition hover:opacity-90"
-            >
-              <ThemeImage
-                darkSrc="/brand/noorieh-logo.png"
-                lightSrc="/brand/noorieh-logo-ink.png"
-                alt="نوریه"
-                className="h-9 w-auto object-contain sm:h-10"
-              />
-            </a>
+            <div className="flex shrink-0 items-center gap-1">
+              <a
+                href="https://noorieh.ir/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="پایگاه اطلاع‌رسانی نوریه"
+                aria-label="پایگاه اطلاع‌رسانی نوریه"
+                className="partner-mark"
+              >
+                <ThemeImage
+                  darkSrc="/brand/noorieh-logo.png"
+                  lightSrc="/brand/noorieh-logo-ink.png"
+                  alt=""
+                  className="h-5 w-auto max-w-[3.6rem] object-contain sm:h-[1.35rem] sm:max-w-[4.1rem]"
+                />
+                <span className="partner-tip">نوریه</span>
+              </a>
+              <a
+                href="https://gharaar.net/"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="قرار بی‌قرارها"
+                aria-label="قرار بی‌قرارها"
+                className="partner-mark partner-mark-square"
+              >
+                <img src="/brand/gharar-mark.png" alt="" className="h-6 w-6 object-contain" />
+                <span className="partner-tip">قرار بی‌قرارها</span>
+              </a>
+            </div>
             <Link href="/donate" className="btn-green hidden rounded-full px-4 py-2 text-sm sm:block">
               کمک به هیئت
             </Link>
@@ -246,6 +261,58 @@ export default function Header() {
           </nav>
         )}
       </div>
+      <style>{`
+        .partner-mark {
+          position: relative;
+          display: flex;
+          height: 2rem;
+          align-items: center;
+          justify-content: center;
+          border-radius: .7rem;
+          border: 1px solid rgba(255,255,255,.16);
+          background: rgba(255,255,255,.1);
+          padding: 0 .35rem;
+          backdrop-filter: blur(8px);
+          transition: border-color .2s ease, background .2s ease, transform .2s ease;
+        }
+        .partner-mark-square { width: 2rem; padding: 0; }
+        .partner-mark:hover,
+        .partner-mark:focus-visible {
+          border-color: rgba(201,162,39,.75);
+          background: rgba(255,255,255,.16);
+          transform: translateY(-1px);
+          outline: none;
+        }
+        .partner-tip {
+          position: absolute;
+          top: calc(100% + .35rem);
+          left: 50%;
+          z-index: 50;
+          transform: translateX(-50%);
+          white-space: nowrap;
+          border-radius: 999px;
+          border: 1px solid rgba(201,162,39,.55);
+          background: #141210;
+          color: #fff;
+          padding: .18rem .5rem;
+          font-size: 10px;
+          font-weight: 800;
+          opacity: 0;
+          pointer-events: none;
+          box-shadow: 0 8px 18px rgba(0,0,0,.28);
+        }
+        .partner-mark:hover .partner-tip,
+        .partner-mark:focus-visible .partner-tip { opacity: 1; }
+        html[data-theme="light"] .partner-mark {
+          border-color: rgba(28,25,21,.14);
+          background: rgba(255,255,255,.72);
+        }
+        html[data-theme="light"] .partner-mark:hover,
+        html[data-theme="light"] .partner-mark:focus-visible {
+          border-color: rgba(201,162,39,.8);
+          background: #fff;
+        }
+      `}</style>
     </header>
   );
 }
