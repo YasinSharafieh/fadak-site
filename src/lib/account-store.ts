@@ -5,14 +5,25 @@ const BUCKET = "accounts";
 const OTP_TTL_MS = 5 * 60 * 1000;
 const SESSION_TTL_MS = 60 * 24 * 60 * 60 * 1000;
 
+export type AccountRole = "user" | "admin";
+
 export type AccountUser = {
   id: string;
   phone: string;
   name: string;
   city: string;
+  username: string;
+  role: AccountRole;
 };
 
-type Profile = AccountUser & {
+type Profile = {
+  id: string;
+  phone: string;
+  name: string;
+  city: string;
+  username?: string;
+  passwordHash?: string;
+  role?: AccountRole;
   version: number;
   likes: string[];
   saves: { key: string; title: string; href: string; thumb?: string }[];
@@ -21,6 +32,9 @@ type Profile = AccountUser & {
 type CountsFile = { version: number; items: Record<string, number> };
 type OtpFile = { hash: string; expires: number; attempts: number; sentAt: number };
 type SessionFile = { userId: string; expires: number };
+type SignupFile = { phone: string; expires: number };
+
+const SIGNUP_TTL_MS = 15 * 60 * 1000;
 
 function serviceKey() {
   return process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -82,6 +96,39 @@ function otpHash(phone: string, code: string) {
   return sha(`${phone}:${code}:fadak-otp`);
 }
 
+export function normalizeUsername(input: string) {
+  const value = input.trim().toLowerCase();
+  if (!/^[\u0600-\u06ffa-z0-9._]{3,32}$/.test(value)) return null;
+  if (value.startsWith(".") || value.endsWith(".")) return null;
+  return value;
+}
+
+function hashPassword(password: string) {
+  const salt = randomBytes(16).toString("hex");
+  const hash = scryptSync(password, salt, 32).toString("hex");
+  return `scrypt$${salt}$${hash}`;
+}
+
+function passwordMatches(password: string, stored: string | undefined) {
+  if (!stored) return false;
+  const [kind, salt, hash] = stored.split("$");
+  if (kind !== "scrypt" || !salt || !hash) return false;
+  const actual = scryptSync(password, salt, 32);
+  const expected = Buffer.from(hash, "hex");
+  return actual.length === expected.length && timingSafeEqual(actual, expected);
+}
+
+function publicUser(profile: Profile): AccountUser {
+  return {
+    id: profile.id,
+    phone: profile.phone || "",
+    name: profile.name || "",
+    city: profile.city || "",
+    username: profile.username || "",
+    role: profile.role === "admin" ? "admin" : "user",
+  };
+}
+
 export function itemKey(type: string, id: string) {
   return `${type}:${id}`;
 }
@@ -89,7 +136,10 @@ export function itemKey(type: string, id: string) {
 export async function sendLoginCode(rawPhone: string) {
   const phone = normalizeIranMobile(rawPhone);
   if (!phone) return { ok: false as const, error: "شماره موبایل معتبر نیست." };
-  if (!accountsConfigured()) return { ok: false as const, error: "ورود فعلاً به پایگاه وصل نیست." };
+  if (!accountsConfigured()) return { ok: false as const, error: "ارسال کد انجام نشد." };
+  if (await readJson<{ userId: string }>(`phones/${phone}.json`)) {
+    return { ok: false as const, error: "این شماره قبلاً ثبت شده است." };
+  }
 
   const existing = await readJson<OtpFile>(`otp/${phone}.json`);
   if (existing && Date.now() - existing.sentAt < 60_000) {
@@ -142,7 +192,7 @@ async function deliverSms(phone: string, code: string): Promise<{ ok: true } | {
     if (!res.ok) return { ok: false, error: "ارسال پیامک انجام نشد. کمی بعد دوباره تلاش کنید." };
     return { ok: true };
   }
-  return { ok: false, error: "ارسال کد تایید هنوز به پنل پیامک وصل نشده است." };
+  return { ok: false, error: "ارسال کد انجام نشد." };
 }
 
 async function createAuthUser(phone: string) {
@@ -160,9 +210,7 @@ async function createAuthUser(phone: string) {
   return user.id as string;
 }
 
-export async function verifyLoginCode(rawPhone: string, code: string) {
-  const phone = normalizeIranMobile(rawPhone);
-  if (!phone) return { ok: false as const, error: "شماره موبایل معتبر نیست." };
+async function checkOtp(phone: string, code: string) {
   const otp = await readJson<OtpFile>(`otp/${phone}.json`);
   if (!otp || otp.expires < Date.now()) return { ok: false as const, error: "کد منقضی شده. دوباره درخواست کنید." };
   if (otp.attempts >= 5) return { ok: false as const, error: "تلاش‌های این کد تمام شد. کد جدید بگیرید." };
@@ -171,25 +219,136 @@ export async function verifyLoginCode(rawPhone: string, code: string) {
     return { ok: false as const, error: "کد تایید اشتباه است." };
   }
   await removeObject(`otp/${phone}.json`);
+  return { ok: true as const };
+}
 
-  let userId = (await readJson<{ userId: string }>(`phones/${phone}.json`))?.userId;
-  if (!userId) {
-    userId = await createAuthUser(phone);
-    await writeJson(`phones/${phone}.json`, { userId });
-    await writeJson(`profiles/${userId}.json`, {
-      id: userId,
-      phone,
-      name: "",
-      city: "",
-      version: 1,
-      likes: [],
-      saves: [],
-    } satisfies Profile);
+export async function openSignup(rawPhone: string, code: string) {
+  const phone = normalizeIranMobile(rawPhone);
+  if (!phone) return { ok: false as const, error: "شماره موبایل معتبر نیست." };
+  if (await readJson<{ userId: string }>(`phones/${phone}.json`)) {
+    return { ok: false as const, error: "این شماره قبلاً ثبت شده است." };
   }
+  const checked = await checkOtp(phone, code);
+  if (!checked.ok) return checked;
+  const ticket = randomBytes(32).toString("hex");
+  await writeJson(`signup/${sha(ticket)}.json`, { phone, expires: Date.now() + SIGNUP_TTL_MS } satisfies SignupFile);
+  return { ok: true as const, ticket };
+}
+
+export async function finishSignup(ticket: string, rawUsername: string, password: string) {
+  const username = normalizeUsername(rawUsername);
+  if (!username) return { ok: false as const, error: "نام کاربری معتبر نیست." };
+  if (password.length < 6 || password.length > 72) return { ok: false as const, error: "رمز عبور کوتاه است." };
+  const pending = await readJson<SignupFile>(`signup/${sha(ticket)}.json`);
+  if (!pending || pending.expires < Date.now()) return { ok: false as const, error: "کد منقضی شده. دوباره درخواست کنید." };
+  if (await readJson<{ userId: string }>(`usernames/${username}.json`)) {
+    return { ok: false as const, error: "این نام کاربری گرفته شده است." };
+  }
+  if (await readJson<{ userId: string }>(`phones/${pending.phone}.json`)) {
+    return { ok: false as const, error: "این شماره قبلاً ثبت شده است." };
+  }
+  const userId = await createAuthUser(pending.phone);
+  const profile: Profile = {
+    id: userId,
+    phone: pending.phone,
+    name: "",
+    city: "",
+    username,
+    passwordHash: hashPassword(password),
+    role: "user",
+    version: 1,
+    likes: [],
+    saves: [],
+  };
+  await writeJson(`phones/${pending.phone}.json`, { userId });
+  await writeJson(`usernames/${username}.json`, { userId });
+  await writeJson(`profiles/${userId}.json`, profile);
+  await removeObject(`signup/${sha(ticket)}.json`);
   const token = randomBytes(32).toString("hex");
   await writeJson(`sessions/${sha(token)}.json`, { userId, expires: Date.now() + SESSION_TTL_MS } satisfies SessionFile);
-  const profile = await readJson<Profile>(`profiles/${userId}.json`);
-  return { ok: true as const, token, needsName: !profile?.name };
+  return { ok: true as const, token, role: "user" as const };
+}
+
+async function provisionOwner(password: string) {
+  const existing = await readJson<{ userId: string }>("usernames/yasin.json");
+  if (existing?.userId) return existing.userId;
+  const listed = await fetch(`${projectUrl()}/auth/v1/admin/users?page=1&per_page=200`, {
+    headers: authHeaders(),
+    cache: "no-store",
+  });
+  const body = listed.ok ? await listed.json() : { users: [] };
+  const found = (body.users || []).find((user: { id: string; email?: string }) => user.email === "yasin@users.fadak.invalid");
+  let userId = found?.id as string | undefined;
+  if (!userId) {
+    const res = await fetch(`${projectUrl()}/auth/v1/admin/users`, {
+      method: "POST",
+      headers: { ...authHeaders(), "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "yasin@users.fadak.invalid",
+        email_confirm: true,
+        user_metadata: { username: "yasin", role: "admin" },
+      }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    userId = (await res.json()).id as string;
+  }
+  await writeJson("usernames/yasin.json", { userId });
+  const current = await readJson<Profile>(`profiles/${userId}.json`);
+  await writeJson(`profiles/${userId}.json`, {
+    id: userId,
+    phone: current?.phone || "",
+    name: current?.name || "",
+    city: current?.city || "",
+    username: "yasin",
+    passwordHash: current?.passwordHash && passwordMatches(password, current.passwordHash) ? current.passwordHash : hashPassword(password),
+    role: "admin",
+    version: (current?.version || 0) + 1,
+    likes: current?.likes || [],
+    saves: current?.saves || [],
+  } satisfies Profile);
+  return userId;
+}
+
+export async function loginWithPassword(rawUsername: string, password: string) {
+  const username = normalizeUsername(rawUsername);
+  if (!username || !password) return { ok: false as const, error: "نام کاربری یا رمز عبور اشتباه است." };
+  const owner = adminPasswordOk(username, password);
+  if (!accountsConfigured()) {
+    if (owner) return { ok: true as const, token: "", role: "admin" as const };
+    return { ok: false as const, error: "ورود انجام نشد." };
+  }
+  let userId = (await readJson<{ userId: string }>(`usernames/${username}.json`))?.userId;
+  if (!userId && owner) {
+    try {
+      userId = await provisionOwner(password);
+    } catch {
+      return { ok: true as const, token: "", role: "admin" as const };
+    }
+  }
+  if (!userId) return { ok: false as const, error: "نام کاربری یا رمز عبور اشتباه است." };
+  let profile = await readJson<Profile>(`profiles/${userId}.json`);
+  const matches = passwordMatches(password, profile?.passwordHash);
+  if (!matches && !owner) return { ok: false as const, error: "نام کاربری یا رمز عبور اشتباه است." };
+  if (owner && !matches) {
+    profile = {
+      id: userId,
+      phone: profile?.phone || "",
+      name: profile?.name || "",
+      city: profile?.city || "",
+      username: "yasin",
+      passwordHash: hashPassword(password),
+      role: "admin",
+      version: (profile?.version || 0) + 1,
+      likes: profile?.likes || [],
+      saves: profile?.saves || [],
+    };
+    await writeJson(`profiles/${userId}.json`, profile);
+  }
+  if (!profile) return { ok: false as const, error: "ورود انجام نشد." };
+  const token = randomBytes(32).toString("hex");
+  await writeJson(`sessions/${sha(token)}.json`, { userId, expires: Date.now() + SESSION_TTL_MS } satisfies SessionFile);
+  const role: AccountRole = profile?.role === "admin" || owner ? "admin" : "user";
+  return { ok: true as const, token, role };
 }
 
 export async function userFromToken(token: string | undefined) {
@@ -198,7 +357,7 @@ export async function userFromToken(token: string | undefined) {
   if (!session || session.expires < Date.now()) return null;
   const profile = await readJson<Profile>(`profiles/${session.userId}.json`);
   if (!profile) return null;
-  return { id: profile.id, phone: profile.phone, name: profile.name, city: profile.city } satisfies AccountUser;
+  return publicUser(profile);
 }
 
 export async function destroySession(token: string | undefined) {
@@ -216,7 +375,7 @@ export async function updateProfile(userId: string, input: { name?: string; city
     version: profile.version + 1,
   };
   await writeJson(`profiles/${userId}.json`, next);
-  return { id: next.id, phone: next.phone, name: next.name, city: next.city } satisfies AccountUser;
+  return publicUser(next);
 }
 
 async function mutateProfile(userId: string, change: (profile: Profile) => Profile) {
@@ -304,16 +463,18 @@ export async function listAccounts() {
   const res = await fetch(`${projectUrl()}/auth/v1/admin/users?page=1&per_page=200`, { headers: authHeaders(), cache: "no-store" });
   if (!res.ok) return [];
   const body = await res.json();
-  const users = (body.users || []) as { id: string; created_at?: string; user_metadata?: { phone?: string; display_name?: string } }[];
+  const users = (body.users || []) as { id: string; created_at?: string; email?: string; user_metadata?: { phone?: string; display_name?: string; username?: string } }[];
   const rows = [];
   for (const user of users) {
     const profile = await readJson<Profile>(`profiles/${user.id}.json`);
-    if (!profile && !user.user_metadata?.phone) continue;
+    if (!profile && !user.user_metadata?.phone && user.email !== "yasin@users.fadak.invalid") continue;
     rows.push({
       id: user.id,
+      username: profile?.username || user.user_metadata?.username || "",
       phone: profile?.phone || user.user_metadata?.phone || "",
       name: profile?.name || user.user_metadata?.display_name || "",
       city: profile?.city || "",
+      role: profile?.role === "admin" ? "admin" : "user",
       likes: profile?.likes.length || 0,
       saves: profile?.saves.length || 0,
       createdAt: user.created_at || "",

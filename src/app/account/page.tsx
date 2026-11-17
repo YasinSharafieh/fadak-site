@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { displayIranMobile } from "@/lib/phone";
 
-type User = { id: string; phone: string; name: string; city: string };
+type User = { id: string; phone: string; name: string; city: string; username: string; role: "user" | "admin" };
 type Saved = { key: string; title: string; href: string; thumb?: string };
 
 export default function AccountPage() {
@@ -60,10 +60,14 @@ export default function AccountPage() {
       <div className="flex items-end justify-between gap-3">
         <div>
           <p className="text-sm text-[#c9a227]">حساب کاربری</p>
-          <h1 className="mt-1 text-3xl font-extrabold">{user.name || "کاربر فدک"}</h1>
-          <p className="mt-1 text-sm text-white/60" dir="ltr">{displayIranMobile(user.phone)}</p>
+          <h1 className="mt-1 text-3xl font-extrabold">{user.name || user.username || "کاربر فدک"}</h1>
+          {user.username && <p className="mt-1 text-sm text-white/60">{user.username}</p>}
+          {user.phone && <p className="mt-1 text-sm text-white/60" dir="ltr">{displayIranMobile(user.phone)}</p>}
         </div>
-        <button onClick={logout} className="rounded-full border border-white/15 px-4 py-2 text-sm hover:border-red-400 hover:text-red-300">خروج</button>
+        <div className="flex gap-2">
+          {user.role === "admin" && <Link href="/admin" className="rounded-full border border-[#c9a227]/50 px-4 py-2 text-sm text-[#c9a227]">مدیریت</Link>}
+          <button onClick={logout} className="rounded-full border border-white/15 px-4 py-2 text-sm hover:border-red-400 hover:text-red-300">خروج</button>
+        </div>
       </div>
 
       <form onSubmit={saveProfile} className="mt-8 rounded-3xl border border-[#c9a227]/30 bg-[#111] p-6">

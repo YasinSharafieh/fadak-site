@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { destroySession } from "@/lib/account-store";
+import { ADMIN_COOKIE, SESSION_COOKIE } from "@/lib/session";
 
 export async function POST(req: Request) {
-  const res = NextResponse.redirect(new URL("/admin/login", req.url), 303);
-  res.cookies.set("fadak_admin", "", { httpOnly: true, path: "/", maxAge: 0 });
+  const jar = await cookies();
+  await destroySession(jar.get(SESSION_COOKIE)?.value);
+  const res = NextResponse.redirect(new URL("/login", req.url), 303);
+  res.cookies.set(ADMIN_COOKIE, "", { httpOnly: true, path: "/", maxAge: 0 });
+  res.cookies.set(SESSION_COOKIE, "", { httpOnly: true, path: "/", maxAge: 0 });
   return res;
 }

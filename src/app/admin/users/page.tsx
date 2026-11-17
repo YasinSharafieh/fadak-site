@@ -14,12 +14,12 @@ export default async function AdminUsersPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-12">
       <Link href="/admin" className="text-sm text-[#14a3a2] hover:underline">← بازگشت به داشبورد</Link>
-      <h1 className="mt-3 text-3xl font-extrabold">کاربران سایت</h1>
-      <p className="mt-2 text-sm text-white/60">{users.length} حساب ثبت‌شده. لایک و علاقه‌مندی هر کاربر اینجاست.</p>
+      <h1 className="mt-3 text-3xl font-extrabold">کاربران</h1>
       <div className="mt-6 overflow-hidden rounded-3xl border border-white/10">
         <table className="w-full text-sm">
           <thead className="bg-[#111] text-white/70">
             <tr>
+              <th className="px-4 py-3 text-right">نام کاربری</th>
               <th className="px-4 py-3 text-right">نام</th>
               <th className="px-4 py-3 text-right">موبایل</th>
               <th className="px-4 py-3 text-right">شهر</th>
@@ -29,10 +29,11 @@ export default async function AdminUsersPage() {
           </thead>
           <tbody>
             {users.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-white/50">هنوز کاربری ثبت‌نام نکرده.</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-white/50">هنوز کاربری ثبت‌نام نکرده.</td></tr>
             )}
             {users.map((user) => (
               <tr key={user.id} className="border-t border-white/10">
+                <td className="px-4 py-3">{user.username || "—"}</td>
                 <td className="px-4 py-3">{user.name || "—"}</td>
                 <td className="px-4 py-3" dir="ltr">{user.phone ? displayIranMobile(user.phone) : "—"}</td>
                 <td className="px-4 py-3">{user.city || "—"}</td>

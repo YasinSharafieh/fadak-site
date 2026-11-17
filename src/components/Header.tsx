@@ -41,14 +41,21 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [accountName, setAccountName] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { theme, toggle } = useTheme();
   const headerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     fetch("/api/auth/me")
       .then((res) => res.json())
-      .then((data) => setAccountName(data.user ? data.user.name || "حساب من" : null))
-      .catch(() => setAccountName(null));
+      .then((data) => {
+        setAccountName(data.user ? data.user.name || data.user.username || "حساب من" : null);
+        setIsAdmin(data.user?.role === "admin");
+      })
+      .catch(() => {
+        setAccountName(null);
+        setIsAdmin(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -118,6 +125,14 @@ export default function Header() {
                 <path d="M20 20l-3.5-3.5" />
               </svg>
             </button>
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="hidden h-9 items-center rounded-full border border-[#c9a227]/50 px-2.5 text-xs font-bold text-[#c9a227] sm:flex"
+              >
+                مدیریت
+              </Link>
+            )}
             <Link
               href={accountName ? "/account" : "/login"}
               title={accountName ? "حساب من" : "ورود"}
@@ -200,6 +215,11 @@ export default function Header() {
 
         {mobileOpen && (
           <nav className="border-t border-white/10 py-4 lg:hidden">
+            {isAdmin && (
+              <Link href="/admin" onClick={() => setMobileOpen(false)} className="mb-2 block rounded-xl border border-[#c9a227]/40 px-4 py-3 text-sm font-bold text-[#c9a227]">
+                مدیریت
+              </Link>
+            )}
             <div className="grid grid-cols-2 gap-2">
               {navItems.map((item) => (
                 <Link

@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 
 export const SESSION_COOKIE = "fadak_session";
+export const ADMIN_COOKIE = "fadak_admin";
 
 export async function readSessionToken() {
   const jar = await cookies();
@@ -14,5 +15,15 @@ export function sessionCookieOptions() {
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 60 * 24 * 60 * 60,
+  };
+}
+
+export function adminCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
   };
 }
