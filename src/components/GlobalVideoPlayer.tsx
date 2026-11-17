@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useVideoPlayer } from "@/context/VideoPlayerContext";
 
 /**
@@ -12,10 +13,10 @@ import { useVideoPlayer } from "@/context/VideoPlayerContext";
  */
 export default function GlobalVideoPlayer() {
   const { current, minimized, minimize, expand, close, fullSlotRef } = useVideoPlayer();
+  const pathname = usePathname();
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0, width: 0, height: 0 });
-  const rafRef = useRef<number>(0);
 
   const syncPos = useCallback(() => {
     const slot = fullSlotRef.current;
@@ -24,24 +25,26 @@ export default function GlobalVideoPlayer() {
     setPos({ top: r.top, left: r.left, width: r.width, height: r.height });
   }, [fullSlotRef]);
 
-  // همگام‌سازی موقعیت با slot در حالت کامل (اسکرول/ریسایز)
+  // موقعیت اولیه پلیر کامل (یک‌بار، بدون همگام‌سازی با اسکرول تا پلیر ثابت بماند)
   useEffect(() => {
     if (minimized || !current) return;
     syncPos();
-    const onScroll = () => {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(syncPos);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
     const t = setTimeout(syncPos, 150);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      cancelAnimationFrame(rafRef.current);
-      clearTimeout(t);
-    };
+    return () => clearTimeout(t);
   }, [minimized, current, syncPos]);
+
+  // توقف پخش هنگام تغییر صفحه (وقتی حالت کامل است و صفحه جدید slot ندارد)
+  useEffect(() => {
+    if (minimized || !current) return;
+    const check = () => {
+      const slot = fullSlotRef.current;
+      if (!slot || !document.body.contains(slot)) {
+        close();
+      }
+    };
+    const t = setTimeout(check, 200);
+    return () => clearTimeout(t);
+  }, [pathname, minimized, current, fullSlotRef, close]);
 
   // ریست وضعیت لود هنگام تغییر ویدیو
   useEffect(() => {
