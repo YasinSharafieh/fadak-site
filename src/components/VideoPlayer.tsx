@@ -8,38 +8,38 @@ type Props = {
   title: string;
   thumbnail?: string;
   videoId?: string;
-  /** اگر true باشد، دکمه مینی‌مالیز نمایش داده می‌شود */
   showMinimize?: boolean;
 };
 
 /**
  * پلیر ویدیوی آپارات.
- * - هنگام mount ویدیو را در کانتکست سراسری ثبت می‌کند.
- * - هنگام unmount (تغییر صفحه): اگر مینی‌مالیز نشده باشد، پخش متوقف می‌شود؛
- *   اگر مینی‌مالیز شده باشد، iframe به مینی‌پلیر منتقل و پخش ادامه می‌یابد.
+ * ساختار: slot (محل پلیر کامل) > wrapper (قابل جابه‌جایی، حاوی iframe)
+ * - minimize: wrapper به مینی‌پلیر منتقل می‌شود (پخش قطع نمی‌شود)
+ * - expand: wrapper به slot برمی‌گردد
+ * - unmount بدون minimize: پخش متوقف می‌شود
  */
 export default function VideoPlayer({ aparatId, title, thumbnail, videoId, showMinimize = true }: Props) {
-  const { play, minimize, minimized, iframeWrapperRef, fullSlotRef, isMinimizedRef } = useVideoPlayer();
+  const { play, minimize, expand, minimized, iframeWrapperRef, fullSlotRef, isMinimizedRef } = useVideoPlayer();
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
+  const slotRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   const embedUrl = `https://www.aparat.com/video/video/embed/videohash/${aparatId}/vt/frame`;
   const watchUrl = `https://www.aparat.com/v/${aparatId}`;
 
-  // ثبت ویدیو در کانتکست هنگام mount
+  // ثبت ویدیو و رفرنس‌ها هنگام mount
   useEffect(() => {
     play({ aparatId, title, thumbnail, videoId });
+    fullSlotRef.current = slotRef.current;
     iframeWrapperRef.current = wrapperRef.current;
-    fullSlotRef.current = wrapperRef.current;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aparatId]);
 
-  // cleanup هنگام unmount: اگر مینی‌مالیز نیستیم، ویدیو را متوقف کن
+  // cleanup هنگام unmount: اگر مینی‌مالیز نیستیم، پخش را متوقف کن
   useEffect(() => {
     return () => {
       if (!isMinimizedRef.current) {
-        // iframe را خالی کن تا پخش متوقف شود
         const iframe = wrapperRef.current?.querySelector("iframe");
         if (iframe) iframe.src = "about:blank";
       }
@@ -70,23 +70,41 @@ export default function VideoPlayer({ aparatId, title, thumbnail, videoId, showM
   }
 
   return (
-    <div ref={wrapperRef} className="relative aspect-video w-full bg-black">
-      {!loaded && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a]">
-          {thumbnail && <img src={thumbnail} alt={title} className="absolute inset-0 h-full w-full object-cover opacity-40" />}
-          <div className="relative h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-[#0e7c7b]" />
-          <p className="relative text-sm text-white/60">در حال بارگذاری ویدیو...</p>
+    <div ref={slotRef} className="relative aspect-video w-full bg-black">
+      {/* پیام راهنما وقتی پلیر کوچک شده (wrapper به مینی‌پلیر رفته) */}
+      {minimized && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#111]">
+          {thumbnail && <img src={thumbnail} alt={title} className="absolute inset-0 h-full w-full object-cover opacity-25" />}
+          <p className="relative text-sm text-white/70">ویدیو در پلیر کوچک در حال پخش است</p>
+          <button
+            onClick={expand}
+            className="btn-green relative rounded-full px-5 py-2 text-sm"
+          >
+            ⛶ باز کردن کامل
+          </button>
         </div>
       )}
-      <iframe
-        src={embedUrl}
-        allowFullScreen
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        className="absolute inset-0 h-full w-full"
-        title={title}
-        onLoad={() => setLoaded(true)}
-        onError={() => setFailed(true)}
-      />
+
+      {/* wrapper قابل جابه‌جایی */}
+      <div ref={wrapperRef} className="absolute inset-0">
+        {!loaded && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a]">
+            {thumbnail && <img src={thumbnail} alt={title} className="absolute inset-0 h-full w-full object-cover opacity-40" />}
+            <div className="relative h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-[#0e7c7b]" />
+            <p className="relative text-sm text-white/60">در حال بارگذاری ویدیو...</p>
+          </div>
+        )}
+        <iframe
+          src={embedUrl}
+          allowFullScreen
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          className="absolute inset-0 h-full w-full"
+          title={title}
+          onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+        />
+      </div>
+
       {showMinimize && !minimized && (
         <button
           onClick={minimize}

@@ -6,7 +6,7 @@ import { useVideoPlayer } from "@/context/VideoPlayerContext";
 
 /**
  * مینی‌پلیر سراسری — در لایه‌اوت رندر می‌شود و با تغییر صفحه باقی می‌ماند.
- * وقتی کاربر پلیر را مینی‌مالیز می‌کند، iframe (بدون قطع پخش) به اینجا منتقل می‌شود.
+ * iframe بین slot پلیر کامل و slot مینی‌پلیر جابه‌جا می‌شود (بدون قطع پخش).
  */
 export default function GlobalVideoPlayer() {
   const { current, minimized, expand, close, iframeWrapperRef, miniSlotRef, fullSlotRef } = useVideoPlayer();
@@ -15,23 +15,27 @@ export default function GlobalVideoPlayer() {
   useEffect(() => {
     const wrapper = iframeWrapperRef.current;
     if (!wrapper) return;
-    if (minimized && miniSlotRef.current) {
-      miniSlotRef.current.appendChild(wrapper);
-    } else if (!minimized && fullSlotRef.current && fullSlotRef.current !== wrapper) {
-      // بازگشت به پلیر کامل (اگر هنوز در DOM هست)
-      if (document.body.contains(fullSlotRef.current)) {
-        fullSlotRef.current.replaceWith(wrapper);
-        fullSlotRef.current = wrapper;
+
+    if (minimized) {
+      // انتقال به مینی‌پلیر
+      if (miniSlotRef.current && wrapper.parentNode !== miniSlotRef.current) {
+        miniSlotRef.current.appendChild(wrapper);
+      }
+    } else {
+      // بازگشت به پلیر کامل
+      const fullSlot = fullSlotRef.current;
+      if (fullSlot && document.body.contains(fullSlot) && wrapper.parentNode !== fullSlot) {
+        fullSlot.appendChild(wrapper);
       }
     }
-  }, [minimized, iframeWrapperRef, miniSlotRef, fullSlotRef]);
+  }, [minimized, current, iframeWrapperRef, miniSlotRef, fullSlotRef]);
 
   if (!current || !minimized) return null;
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl sm:left-auto sm:right-4 sm:w-80">
       {/* محل قرارگیری iframe */}
-      <div ref={miniSlotRef} className="aspect-video w-full bg-black" />
+      <div ref={miniSlotRef} className="relative aspect-video w-full bg-black" />
 
       {/* نوار کنترل مینی‌پلیر */}
       <div className="flex items-center gap-2 bg-[#1a1a1a] px-3 py-2">
