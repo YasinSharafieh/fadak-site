@@ -130,6 +130,20 @@ export default function GlobalVideoPlayer() {
             کوچک کردن
           </button>
         )}
+
+        {/* دکمه بستن روی گوشه ویدیوی کوچیک‌شده */}
+        {minimized && !failed && (
+          <button
+            onClick={close}
+            title="بستن ویدیو"
+            className="absolute left-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/25 bg-black/85 text-white shadow-lg backdrop-blur transition hover:bg-red-600"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6L6 18" />
+              <path d="M6 6l12 12" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* نوار کنترل مینی‌پلیر */}
