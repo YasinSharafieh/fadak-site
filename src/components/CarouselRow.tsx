@@ -20,36 +20,38 @@ export default function CarouselRow({ children, className = "" }: Props) {
     const el = ref.current;
     if (!el) return;
     const max = el.scrollWidth - el.clientWidth;
-    // در RTL مرورگرها: scrollLeft از 0 تا منفی (کروم) یا از max تا 0 (سافاری)
-    const sl = el.scrollLeft;
-    const abs = Math.abs(sl);
+    const abs = Math.abs(el.scrollLeft);
     setCanPrev(abs > 4);
     setCanNext(abs < max - 4);
   }, []);
 
+  // به‌روزرسانی وضعیت دکمه‌ها هنگام اسکرول/ریسایز/تغییر محتوا
   useEffect(() => {
     update();
     const el = ref.current;
     if (!el) return;
     el.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
-    const t = setTimeout(update, 300);
+    // مشاهده‌گر تغییرات محتوا (وقتی آیتم‌ها لود می‌شن)
+    const mo = new MutationObserver(update);
+    mo.observe(el, { childList: true, subtree: true });
+    const t = setTimeout(update, 400);
     return () => {
       el.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
+      mo.disconnect();
       clearTimeout(t);
     };
-  }, [update]);
+  }, [update, children]);
 
   const scroll = (dir: 1 | -1) => {
     const el = ref.current;
     if (!el) return;
-    // dir=1 → بعدی (اسکرول به چپ در RTL)، dir=-1 → قبلی
     el.scrollBy({ left: -dir * el.clientWidth * 0.8, behavior: "smooth" });
   };
 
   const btnBase =
-    "absolute top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-white shadow-lg backdrop-blur transition hover:bg-[#0e7c7b] disabled:opacity-0 disabled:pointer-events-none";
+    "absolute top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#0e7c7b] text-white shadow-xl ring-1 ring-white/20 transition hover:bg-[#14a3a2] hover:scale-110 disabled:opacity-0 disabled:pointer-events-none";
 
   return (
     <div className="relative">
@@ -67,7 +69,7 @@ export default function CarouselRow({ children, className = "" }: Props) {
         aria-label="قبلی"
         className={`${btnBase} right-2`}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M9 18l6-6-6-6" />
         </svg>
       </button>
@@ -79,7 +81,7 @@ export default function CarouselRow({ children, className = "" }: Props) {
         aria-label="بعدی"
         className={`${btnBase} left-2`}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M15 18l-6-6 6-6" />
         </svg>
       </button>
