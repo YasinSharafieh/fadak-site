@@ -1,5 +1,4 @@
 const MONTHS = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"] as const;
-const WEEKDAYS = ["یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه", "شنبه"] as const;
 const FA = "۰۱۲۳۴۵۶۷۸۹";
 
 export function toPersianDigits(value: string | number) {
@@ -63,15 +62,47 @@ export type NextMajles = {
   label: string;
 };
 
+const TEHRAN_WEEKDAY: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+/** تاریخ و ساعت تقویمی تهران، مستقل از منطقهٔ زمانی سرور. */
+export function tehranParts(now = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Tehran",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(now);
+  const get = (type: string) => parts.find((part) => part.type === type)?.value || "0";
+  return {
+    y: Number(get("year")),
+    m: Number(get("month")),
+    d: Number(get("day")),
+    weekday: TEHRAN_WEEKDAY[get("weekday")] ?? 0,
+    hour: Number(get("hour")),
+    minute: Number(get("minute")),
+    second: Number(get("second")),
+  };
+}
+
+export function msUntilTehranMidnight(now = new Date()) {
+  const t = tehranParts(now);
+  const elapsed = ((t.hour * 60 + t.minute) * 60 + t.second) * 1000;
+  return 24 * 60 * 60 * 1000 - elapsed + 250;
+}
+
 /** روضه هفتگی فدک هر سه‌شنبه است. اگر امروز سه‌شنبه باشد، همان امروز اعلام می‌شود. */
 export function nextWeeklyMajles(now = new Date()): NextMajles {
-  const date = new Date(now);
-  const day = date.getDay();
-  const wednesday = 3;
-  const add = day === wednesday ? 0 : (wednesday - day + 7) % 7;
-  date.setDate(date.getDate() + add);
-  const j = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
-  const weekday = WEEKDAYS[date.getDay()];
+  const t = tehranParts(now);
+  const tuesday = 2;
+  const add = (tuesday - t.weekday + 7) % 7;
+  const next = new Date(Date.UTC(t.y, t.m - 1, t.d + add));
+  const j = gregorianToJalali(next.getUTCFullYear(), next.getUTCMonth() + 1, next.getUTCDate());
+  const weekday = "سه‌شنبه";
   const dayText = toPersianDigits(j.jd);
   const yearText = toPersianDigits(j.jy);
   const month = MONTHS[j.jm - 1];
