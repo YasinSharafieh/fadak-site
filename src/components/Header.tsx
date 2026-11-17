@@ -32,12 +32,8 @@ export default function Header() {
     <header className="sticky top-0 z-40 bg-black/95 backdrop-blur border-b border-white/10 text-white">
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between py-3">
-          <Link href="/" className="flex items-center gap-3 group">
-            <img src="/brand/fadak-mark.png" alt="فدک" className="h-11 w-11 object-contain transition group-hover:scale-105" />
-            <div>
-              <div className="text-lg font-extrabold leading-none">فدک</div>
-              <div className="text-[10px] text-white/60">حفظ و نشر آثار کربلایی حسین طاهری</div>
-            </div>
+          <Link href="/" className="flex shrink-0 items-center group">
+            <img src="/brand/fadak-wordmark.png" alt="فدک" className="h-11 w-auto object-contain transition group-hover:scale-[1.03] sm:h-14" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">

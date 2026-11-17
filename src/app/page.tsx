@@ -72,6 +72,10 @@ export default function Home() {
         <div className="islamic-pattern-dark absolute inset-0" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-4 py-14 md:grid-cols-[1.4fr_0.8fr] md:py-20">
           <div className="text-center md:text-right">
+            <div className="mb-6 flex flex-wrap items-center justify-center gap-4 md:justify-start">
+              <img src="/brand/heyat-mark.png" alt="هیئت فدائیان حضرت زهرا" className="h-28 w-auto object-contain sm:h-36" />
+              <img src="/brand/fadak-wordmark.png" alt="فدک" className="h-14 w-auto max-w-[16rem] object-contain sm:h-16" />
+            </div>
             <span className="text-sm font-medium text-[#c9a227]">اطلاعیه</span>
             <h1 className="mt-3 text-3xl font-extrabold text-white md:text-5xl">مجلس روضه هفتگی</h1>
             <p className="mt-3 text-lg text-white/80">{nextMajles ? nextMajles.label : "هر سه‌شنبه"} — ساعت ۱۹:۳۰</p>
@@ -79,10 +83,6 @@ export default function Home() {
             <div className="mt-6 flex flex-wrap justify-center gap-3 md:justify-start">
               <Link href="/events" className="btn-green rounded-full px-8 py-3">جزئیات و مسیریابی</Link>
               <Link href="/archive" className="rounded-full border border-white/20 px-8 py-3 text-white hover:bg-white/10">آرشیو مراسمات</Link>
-            </div>
-            <div className="mt-6 flex items-center justify-center gap-4 md:justify-start">
-              <img src="/brand/fadak-mark.png" alt="فدک" className="h-12 w-12 object-contain" />
-              <img src="/brand/heyat-mark.png" alt="هیئت فدائیان حضرت زهرا" className="h-14 w-auto object-contain" />
             </div>
           </div>
           <div className="mx-auto flex h-52 w-52 flex-col items-center justify-center rounded-full border border-[#c9a227]/40 bg-[#0b3d2e]/80 text-center shadow-2xl md:h-64 md:w-64">
