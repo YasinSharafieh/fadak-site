@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { fadakAddress, fadakMapUrl } from "@/data/mock";
+import { nextWeeklyMajles, type NextMajles } from "@/lib/jalali";
 
 type Event = {
   id: string;
@@ -20,6 +21,7 @@ type Event = {
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [nextMajles, setNextMajles] = useState<NextMajles | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -30,6 +32,7 @@ export default function EventsPage() {
       setLoading(false);
     }
     load();
+    setNextMajles(nextWeeklyMajles());
   }, []);
 
   const upcoming = events.filter((e) => e.status === "upcoming");
@@ -51,9 +54,11 @@ export default function EventsPage() {
           ) : upcoming.length === 0 ? (
             <div className="col-span-full gold-frame rounded-2xl bg-[#1a1a1a] p-8 text-center">
               <div className="text-4xl">🕌</div>
-              <p className="mt-3 font-bold">مراسم آینده‌ای ثبت نشده</p>
-              <p className="mt-1 text-sm text-white/70/70">مراسم‌های روضه هفتگی هر سه‌شنبه برگزار می‌شود</p>
-              <p className="mt-3 text-sm">{fadakAddress}</p>
+              <p className="mt-3 text-xl font-extrabold">مجلس روضه هفتگی</p>
+              <p className="mt-2 text-sm text-[#14a3a2]">{nextMajles ? `${nextMajles.label} — ساعت ۱۹:۳۰` : "هر سه‌شنبه — ساعت ۱۹:۳۰"}</p>
+              <p className="mt-1 text-sm text-white/70">حسینیه سیدالشهدا (ع)</p>
+              <p className="mt-3 text-sm leading-7 text-white/60">{fadakAddress}</p>
+              <a href={fadakMapUrl} target="_blank" rel="noopener noreferrer" className="btn-green mt-5 inline-block rounded-full px-6 py-2 text-sm">مسیریابی</a>
             </div>
           ) : (
             upcoming.map((e) => (

@@ -18,8 +18,8 @@ export const upcomingEvents: EventItem[] = [
   {
     id: "next-1",
     title: "مجلس روضه هفتگی",
-    dateFa: "سه‌شنبه ۲۱ آبان ۱۴۰۵",
-    dateHijri: "۲۱ جمادی‌الثانی ۱۴۴۸",
+    dateFa: "هر سه‌شنبه — ساعت ۱۹:۳۰",
+    dateHijri: "",
     maddah: "کربلایی حسین طاهری",
     location: "حسینیه سیدالشهدا (ع)",
     address: fadakAddress,

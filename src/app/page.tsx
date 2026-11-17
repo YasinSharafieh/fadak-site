@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { collections } from "@/data/mock";
+import { collections, fadakAddress, fadakMapUrl } from "@/data/mock";
+import { popularIds, popularViews } from "@/data/popular-videos";
 import CarouselRow from "@/components/CarouselRow";
+import { artistFromTitle, comparePersianDates, formatViews, nextWeeklyMajles, parsePersianDate, toPersianDigits, type NextMajles } from "@/lib/jalali";
 
 type Event = {
   id: string;
@@ -13,6 +15,7 @@ type Event = {
   date_fa: string;
   date_hijri?: string;
   maddah?: string;
+  poster_url?: string;
   status: string;
 };
 
@@ -22,47 +25,70 @@ type Video = {
   aparat_id: string;
   thumbnail?: string;
   duration?: string;
+  created_at?: string;
+};
+
+const collectionStyle: Record<string, { mark: string; from: string; to: string }> = {
+  fatimieh: { mark: "فا", from: "#0b3d2e", to: "#0e7c7b" },
+  moharam: { mark: "مح", from: "#1a1a1a", to: "#3a1d1d" },
+  safar: { mark: "صف", from: "#1a1a1a", to: "#243044" },
+  ramadan: { mark: "رم", from: "#0b3d2e", to: "#145c45" },
+  weekly: { mark: "هف", from: "#0e7c7b", to: "#0b3d2e" },
+  occasions: { mark: "من", from: "#1a1a1a", to: "#3a3214" },
 };
 
 export default function Home() {
   const [events, setEvents] = useState<Event[]>([]);
-  const [videos, setVideos] = useState<Video[]>([]);
   const [namahang, setNamahang] = useState<Video[]>([]);
+  const [popular, setPopular] = useState<Video[]>([]);
+  const [nextMajles, setNextMajles] = useState<NextMajles | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setNextMajles(nextWeeklyMajles());
     async function load() {
       if (supabase) {
-        const [ev, vi, nm] = await Promise.all([
+        const [ev, nm, pop] = await Promise.all([
           supabase.from("events").select("*").order("created_at", { ascending: false }).limit(8),
-          supabase.from("videos").select("*").order("created_at", { ascending: false }).limit(8),
           supabase.from("videos").select("*").ilike("title", "%نماهنگ%").order("created_at", { ascending: false }).limit(10),
+          supabase.from("videos").select("*").in("aparat_id", popularIds),
         ]);
-        setEvents(ev.data || []);
-        setVideos(vi.data || []);
+        const sortedEvents = [...(ev.data || [])].sort((a, b) => comparePersianDates(a.date_fa || "", b.date_fa || ""));
+        const sortedPopular = [...(pop.data || [])].sort((a, b) => (popularViews[b.aparat_id] || 0) - (popularViews[a.aparat_id] || 0));
+        setEvents(sortedEvents);
         setNamahang(nm.data || []);
+        setPopular(sortedPopular);
       }
       setLoading(false);
     }
     load();
   }, []);
 
+  const weeklyCount = events.filter((e) => (e.title || "").includes("روضه") || (e.title || "").includes("هفتگی")).length;
+
   return (
     <div>
-      {/* بنر اطلاعیه */}
-      <section className="relative bg-black">
+      <section className="relative overflow-hidden bg-black">
         <div className="islamic-pattern-dark absolute inset-0" />
-        <div className="relative mx-auto max-w-7xl px-4 py-16 text-center text-white">
-          <span className="text-sm font-medium text-[#14a3a2]">اطلاعیه</span>
-          <h1 className="mt-3 text-3xl font-extrabold md:text-5xl">مجلس روضه هفتگی</h1>
-          <p className="mt-3 text-white/70">سه‌شنبه ۲۱ آبان ۱۴۰۵ — حسینیه سیدالشهدا (ع)</p>
-          <Link href="/archive" className="btn-green mt-6 inline-block rounded-full px-8 py-3">
-            آرشیو مراسمات
-          </Link>
+        <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-4 py-14 md:grid-cols-[1.4fr_0.8fr] md:py-20">
+          <div className="text-center md:text-right">
+            <span className="text-sm font-medium text-[#c9a227]">اطلاعیه</span>
+            <h1 className="mt-3 text-3xl font-extrabold text-white md:text-5xl">مجلس روضه هفتگی</h1>
+            <p className="mt-3 text-lg text-white/80">{nextMajles ? nextMajles.label : "هر سه‌شنبه"} — ساعت ۱۹:۳۰</p>
+            <p className="mt-2 text-sm text-white/60">حسینیه سیدالشهدا (ع)، تهران</p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3 md:justify-start">
+              <Link href="/events" className="btn-green rounded-full px-8 py-3">جزئیات و مسیریابی</Link>
+              <Link href="/archive" className="rounded-full border border-white/20 px-8 py-3 text-white hover:bg-white/10">آرشیو مراسمات</Link>
+            </div>
+          </div>
+          <div className="mx-auto flex h-52 w-52 flex-col items-center justify-center rounded-full border border-[#c9a227]/40 bg-[#0b3d2e]/80 text-center shadow-2xl md:h-64 md:w-64">
+            <p className="text-sm text-[#c9a227]">{nextMajles?.weekday || "سه‌شنبه"}</p>
+            <p className="text-6xl font-extrabold text-white">{nextMajles?.day || "—"}</p>
+            <p className="text-sm text-white/70">{nextMajles ? `${nextMajles.month} ${nextMajles.year}` : "هر هفته"}</p>
+          </div>
         </div>
       </section>
 
-      {/* آخرین مراسم‌ها */}
       <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="flex items-start justify-between">
           <div>
@@ -75,28 +101,37 @@ export default function Home() {
         <CarouselRow className="mt-5 gap-4">
           {loading ? (
             <p className="text-sm text-white/50">در حال بارگذاری...</p>
-          ) : events.map((e) => (
-            <Link key={e.id} href={`/archive/${e.slug}`} className="card-hover group w-80 shrink-0 overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/5">
-              <div className="relative h-48 bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b]">
-                <div className="islamic-pattern-dark absolute inset-0" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-6xl text-white/20">🕌</span>
+          ) : events.map((e) => {
+            const parsed = parsePersianDate(e.date_fa || "");
+            return (
+              <Link key={e.id} href={`/archive/${e.slug}`} className="card-hover group w-80 shrink-0 overflow-hidden rounded-2xl border border-white/5 bg-[#1a1a1a]">
+                <div className="relative h-48 bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b]">
+                  {e.poster_url ? (
+                    <img src={e.poster_url} alt={e.title} className="h-full w-full object-cover" />
+                  ) : (
+                    <>
+                      <div className="islamic-pattern-dark absolute inset-0" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                        <span className="text-5xl font-extrabold">{parsed ? toPersianDigits(parsed.d) : "ف"}</span>
+                        <span className="mt-1 text-sm text-white/80">{parsed ? ["", "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"][parsed.m] : ""}</span>
+                      </div>
+                    </>
+                  )}
+                  <div className="absolute bottom-3 right-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#c9a227] text-xl font-extrabold text-[#0b3d2e] shadow-lg">ف</div>
                 </div>
-                <div className="absolute bottom-3 right-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#c9a227] text-xl font-extrabold text-[#0b3d2e] shadow-lg">ف</div>
-              </div>
-              <div className="p-4">
-                {e.date_hijri && <p className="text-xs text-[#14a3a2]">{e.date_hijri}</p>}
-                <h3 className="mt-1 font-bold leading-6 group-hover:text-[#14a3a2] transition">{e.title}</h3>
-                {e.maddah && <p className="mt-2 text-xs leading-5 text-white/60">{e.maddah}</p>}
-                <p className="mt-2 text-xs text-white/50">{e.date_fa}</p>
-              </div>
-            </Link>
-          ))}
+                <div className="p-4">
+                  {e.date_hijri && <p className="text-xs text-[#14a3a2]">{e.date_hijri}</p>}
+                  <h3 className="mt-1 font-bold leading-6 transition group-hover:text-[#14a3a2]">{e.title.replace(/\u200c/g, " ")}</h3>
+                  {e.maddah && <p className="mt-2 text-xs leading-5 text-white/60">{e.maddah}</p>}
+                  <p className="mt-2 text-xs text-white/50">{e.date_fa}</p>
+                </div>
+              </Link>
+            );
+          })}
         </CarouselRow>
         <p className="mt-1 text-xs text-white/40">برای مشاهده بیشتر بکشید ←</p>
       </section>
 
-      {/* جدیدترین نماهنگ‌ها — با افکت هاور عریض شدن */}
       <section className="bg-[#111111] py-10">
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex items-start justify-between">
@@ -113,7 +148,7 @@ export default function Home() {
               <Link
                 key={v.id}
                 href={`/videos/${v.id}`}
-                className="group relative w-64 shrink-0 overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/5 transition-all duration-500 hover:w-80 hover:border-[#0e7c7b]/50"
+                className="group relative w-64 shrink-0 overflow-hidden rounded-2xl border border-white/5 bg-[#1a1a1a] transition-all duration-500 hover:w-80 hover:border-[#0e7c7b]/50"
               >
                 <div className="relative aspect-video bg-black">
                   {v.thumbnail ? (
@@ -131,8 +166,8 @@ export default function Home() {
                   <span className="absolute top-2 right-2 rounded bg-[#0e7c7b] px-2 py-1 text-[10px] font-bold text-white">نماهنگ</span>
                 </div>
                 <div className="p-3">
-                  <h3 className="text-sm font-bold leading-5 group-hover:text-[#14a3a2] transition">{v.title}</h3>
-                  <p className="mt-1 text-xs text-white/50">کربلایی حسین طاهری</p>
+                  <h3 className="text-sm font-bold leading-5 transition group-hover:text-[#14a3a2]">{v.title}</h3>
+                  <p className="mt-1 text-xs text-white/50">{artistFromTitle(v.title)}</p>
                 </div>
               </Link>
             ))}
@@ -141,7 +176,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* مجموعه‌ها */}
       <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="flex items-start justify-between">
           <div>
@@ -151,38 +185,43 @@ export default function Home() {
           </div>
           <Link href="/collections" className="shrink-0 text-sm text-[#14a3a2] hover:underline">همه مجموعه‌ها</Link>
         </div>
-
-        <div className="mt-5 flex flex-wrap gap-3">
-          {collections.map((col) => (
-            <Link
-              key={col.slug}
-              href={`/collections/${col.slug}`}
-              className="rounded-full bg-[#1a1a1a] px-6 py-3 font-bold text-white hover:bg-[#0e7c7b] hover:scale-105 transition border border-white/10"
-            >
-              {col.name}
-            </Link>
-          ))}
-        </div>
+        <CarouselRow className="mt-5 gap-4">
+          {collections.map((col) => {
+            const style = collectionStyle[col.slug] || collectionStyle.occasions;
+            const count = col.slug === "weekly" ? weeklyCount : 0;
+            return (
+              <Link key={col.slug} href={`/collections/${col.slug}`} className="card-hover group relative h-44 w-56 shrink-0 overflow-hidden rounded-3xl border border-white/10">
+                <div className="absolute inset-0" style={{ background: `linear-gradient(145deg, ${style.from}, ${style.to})` }} />
+                <div className="islamic-pattern-dark absolute inset-0" />
+                <div className="relative flex h-full flex-col justify-between p-5 text-white">
+                  <span className="text-3xl font-extrabold text-[#c9a227]">{style.mark}</span>
+                  <div>
+                    <h3 className="text-xl font-extrabold">{col.name}</h3>
+                    <p className="mt-1 text-xs text-white/70">{toPersianDigits(count)} مراسم · مشاهده مجموعه</p>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </CarouselRow>
       </section>
 
-      {/* محبوب‌ترین ویدئوها */}
       <section className="bg-[#111111] py-10">
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex items-start justify-between">
             <div>
               <span className="text-xs text-[#14a3a2]">ویدئوهای برگزیده</span>
               <h2 className="mt-1 text-2xl font-extrabold text-white">محبوب‌ترین ویدئوها</h2>
-              <p className="mt-1 text-sm text-white/60">ویدئوهای منتخب کانال فدک در آپارات.</p>
+              <p className="mt-1 text-sm text-white/60">پربازدیدترین نماهنگ‌های کانال فدک در آپارات، جدا از تازه‌ها.</p>
             </div>
-            <Link href="/videos" className="shrink-0 text-sm text-[#14a3a2] hover:underline">همه ویدئوها</Link>
+            <Link href="/videos" className="shrink-0 text-sm text-[#14a3a2] hover:underline">همه نماهنگ‌ها</Link>
           </div>
-
           <CarouselRow className="mt-5">
-            {videos.slice(0, 5).map((v) => (
+            {popular.map((v) => (
               <Link
                 key={v.id}
                 href={`/videos/${v.id}`}
-                className="group relative w-64 shrink-0 overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/5 transition-all duration-500 hover:w-80 hover:border-[#0e7c7b]/50"
+                className="group relative w-64 shrink-0 overflow-hidden rounded-2xl border border-white/5 bg-[#1a1a1a] transition-all duration-500 hover:w-80 hover:border-[#0e7c7b]/50"
               >
                 <div className="relative aspect-video bg-black">
                   {v.thumbnail ? (
@@ -190,70 +229,91 @@ export default function Home() {
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b] text-4xl text-white/20">🎬</div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition duration-500 group-hover:opacity-100" />
                   <span className="absolute inset-0 flex items-center justify-center opacity-0 transition duration-500 group-hover:opacity-100">
                     <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#0e7c7b] text-2xl text-white shadow-2xl">▶</span>
                   </span>
-                  {v.duration && (
-                    <span className="absolute bottom-2 left-2 rounded bg-black/80 px-2 py-1 text-xs text-white">{v.duration}</span>
-                  )}
-                  <span className="absolute top-2 right-2 rounded bg-black/80 px-2 py-1 text-[10px] text-white">آپارات</span>
+                  {v.duration && <span className="absolute bottom-2 left-2 rounded bg-black/80 px-2 py-1 text-xs text-white">{v.duration}</span>}
+                  <span className="absolute top-2 right-2 rounded bg-black/80 px-2 py-1 text-[10px] text-white">{formatViews(popularViews[v.aparat_id] || 0)}</span>
                 </div>
                 <div className="p-3">
-                  <h3 className="text-sm font-bold leading-5 group-hover:text-[#14a3a2] transition">{v.title}</h3>
+                  <h3 className="text-sm font-bold leading-5 transition group-hover:text-[#14a3a2]">{v.title}</h3>
                 </div>
               </Link>
             ))}
           </CarouselRow>
-          <p className="mt-1 text-xs text-white/40">برای مشاهده ویدئوهای بیشتر بکشید ←</p>
         </div>
       </section>
 
-      {/* حمایت */}
       <section className="mx-auto max-w-7xl px-4 py-10">
-        <div className="rounded-3xl bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b] p-8 md:p-10 text-center text-white">
+        <div className="rounded-3xl bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b] p-8 text-center text-white md:p-10">
           <p className="text-sm text-[#c9a227]">یک قدم برای ساختن یک خانه ماندگار</p>
           <h2 className="mt-2 text-2xl font-extrabold md:text-3xl">با هم، آینده حسینیه را بسازیم</h2>
           <p className="mx-auto mt-3 max-w-2xl leading-7 text-white/80">
             ساخت حسینیه با همراهی دل‌های مهربان شکل می‌گیرد. چه با کمک در مسیر ساخت‌وساز و چه با اهدای نذورات، سهم شما می‌تواند بخشی از این بنای ماندگار باشد.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link href="/donate" className="btn-gold rounded-full px-6 py-3">مشارکت در ساخت</Link>
-            <Link href="/donate" className="rounded-full border border-white/30 px-6 py-3 hover:bg-white/10 transition">اهدای نذورات</Link>
+            <Link href="/donate" className="btn-gold rounded-full px-6 py-3 text-right">
+              <span className="block">مشارکت در ساخت</span>
+              <span className="block text-xs font-medium opacity-80">همراهی در تکمیل حسینیه</span>
+            </Link>
+            <Link href="/donate" className="rounded-full border border-white/30 px-6 py-3 text-right transition hover:bg-white/10">
+              <span className="block font-bold">اهدای نذورات</span>
+              <span className="block text-xs text-white/70">نذر و کمک‌های مردمی</span>
+            </Link>
           </div>
-          <div className="mt-8 grid gap-3 sm:grid-cols-3 text-sm">
+          <div className="mt-8 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl bg-white/10 p-4">این بنا، با همراهی شما ساخته می‌شود</div>
             <div className="rounded-2xl bg-white/10 p-4">مشارکت به اندازه توان شما</div>
             <div className="rounded-2xl bg-white/10 p-4">همراهی در یک کار ماندگار</div>
+            <div className="rounded-2xl bg-white/10 p-4">هر همراهی، گامی به سوی تکمیل حسینیه</div>
           </div>
         </div>
       </section>
 
-      {/* موقعیت */}
-      <section className="mx-auto max-w-7xl px-4 pb-10">
+      <section className="mx-auto max-w-7xl px-4 pb-4">
+        <div className="flex items-end justify-between">
+          <div>
+            <span className="text-xs text-[#14a3a2]">اخبار و اعلامیه</span>
+            <h2 className="mt-1 text-2xl font-extrabold text-white">آخرین خبرهای هیئت</h2>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <a href="https://gharaar.net" target="_blank" rel="noopener noreferrer" className="card-hover rounded-3xl border border-white/10 bg-[#1a1a1a] p-6">
+            <p className="text-xs text-[#c9a227]">فرهنگی</p>
+            <h3 className="mt-2 text-lg font-extrabold">قرار بی‌قرارها</h3>
+            <p className="mt-2 text-sm leading-6 text-white/60">برنامه‌ها و فعالیت‌های فرهنگی هیئت فدائیان حضرت زهرا (س).</p>
+          </a>
+          <Link href="/khadam" className="card-hover rounded-3xl border border-white/10 bg-[#1a1a1a] p-6">
+            <p className="text-xs text-[#c9a227]">اطلاعیه</p>
+            <h3 className="mt-2 text-lg font-extrabold">ثبت‌نام خادمین</h3>
+            <p className="mt-2 text-sm leading-6 text-white/60">همکاری در صوت، تصویر، پذیرایی و بقیه کارها.</p>
+          </Link>
+          <Link href="/archive" className="card-hover rounded-3xl border border-white/10 bg-[#1a1a1a] p-6">
+            <p className="text-xs text-[#c9a227]">آرشیو</p>
+            <h3 className="mt-2 text-lg font-extrabold">مراسم‌های ثبت‌شده</h3>
+            <p className="mt-2 text-sm leading-6 text-white/60">صوت، عکس و ویدیوی مجالس گذشته، هر مراسم در صفحه خودش.</p>
+          </Link>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="grid gap-6 md:grid-cols-2">
-          <div className="rounded-3xl bg-[#1a1a1a] p-8 border border-white/10">
+          <div className="rounded-3xl border border-white/10 bg-[#1a1a1a] p-8">
             <span className="text-xs text-[#14a3a2]">موقعیت حسینیه</span>
             <h2 className="mt-2 text-2xl font-extrabold text-white">حسینیه سیدالشهدا (ع)</h2>
-            <p className="mt-3 leading-7 text-white/70">
-              برای حضور در مراسم‌ها و برنامه‌های حسینیه، می‌توانید موقعیت مجموعه را روی نقشه مشاهده کنید.
-            </p>
+            <p className="mt-3 leading-7 text-white/70">برای حضور در مراسم‌ها و برنامه‌های حسینیه، می‌توانید موقعیت مجموعه را روی نقشه مشاهده کنید.</p>
             <div className="mt-4">
               <p className="text-sm font-bold">آدرس</p>
-              <p className="mt-1 text-sm leading-6 text-white/60">
-                تهران، میدان هفتم تیر، خیابان مفتح جنوبی، خیابان ورزنده (جنب ورزشگاه شهید شیرودی)، خیابان ملک الشعراء بهار
-              </p>
+              <p className="mt-1 text-sm leading-6 text-white/60">{fadakAddress}</p>
             </div>
-            <a href="https://www.openstreetmap.org/?mlat=35.725616&mlon=51.445673#map=16/35.725616/51.445673" target="_blank" rel="noopener noreferrer" className="btn-green mt-5 inline-block rounded-full px-6 py-3">
-              مسیریابی
-            </a>
+            <a href={fadakMapUrl} target="_blank" rel="noopener noreferrer" className="btn-green mt-5 inline-block rounded-full px-6 py-3">مسیریابی</a>
           </div>
-          <div className="islamic-pattern flex items-center justify-center rounded-3xl bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b] p-8 text-center text-white">
-            <div>
-              <div className="text-6xl">🕌</div>
-              <h3 className="mt-3 text-xl font-extrabold">حسینیه سیدالشهدا (ع)</h3>
-              <p className="mt-2 text-sm text-white/70">مراسم‌های روضه هفتگی هر سه‌شنبه برگزار می‌شود</p>
-            </div>
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#1a1a1a]">
+            <iframe
+              title="نقشه حسینیه سیدالشهدا"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=51.4356%2C35.7206%2C51.4557%2C35.7306&layer=mapnik&marker=35.725616%2C51.445673"
+              className="h-full min-h-72 w-full border-0"
+            />
           </div>
         </div>
       </section>

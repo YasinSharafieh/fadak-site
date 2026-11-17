@@ -307,7 +307,7 @@ https://fadak-site-murex.vercel.app/link
       } else if (text.startsWith("/events")) {
         await sendMessage(token, chatId, `🕌 <b>مراسم آینده:</b>
 
-مجلس روضه هفتگی — سه‌شنبه ۲۱ آبان ۱۴۰۵ ساعت ۱۹:۳۰
+مجلس روضه هفتگی — هر سه‌شنبه، ساعت ۱۹:۳۰
 حسینیه سیدالشهدا (ع)، تهران
 
 جزئیات: https://fadak-site-murex.vercel.app/events`);
