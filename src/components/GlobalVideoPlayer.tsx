@@ -1,68 +1,155 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useVideoPlayer } from "@/context/VideoPlayerContext";
 
 /**
- * مینی‌پلیر سراسری — در لایه‌اوت رندر می‌شود و با تغییر صفحه باقی می‌ماند.
- * iframe بین slot پلیر کامل و slot مینی‌پلیر جابه‌جا می‌شود (بدون قطع پخش).
+ * پلیر سراسری — یک iframe واحد که هرگز در DOM جابه‌جا یا بازسازی نمی‌شود.
+ *
+ * - حالت کامل: دقیقاً روی slot در صفحه قرار می‌گیرد و با اسکرول صفحه
+ *   همراهش حرکت می‌کند (مثل یک المان عادی صفحه — بدون هیچ پرش یا جابه‌جایی عجیب).
+ * - حالت مینی: گوشه پایین صفحه ثابت می‌ماند.
+ *
+ * کوچک/بزرگ کردن فقط position را عوض می‌کند → پخش بدون هیچ وقفه،
+ * بدون رفرش و بدون از اول شروع شدن ادامه می‌یابد.
  */
 export default function GlobalVideoPlayer() {
-  const { current, minimized, expand, close, iframeWrapperRef, miniSlotRef, fullSlotRef } = useVideoPlayer();
+  const { current, minimized, expand, minimize, close, fullSlotRef } = useVideoPlayer();
+  const pathname = usePathname();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
 
-  // جابه‌جایی iframe بین پلیر کامل و مینی‌پلیر بدون قطع پخش
+  // ریست وضعیت لود با تغییر ویدیو
   useEffect(() => {
-    const wrapper = iframeWrapperRef.current;
-    if (!wrapper) return;
+    setLoaded(false);
+    setFailed(false);
+  }, [current?.aparatId]);
 
-    if (minimized) {
-      if (miniSlotRef.current && wrapper.parentNode !== miniSlotRef.current) {
-        miniSlotRef.current.appendChild(wrapper);
+  // همگام‌سازی موقعیت با slot در حالت کامل — با اسکرول و ری‌سایز همراهش حرکت می‌کند
+  useEffect(() => {
+    if (!current || minimized) return;
+    let rafId = 0;
+    const sync = () => {
+      const container = containerRef.current;
+      const slot = fullSlotRef.current;
+      if (container && slot) {
+        const rect = slot.getBoundingClientRect();
+        container.style.top = `${rect.top}px`;
+        container.style.left = `${rect.left}px`;
+        container.style.width = `${rect.width}px`;
+        container.style.height = `${rect.height}px`;
       }
-    } else {
-      const fullSlot = fullSlotRef.current;
-      if (fullSlot && document.body.contains(fullSlot) && wrapper.parentNode !== fullSlot) {
-        fullSlot.appendChild(wrapper);
-      }
+      rafId = requestAnimationFrame(sync);
+    };
+    rafId = requestAnimationFrame(sync);
+    return () => cancelAnimationFrame(rafId);
+  }, [current, minimized, fullSlotRef]);
+
+  // توقف پخش هنگام ناوبری در حالت کامل (صفحه جدید slot ندارد)
+  useEffect(() => {
+    if (!minimized && current && !fullSlotRef.current) {
+      close();
     }
-  }, [minimized, current, iframeWrapperRef, miniSlotRef, fullSlotRef]);
+  }, [pathname, minimized, current, close, fullSlotRef]);
 
-  if (!current || !minimized) return null;
+  if (!current) return null;
+
+  const embedUrl = `https://www.aparat.com/video/video/embed/videohash/${current.aparatId}/vt/frame`;
+  const watchUrl = `https://www.aparat.com/v/${current.aparatId}`;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl sm:left-auto sm:right-4 sm:w-80">
-      {/* محل قرارگیری iframe */}
-      <div ref={miniSlotRef} className="relative aspect-video w-full bg-black" />
+    <div
+      ref={containerRef}
+      className={
+        minimized
+          ? "fixed bottom-4 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl"
+          : "fixed z-40 bg-black"
+      }
+      style={minimized ? undefined : { top: 0, left: 0 }}
+    >
+      <div className="relative aspect-video w-full">
+        {!loaded && !failed && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a]">
+            {current.thumbnail && (
+              <img src={current.thumbnail} alt={current.title} className="absolute inset-0 h-full w-full object-cover opacity-40" />
+            )}
+            <div className="relative h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-[#0e7c7b]" />
+            <p className="relative text-sm text-white/60">در حال بارگذاری ویدیو...</p>
+          </div>
+        )}
+
+        {failed ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b] p-6 text-center">
+            <div className="text-4xl">🎬</div>
+            <p className="font-bold text-white">این ویدیو در حال حاضر در دسترس نیست</p>
+            <a href={watchUrl} target="_blank" rel="noopener noreferrer" className="btn-green rounded-full px-5 py-2 text-sm">
+              مشاهده در آپارات
+            </a>
+          </div>
+        ) : (
+          <iframe
+            key={current.aparatId}
+            src={embedUrl}
+            allowFullScreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            className="absolute inset-0 h-full w-full"
+            title={current.title}
+            onLoad={() => setLoaded(true)}
+            onError={() => setFailed(true)}
+          />
+        )}
+
+        {/* دکمه مینی‌مالیز در حالت کامل */}
+        {!minimized && !failed && (
+          <button
+            onClick={minimize}
+            title="کوچک کردن پلیر"
+            className="absolute bottom-3 left-3 z-10 flex items-center gap-1 rounded-full bg-black/70 px-3 py-1.5 text-xs font-bold text-white backdrop-blur transition hover:bg-[#0e7c7b]"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 3v3a2 2 0 0 1-2 2H3" />
+              <path d="M21 8h-3a2 2 0 0 1-2-2V3" />
+              <path d="M3 16h3a2 2 0 0 1 2 2v3" />
+              <path d="M16 21v-3a2 2 0 0 1 2-2h3" />
+            </svg>
+            کوچک کردن
+          </button>
+        )}
+      </div>
 
       {/* نوار کنترل مینی‌پلیر */}
-      <div className="flex items-center gap-2 bg-[#1a1a1a] px-3 py-2">
-        <p className="min-w-0 flex-1 truncate text-xs font-bold text-white">{current.title}</p>
-        {current.videoId && (
-          <Link
-            href={`/videos/${current.videoId}`}
-            onClick={expand}
-            title="باز کردن کامل"
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-[#0e7c7b]"
+      {minimized && (
+        <div className="flex items-center gap-2 bg-[#1a1a1a] px-3 py-2">
+          <p className="min-w-0 flex-1 truncate text-xs font-bold text-white">{current.title}</p>
+          {current.videoId && (
+            <Link
+              href={`/videos/${current.videoId}`}
+              onClick={expand}
+              title="باز کردن کامل"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-[#0e7c7b]"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 3h6v6" />
+                <path d="M10 14L21 3" />
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              </svg>
+            </Link>
+          )}
+          <button
+            onClick={close}
+            title="بستن پلیر"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-red-600"
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 3h6v6" />
-              <path d="M10 14L21 3" />
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <path d="M18 6L6 18" />
+              <path d="M6 6l12 12" />
             </svg>
-          </Link>
-        )}
-        <button
-          onClick={close}
-          title="بستن پلیر"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-red-600"
-        >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 6L6 18" />
-            <path d="M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
