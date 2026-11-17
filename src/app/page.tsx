@@ -46,16 +46,14 @@ export default function Home() {
   return (
     <div>
       {/* بنر اطلاعیه — عین نوریه */}
-      <section className="relative bg-[#0B3D2E]">
-        <div className="mx-auto max-w-7xl px-4 py-10 md:py-14">
-          <div className="text-center text-[#F7F3E8]">
-            <span className="text-sm font-medium text-[#C9A227]">اطلاعیه</span>
-            <h1 className="mt-3 text-3xl font-extrabold md:text-4xl">مجلس روضه هفتگی</h1>
-            <p className="mt-3 text-white/80">سه‌شنبه ۲۱ آبان ۱۴۰۵ — حسینیه سیدالشهدا (ع)</p>
-            <Link href="/archive" className="mt-6 inline-block rounded-full bg-[#C9A227] px-8 py-3 font-bold text-[#0B3D2E] hover:bg-[#e8c766] transition">
-              آرشیو مراسمات
-            </Link>
-          </div>
+      <section className="bg-[#0B3D2E]">
+        <div className="mx-auto max-w-7xl px-4 py-10 text-center text-[#F7F3E8]">
+          <span className="text-sm text-[#C9A227]">اطلاعیه</span>
+          <h1 className="mt-2 text-3xl font-extrabold md:text-4xl">مجلس روضه هفتگی</h1>
+          <p className="mt-2 text-white/80">سه‌شنبه ۲۱ آبان ۱۴۰۵ — حسینیه سیدالشهدا (ع)</p>
+          <Link href="/archive" className="mt-5 inline-block rounded-full bg-[#C9A227] px-8 py-3 font-bold text-[#0B3D2E] hover:bg-[#e8c766] transition">
+            آرشیو مراسمات
+          </Link>
         </div>
       </section>
 
@@ -98,7 +96,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs font-medium text-[#0E7C7B]">ویدئو</span>
+              <span className="text-xs text-[#0E7C7B]">ویدئو</span>
               <h2 className="mt-1 text-2xl font-extrabold text-[#0B3D2E]">جدیدترین نماهنگ‌ها</h2>
               <p className="mt-1 text-sm text-[#3D2B1F]/70">جدیدترین نماهنگ‌ها و کلیپ‌های منتشرشده از مراسمات هیئت.</p>
             </div>
@@ -140,7 +138,7 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="flex items-start justify-between">
           <div>
-            <span className="text-xs font-medium text-[#0E7C7B]">آرشیو</span>
+            <span className="text-xs text-[#0E7C7B]">آرشیو</span>
             <h2 className="mt-1 text-2xl font-extrabold text-[#0B3D2E]">مجموعه‌ها</h2>
             <p className="mt-1 text-sm text-[#3D2B1F]/70">دسترسی سریع به آرشیو مناسبت‌های مختلف هیئت</p>
           </div>
@@ -165,7 +163,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs font-medium text-[#0E7C7B]">ویدئوهای برگزیده</span>
+              <span className="text-xs text-[#0E7C7B]">ویدئوهای برگزیده</span>
               <h2 className="mt-1 text-2xl font-extrabold text-[#0B3D2E]">محبوب‌ترین ویدئوها</h2>
               <p className="mt-1 text-sm text-[#3D2B1F]/70">ویدئوهای منتخب کانال فدک در آپارات.</p>
             </div>
@@ -226,7 +224,7 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 pb-10">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="rounded-3xl bg-white p-8 shadow-sm">
-            <span className="text-xs font-medium text-[#0E7C7B]">موقعیت حسینیه</span>
+            <span className="text-xs text-[#0E7C7B]">موقعیت حسینیه</span>
             <h2 className="mt-2 text-2xl font-extrabold text-[#0B3D2E]">حسینیه سیدالشهدا (ع)</h2>
             <p className="mt-3 leading-7 text-[#3D2B1F]/80">
               برای حضور در مراسم‌ها و برنامه‌های حسینیه، می‌توانید موقعیت مجموعه را روی نقشه مشاهده کنید.
