@@ -12,8 +12,12 @@ export type CurrentVideo = {
 type VideoPlayerContextType = {
   current: CurrentVideo | null;
   minimized: boolean;
-  /** رفرنس به محل پلیر کامل در صفحه (slot) — برای همگام‌سازی موقعیت پلیر سراسری */
+  /** رفرنس به گره DOM حاوی iframe — برای جابه‌جایی بدون قطع پخش */
+  iframeWrapperRef: MutableRefObject<HTMLDivElement | null>;
+  /** رفرنس به کانتینر پلیر کامل (در صفحه) */
   fullSlotRef: MutableRefObject<HTMLDivElement | null>;
+  /** رفرنس به کانتینر مینی‌پلیر (در لایه‌اوت) */
+  miniSlotRef: MutableRefObject<HTMLDivElement | null>;
   play: (video: CurrentVideo) => void;
   minimize: () => void;
   expand: () => void;
@@ -28,7 +32,9 @@ export function VideoPlayerProvider({ children }: { children: ReactNode }) {
   const [current, setCurrent] = useState<CurrentVideo | null>(null);
   const [minimized, setMinimized] = useState(false);
   const isMinimizedRef = useRef(false);
+  const iframeWrapperRef = useRef<HTMLDivElement | null>(null);
   const fullSlotRef = useRef<HTMLDivElement | null>(null);
+  const miniSlotRef = useRef<HTMLDivElement | null>(null);
 
   const play = useCallback((video: CurrentVideo) => {
     setCurrent(video);
@@ -57,7 +63,9 @@ export function VideoPlayerProvider({ children }: { children: ReactNode }) {
       value={{
         current,
         minimized,
+        iframeWrapperRef,
         fullSlotRef,
+        miniSlotRef,
         play,
         minimize,
         expand,
