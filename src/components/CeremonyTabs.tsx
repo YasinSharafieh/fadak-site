@@ -21,15 +21,15 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
 
   return (
     <div className="mt-10">
-      <div className="flex gap-2 border-b border-[#C9A227]/30 pb-3">
+      <div className="flex gap-2 border-b border-[#0e7c7b]/30 pb-3">
         {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`rounded-full px-5 py-2 text-sm font-bold transition ${
               tab === t.id
-                ? "bg-[#0B3D2E] text-[#F7F3E8]"
-                : "bg-white text-[#3D2B1F] hover:bg-[#F7F3E8]"
+                ? "bg-[#0b3d2e] text-[#F7F3E8]"
+                : "bg-[#1a1a1a] text-white/70 hover:bg-[#111111]"
             }`}
           >
             {t.label}
@@ -40,12 +40,12 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
       <div className="mt-6">
         {tab === "photos" && (
           <div>
-            {photos.length === 0 && <p className="text-sm text-[#3D2B1F]/60">هنوز عکسی ثبت نشده.</p>}
+            {photos.length === 0 && <p className="text-sm text-white/70/60">هنوز عکسی ثبت نشده.</p>}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {photos.map((p) => (
                 <figure key={p.id}>
                   <img src={p.url} alt={p.caption || ""} className="aspect-square w-full rounded-2xl object-cover" />
-                  {p.caption && <figcaption className="mt-1 text-center text-xs text-[#3D2B1F]/70">{p.caption}</figcaption>}
+                  {p.caption && <figcaption className="mt-1 text-center text-xs text-white/70/70">{p.caption}</figcaption>}
                 </figure>
               ))}
             </div>
@@ -54,7 +54,7 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
 
         {tab === "audios" && (
           <div className="space-y-3">
-            {audios.length === 0 && <p className="text-sm text-[#3D2B1F]/60">هنوز صوتی ثبت نشده.</p>}
+            {audios.length === 0 && <p className="text-sm text-white/70/60">هنوز صوتی ثبت نشده.</p>}
             {audios.map((a) => (
               <AudioPlayer key={a.id} title={a.title} src={a.file_url} />
             ))}
@@ -63,10 +63,10 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
 
         {tab === "videos" && (
           <div>
-            {videos.length === 0 && <p className="text-sm text-[#3D2B1F]/60">هنوز ویدیویی ثبت نشده.</p>}
+            {videos.length === 0 && <p className="text-sm text-white/70/60">هنوز ویدیویی ثبت نشده.</p>}
             <div className="grid gap-5 md:grid-cols-2">
               {videos.map((v) => (
-                <div key={v.id} className="overflow-hidden rounded-3xl bg-white shadow">
+                <div key={v.id} className="overflow-hidden rounded-3xl bg-[#1a1a1a] shadow">
                   <div className="relative aspect-video w-full bg-black">
                     {playingId === v.id && v.aparat_id ? (
                       <iframe

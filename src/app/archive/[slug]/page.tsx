@@ -61,10 +61,10 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 animate-fade-in">
-      <Link href="/archive" className="text-sm text-[#0E7C7B] hover:underline">← بازگشت به آرشیو</Link>
+      <Link href="/archive" className="text-sm text-[#14a3a2] hover:underline">← بازگشت به آرشیو</Link>
 
       {/* هدر مراسم */}
-      <div className="gold-frame mt-4 rounded-3xl bg-white p-8">
+      <div className="gold-frame mt-4 rounded-3xl bg-[#1a1a1a] p-8">
         <div className="flex flex-col md:flex-row gap-6">
           {posterUrl && (
             <div className="shrink-0">
@@ -72,12 +72,12 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
             </div>
           )}
           <div className="flex-1 text-center md:text-right">
-            <h1 className="text-3xl font-extrabold text-[#0B3D2E]">{title}</h1>
-            <p className="mt-3 text-[#3D2B1F]/80">{dateFa} {dateHijri && `| ${dateHijri}`}</p>
+            <h1 className="text-3xl font-extrabold text-white">{title}</h1>
+            <p className="mt-3 text-white/70/80">{dateFa} {dateHijri && `| ${dateHijri}`}</p>
             {speaker && <p className="mt-2 text-sm"><span className="font-bold">سخنران:</span> {speaker}</p>}
             <p className="mt-1 text-sm"><span className="font-bold">مداحان:</span> {maddah}</p>
-            <p className="mt-1 text-sm text-[#3D2B1F]/70"><span className="font-bold">مکان:</span> {location}</p>
-            {address && <p className="mt-1 text-sm text-[#3D2B1F]/70"><span className="font-bold">آدرس:</span> {address}</p>}
+            <p className="mt-1 text-sm text-white/70/70"><span className="font-bold">مکان:</span> {location}</p>
+            {address && <p className="mt-1 text-sm text-white/70/70"><span className="font-bold">آدرس:</span> {address}</p>}
 
             {/* دکمه‌های اقدام */}
             <div className="mt-6 flex flex-wrap gap-3 justify-center md:justify-start">
@@ -86,19 +86,19 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
                   🗺️ مسیریابی
                 </a>
               )}
-              <a href={calendarUrl} target="_blank" rel="noopener noreferrer" className="rounded-full border px-5 py-2 text-sm hover:bg-[#F7F3E8] transition">
+              <a href={calendarUrl} target="_blank" rel="noopener noreferrer" className="rounded-full border px-5 py-2 text-sm hover:bg-[#111111] transition">
                 📅 افزودن به تقویم
               </a>
-              <a href={`https://t.me/fadak_media_bot`} target="_blank" rel="noopener noreferrer" className="rounded-full border px-5 py-2 text-sm hover:bg-[#F7F3E8] transition">
+              <a href={`https://t.me/fadak_media_bot`} target="_blank" rel="noopener noreferrer" className="rounded-full border px-5 py-2 text-sm hover:bg-[#111111] transition">
                 🔔 یادآور تلگرام
               </a>
-              <button className="rounded-full border px-5 py-2 text-sm hover:bg-[#F7F3E8] transition">
+              <button className="rounded-full border px-5 py-2 text-sm hover:bg-[#111111] transition">
                 📤 اشتراک‌گذاری
               </button>
             </div>
 
             {event?.description && (
-              <div className="mt-6 whitespace-pre-line rounded-2xl bg-[#F7F3E8] p-4 text-right text-sm leading-7">
+              <div className="mt-6 whitespace-pre-line rounded-2xl bg-[#111111] p-4 text-right text-sm leading-7">
                 {event.description}
               </div>
             )}

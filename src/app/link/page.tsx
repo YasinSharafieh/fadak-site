@@ -5,10 +5,10 @@ export default function LinkPage() {
     <div className="mx-auto max-w-2xl px-4 py-12 animate-fade-in">
       {/* هدر */}
       <div className="text-center">
-        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-[#0B3D2E] text-4xl font-extrabold text-[#C9A227]">ف</div>
-        <h1 className="mt-4 text-2xl font-extrabold text-[#0B3D2E]">کربلایی حسین طاهری</h1>
-        <p className="mt-2 text-sm text-[#3D2B1F]/70">هیأت فدائیان حضرت زهرا (س) | فدک</p>
-        <p className="mt-1 text-xs text-[#3D2B1F]/60">همه شبکه‌های اجتماعی در یک صفحه</p>
+        <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-[#0b3d2e] text-4xl font-extrabold text-[#14a3a2]">ف</div>
+        <h1 className="mt-4 text-2xl font-extrabold text-white">کربلایی حسین طاهری</h1>
+        <p className="mt-2 text-sm text-white/70/70">هیأت فدائیان حضرت زهرا (س) | فدک</p>
+        <p className="mt-1 text-xs text-white/70/60">همه شبکه‌های اجتماعی در یک صفحه</p>
       </div>
 
       {/* لینک‌ها */}
@@ -19,19 +19,19 @@ export default function LinkPage() {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="card-hover flex items-center gap-4 rounded-2xl bg-white p-4 shadow"
+            className="card-hover flex items-center gap-4 rounded-2xl bg-[#1a1a1a] p-4 shadow"
           >
             <span className="text-2xl">{link.icon}</span>
             <span className="flex-1 font-bold">{link.name}</span>
-            <span className="text-[#0E7C7B]">←</span>
+            <span className="text-[#14a3a2]">←</span>
           </a>
         ))}
       </div>
 
       {/* زیلینک */}
-      <div className="mt-8 rounded-2xl bg-[#0B3D2E] p-6 text-center text-[#F7F3E8]">
+      <div className="mt-8 rounded-2xl bg-[#0b3d2e] p-6 text-center text-[#F7F3E8]">
         <p className="font-bold">زیلینک رسمی طاهری‌نت</p>
-        <a href="https://zil.ink/taheri_net" target="_blank" rel="noopener noreferrer" className="mt-3 inline-block rounded-full bg-[#C9A227] px-6 py-2 font-bold text-[#0B3D2E]">
+        <a href="https://zil.ink/taheri_net" target="_blank" rel="noopener noreferrer" className="mt-3 inline-block rounded-full bg-[#0e7c7b] px-6 py-2 font-bold text-white">
           zil.ink/taheri_net
         </a>
       </div>

@@ -40,18 +40,18 @@ export default function VideosPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
       <div className="text-center">
-        <h1 className="text-3xl font-extrabold text-[#0B3D2E]">نماهنگ‌ها و ویدیوها</h1>
-        <p className="mt-2 text-[#3D2B1F]/70">ویدیوهای کانال آپارات فدک</p>
-        <a href="https://www.aparat.com/fadakinfo" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block rounded-full border px-5 py-2 text-sm hover:bg-[#F7F3E8] transition">
+        <h1 className="text-3xl font-extrabold text-white">نماهنگ‌ها و ویدیوها</h1>
+        <p className="mt-2 text-white/70/70">ویدیوهای کانال آپارات فدک</p>
+        <a href="https://www.aparat.com/fadakinfo" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block rounded-full border px-5 py-2 text-sm hover:bg-[#111111] transition">
           🎬 کانال آپارات فدک
         </a>
       </div>
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {loading ? (
-          <p className="col-span-full text-center text-[#3D2B1F]/60">در حال بارگذاری...</p>
+          <p className="col-span-full text-center text-white/70/60">در حال بارگذاری...</p>
         ) : videos.length === 0 ? (
-          <p className="col-span-full text-center text-[#3D2B1F]/60">ویدیویی یافت نشد.</p>
+          <p className="col-span-full text-center text-white/70/60">ویدیویی یافت نشد.</p>
         ) : (
           videos.map((v) => (
             <a
@@ -59,7 +59,7 @@ export default function VideosPage() {
               href={`https://www.aparat.com/v/${v.aparat_id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="card-hover group overflow-hidden rounded-2xl bg-white shadow"
+              className="card-hover group overflow-hidden rounded-2xl bg-[#1a1a1a] shadow"
             >
               <div className="relative aspect-video bg-black">
                 {v.thumbnail ? (
@@ -68,7 +68,7 @@ export default function VideosPage() {
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0B3D2E] to-[#0E7C7B] text-5xl text-white/50">🎬</div>
                 )}
                 <span className="absolute inset-0 flex items-center justify-center">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-black/60 text-2xl text-white transition group-hover:bg-[#C9A227] group-hover:text-[#0B3D2E]">▶</span>
+                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-black/60 text-2xl text-white transition group-hover:bg-[#0e7c7b] group-hover:text-white">▶</span>
                 </span>
                 {v.duration && (
                   <span className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">{v.duration}</span>
@@ -76,14 +76,14 @@ export default function VideosPage() {
               </div>
               <div className="p-4">
                 <h3 className="font-bold leading-6">{v.title}</h3>
-                <p className="mt-1 text-xs text-[#3D2B1F]/60">کربلایی حسین طاهری • آپارات</p>
+                <p className="mt-1 text-xs text-white/70/60">کربلایی حسین طاهری • آپارات</p>
               </div>
             </a>
           ))
         )}
       </div>
 
-      <p className="mt-8 text-center text-sm text-[#3D2B1F]/60">
+      <p className="mt-8 text-center text-sm text-white/70/60">
         {videos.length} ویدیو
       </p>
     </div>

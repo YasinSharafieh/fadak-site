@@ -49,8 +49,8 @@ export default function AudioPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
       <div className="text-center">
-        <h1 className="text-3xl font-extrabold text-[#0B3D2E]">کتابخانه صوتی</h1>
-        <p className="mt-2 text-[#3D2B1F]/70">آرشیو کامل صوت‌های مراسم‌های فدک</p>
+        <h1 className="text-3xl font-extrabold text-white">کتابخانه صوتی</h1>
+        <p className="mt-2 text-white/70/70">آرشیو کامل صوت‌های مراسم‌های فدک</p>
       </div>
 
       {/* فیلترها */}
@@ -60,12 +60,12 @@ export default function AudioPage() {
           placeholder="جستجو در صوت‌ها..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 rounded-full border border-[#C9A227]/40 bg-white px-5 py-3"
+          className="flex-1 rounded-full border border-[#0e7c7b]/40 bg-[#1a1a1a] px-5 py-3"
         />
         <select
           value={filterEvent}
           onChange={(e) => setFilterEvent(e.target.value)}
-          className="rounded-full border border-[#C9A227]/40 bg-white px-5 py-3"
+          className="rounded-full border border-[#0e7c7b]/40 bg-[#1a1a1a] px-5 py-3"
         >
           <option value="all">همه مراسم‌ها</option>
           {events.map((e) => (
@@ -77,9 +77,9 @@ export default function AudioPage() {
       {/* لیست صوت‌ها */}
       <div className="mt-8 space-y-3">
         {loading ? (
-          <p className="text-center text-[#3D2B1F]/60">در حال بارگذاری...</p>
+          <p className="text-center text-white/70/60">در حال بارگذاری...</p>
         ) : filtered.length === 0 ? (
-          <p className="text-center text-[#3D2B1F]/60">صوتی یافت نشد.</p>
+          <p className="text-center text-white/70/60">صوتی یافت نشد.</p>
         ) : (
           filtered.map((a) => (
             <AudioPlayer key={a.id} title={a.title} src={a.file_url} />
@@ -87,7 +87,7 @@ export default function AudioPage() {
         )}
       </div>
 
-      <p className="mt-8 text-center text-sm text-[#3D2B1F]/60">
+      <p className="mt-8 text-center text-sm text-white/70/60">
         {filtered.length} صوت از {audios.length} صوت
       </p>
     </div>

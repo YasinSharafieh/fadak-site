@@ -108,8 +108,8 @@ export default function SearchPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 animate-fade-in">
       <div className="text-center">
-        <h1 className="text-3xl font-extrabold text-[#0B3D2E]">جستجوی سراسری</h1>
-        <p className="mt-2 text-[#3D2B1F]/70">جستجو در مراسم‌ها، صوت‌ها، ویدیوها و اشعار</p>
+        <h1 className="text-3xl font-extrabold text-white">جستجوی سراسری</h1>
+        <p className="mt-2 text-white/70/70">جستجو در مراسم‌ها، صوت‌ها، ویدیوها و اشعار</p>
       </div>
 
       <form onSubmit={handleSubmit} className="mt-8">
@@ -119,7 +119,7 @@ export default function SearchPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="نام مراسم، مداح، عنوان صوت..."
-            className="flex-1 rounded-full border border-[#C9A227]/40 bg-white px-6 py-4 text-lg"
+            className="flex-1 rounded-full border border-[#0e7c7b]/40 bg-[#1a1a1a] px-6 py-4 text-lg"
           />
           <button type="submit" className="btn-gold rounded-full px-8 py-4">
             جستجو
@@ -129,21 +129,21 @@ export default function SearchPage() {
 
       <div className="mt-8">
         {loading ? (
-          <p className="text-center text-[#3D2B1F]/60">در حال جستجو...</p>
+          <p className="text-center text-white/70/60">در حال جستجو...</p>
         ) : query && results.length === 0 ? (
-          <p className="text-center text-[#3D2B1F]/60">نتیجه‌ای یافت نشد.</p>
+          <p className="text-center text-white/70/60">نتیجه‌ای یافت نشد.</p>
         ) : results.length > 0 ? (
           <>
-            <p className="mb-4 text-sm text-[#3D2B1F]/60">{results.length} نتیجه یافت شد</p>
+            <p className="mb-4 text-sm text-white/70/60">{results.length} نتیجه یافت شد</p>
             <div className="space-y-3">
               {results.map((r) => (
-                <Link key={`${r.type}-${r.id}`} href={r.url} className="card-hover flex items-center gap-4 rounded-2xl bg-white p-4 shadow">
+                <Link key={`${r.type}-${r.id}`} href={r.url} className="card-hover flex items-center gap-4 rounded-2xl bg-[#1a1a1a] p-4 shadow">
                   <span className="text-2xl">{getIcon(r.type)}</span>
                   <div className="flex-1">
                     <div className="font-bold">{r.title}</div>
-                    {r.subtitle && <div className="text-sm text-[#3D2B1F]/60">{r.subtitle}</div>}
+                    {r.subtitle && <div className="text-sm text-white/70/60">{r.subtitle}</div>}
                   </div>
-                  <span className="text-[#0E7C7B]">←</span>
+                  <span className="text-[#14a3a2]">←</span>
                 </Link>
               ))}
             </div>

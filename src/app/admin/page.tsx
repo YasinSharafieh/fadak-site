@@ -43,7 +43,7 @@ export default async function AdminDashboard() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-extrabold text-[#0B3D2E]">داشبورد مدیریت</h1>
+        <h1 className="text-3xl font-extrabold text-white">داشبورد مدیریت</h1>
         <Link href="/admin/upload" className="btn-gold rounded-full px-6 py-3">
           + آپلود صوت
         </Link>
@@ -51,10 +51,10 @@ export default async function AdminDashboard() {
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => (
-          <Link key={card.label} href={card.href} className="card-hover gold-frame rounded-2xl bg-white p-6">
+          <Link key={card.label} href={card.href} className="card-hover gold-frame rounded-2xl bg-[#1a1a1a] p-6">
             <div className="flex items-center justify-between">
               <span className="text-3xl">{card.icon}</span>
-              <span className="text-3xl font-extrabold text-[#0B3D2E]">{card.value}</span>
+              <span className="text-3xl font-extrabold text-white">{card.value}</span>
             </div>
             <p className="mt-3 font-bold">{card.label}</p>
           </Link>
@@ -62,12 +62,12 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <Link href="/admin/events" className="card-hover rounded-2xl bg-[#0B3D2E] p-6 text-white">
+        <Link href="/admin/events" className="card-hover rounded-2xl bg-[#0b3d2e] p-6 text-white">
           <div className="text-2xl">🕌</div>
           <div className="mt-2 text-lg font-extrabold">مدیریت مراسم‌ها</div>
           <p className="mt-1 text-sm text-white/70">افزودن و ویرایش مراسم‌ها</p>
         </Link>
-        <Link href="/admin/upload" className="card-hover rounded-2xl bg-[#0E7C7B] p-6 text-white">
+        <Link href="/admin/upload" className="card-hover rounded-2xl bg-[#0e7c7b] p-6 text-white">
           <div className="text-2xl">🎵</div>
           <div className="mt-2 text-lg font-extrabold">آپلود صوت</div>
           <p className="mt-1 text-sm text-white/70">آپلود مستقیم فایل صوتی</p>

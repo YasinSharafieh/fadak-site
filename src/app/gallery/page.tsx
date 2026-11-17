@@ -44,8 +44,8 @@ export default function GalleryPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
       <div className="text-center">
-        <h1 className="text-3xl font-extrabold text-[#0B3D2E]">گالری عکس</h1>
-        <p className="mt-2 text-[#3D2B1F]/70">تصاویر مراسم‌های فدک</p>
+        <h1 className="text-3xl font-extrabold text-white">گالری عکس</h1>
+        <p className="mt-2 text-white/70/70">تصاویر مراسم‌های فدک</p>
       </div>
 
       {/* فیلتر */}
@@ -53,7 +53,7 @@ export default function GalleryPage() {
         <select
           value={filterEvent}
           onChange={(e) => setFilterEvent(e.target.value)}
-          className="w-full rounded-full border border-[#C9A227]/40 bg-white px-5 py-3"
+          className="w-full rounded-full border border-[#0e7c7b]/40 bg-[#1a1a1a] px-5 py-3"
         >
           <option value="all">همه مراسم‌ها</option>
           {events.map((e) => (
@@ -65,9 +65,9 @@ export default function GalleryPage() {
       {/* گالری */}
       <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {loading ? (
-          <p className="col-span-full text-center text-[#3D2B1F]/60">در حال بارگذاری...</p>
+          <p className="col-span-full text-center text-white/70/60">در حال بارگذاری...</p>
         ) : filtered.length === 0 ? (
-          <p className="col-span-full text-center text-[#3D2B1F]/60">عکسی یافت نشد.</p>
+          <p className="col-span-full text-center text-white/70/60">عکسی یافت نشد.</p>
         ) : (
           filtered.map((photo) => (
             <button
@@ -91,7 +91,7 @@ export default function GalleryPage() {
         )}
       </div>
 
-      <p className="mt-8 text-center text-sm text-[#3D2B1F]/60">
+      <p className="mt-8 text-center text-sm text-white/70/60">
         {filtered.length} عکس از {photos.length} عکس
       </p>
 
@@ -108,7 +108,7 @@ export default function GalleryPage() {
             )}
             <button
               onClick={() => setLightbox(null)}
-              className="absolute top-4 right-4 rounded-full bg-white/20 p-3 text-white hover:bg-white/30 transition"
+              className="absolute top-4 right-4 rounded-full bg-[#1a1a1a]/20 p-3 text-white hover:bg-[#1a1a1a]/30 transition"
             >
               ✕
             </button>
