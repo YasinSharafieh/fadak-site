@@ -70,8 +70,9 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
                   <div className="relative aspect-video w-full bg-black">
                     {playingId === v.id && v.aparat_id ? (
                       <iframe
-                        src={`https://www.aparat.com/video/${v.aparat_id}/vframe/embed`}
+                        src={`https://www.aparat.com/video/video/embed/videohash/${v.aparat_id}/vt/frame`}
                         allowFullScreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         className="absolute inset-0 h-full w-full"
                         title={v.title}
                       />

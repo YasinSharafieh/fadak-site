@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { getAparatVideoInfo } from "@/lib/aparat";
 
 export const instant = false;
 
@@ -33,7 +32,6 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
     );
   }
 
-  const info = video.aparat_id ? await getAparatVideoInfo(video.aparat_id) : null;
   const related = await getRelatedVideos(video.event_id, video.id);
 
   return (
@@ -44,8 +42,9 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
       <div className="mt-6 overflow-hidden rounded-3xl bg-black shadow-2xl">
         {video.aparat_id ? (
           <iframe
-            src={`https://www.aparat.com/video/${video.aparat_id}/vframe/embed`}
+            src={`https://www.aparat.com/video/video/embed/videohash/${video.aparat_id}/vt/frame`}
             allowFullScreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             className="aspect-video w-full"
             title={video.title}
           />

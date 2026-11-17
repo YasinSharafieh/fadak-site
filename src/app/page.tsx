@@ -26,24 +26,25 @@ type Video = {
 export default function Home() {
   const [events, setEvents] = useState<Event[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
+  const [namahang, setNamahang] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       if (supabase) {
-        const [ev, vi] = await Promise.all([
+        const [ev, vi, nm] = await Promise.all([
           supabase.from("events").select("*").order("created_at", { ascending: false }).limit(8),
           supabase.from("videos").select("*").order("created_at", { ascending: false }).limit(8),
+          supabase.from("videos").select("*").ilike("title", "%نماهنگ%").order("created_at", { ascending: false }).limit(10),
         ]);
         setEvents(ev.data || []);
         setVideos(vi.data || []);
+        setNamahang(nm.data || []);
       }
       setLoading(false);
     }
     load();
   }, []);
-
-  const namahang = videos.filter((v) => v.title.startsWith("نماهنگ")).slice(0, 5);
 
   return (
     <div>

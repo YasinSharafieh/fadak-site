@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { getAparatVideoInfo } from "@/lib/aparat";
 
 type Video = {
   id: string;
@@ -22,24 +21,15 @@ export default function VideosPage() {
     async function load() {
       if (supabase) {
         const { data } = await supabase.from("videos").select("*").order("created_at", { ascending: false });
-        if (data) {
-          const fresh = await Promise.all(
-            data.map(async (v: any) => {
-              if (!v.aparat_id) return v;
-              const info = await getAparatVideoInfo(v.aparat_id);
-              return { ...v, thumbnail: info.thumbnail || v.thumbnail, duration: info.duration || v.duration };
-            })
-          );
-          setVideos(fresh);
-        }
+        if (data) setVideos(data);
       }
       setLoading(false);
     }
     load();
   }, []);
 
-  const namahang = videos.filter((v) => v.title.startsWith("نماهنگ"));
-  const others = videos.filter((v) => !v.title.startsWith("نماهنگ"));
+  const namahang = videos.filter((v) => v.title.includes("نماهنگ"));
+  const others = videos.filter((v) => !v.title.includes("نماهنگ"));
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
