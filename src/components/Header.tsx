@@ -33,7 +33,7 @@ export default function Header() {
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between py-3">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0e7c7b] text-xl font-extrabold text-white transition group-hover:bg-[#14a3a2] group-hover:scale-105">ف</div>
+            <img src="/brand/fadak-mark.png" alt="فدک" className="h-11 w-11 object-contain transition group-hover:scale-105" />
             <div>
               <div className="text-lg font-extrabold leading-none">فدک</div>
               <div className="text-[10px] text-white/60">حفظ و نشر آثار کربلایی حسین طاهری</div>

@@ -8,12 +8,11 @@ export default function Footer() {
         <div className="grid gap-8 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0e7c7b] text-xl font-extrabold text-white">ف</div>
-              <div>
-                <div className="text-lg font-extrabold">فدک</div>
-                <div className="text-xs text-white/60">حفظ و نشر آثار کربلایی حسین طاهری</div>
-              </div>
+              <img src="/brand/fadak-mark.png" alt="" className="h-14 w-14 shrink-0 object-contain" />
+              <img src="/brand/fadak-wordmark.png" alt="فدک" className="h-12 w-auto max-w-[210px] object-contain" />
             </div>
+            <p className="mt-3 text-xs text-white/60">حفظ و نشر آثار کربلایی حسین طاهری</p>
+            <img src="/brand/heyat-mark.png" alt="هیئت فدائیان حضرت زهرا (س)" className="mt-5 h-28 w-auto max-w-full object-contain" />
             <p className="mt-4 text-sm leading-6 text-white/70">
               پایگاه حفظ و نشر آثار کربلایی حسین طاهری و هیأت فدائیان حضرت زهرا (س) — آرشیو زنده و مرجع دیجیتال.
             </p>

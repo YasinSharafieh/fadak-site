@@ -80,6 +80,10 @@ export default function Home() {
               <Link href="/events" className="btn-green rounded-full px-8 py-3">جزئیات و مسیریابی</Link>
               <Link href="/archive" className="rounded-full border border-white/20 px-8 py-3 text-white hover:bg-white/10">آرشیو مراسمات</Link>
             </div>
+            <div className="mt-6 flex items-center justify-center gap-4 md:justify-start">
+              <img src="/brand/fadak-mark.png" alt="فدک" className="h-12 w-12 object-contain" />
+              <img src="/brand/heyat-mark.png" alt="هیئت فدائیان حضرت زهرا" className="h-14 w-auto object-contain" />
+            </div>
           </div>
           <div className="mx-auto flex h-52 w-52 flex-col items-center justify-center rounded-full border border-[#c9a227]/40 bg-[#0b3d2e]/80 text-center shadow-2xl md:h-64 md:w-64">
             <p className="text-sm text-[#c9a227]">{nextMajles?.weekday || "سه‌شنبه"}</p>
@@ -117,7 +121,7 @@ export default function Home() {
                       </div>
                     </>
                   )}
-                  <div className="absolute bottom-3 right-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#c9a227] text-xl font-extrabold text-[#0b3d2e] shadow-lg">ف</div>
+                  <img src="/brand/fadak-mark.png" alt="" className="absolute bottom-3 right-3 h-12 w-12 rounded-full object-cover shadow-lg ring-2 ring-[#c9a227]" />
                 </div>
                 <div className="p-4">
                   {e.date_hijri && <p className="text-xs text-[#14a3a2]">{e.date_hijri}</p>}

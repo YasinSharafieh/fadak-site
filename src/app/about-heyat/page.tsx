@@ -4,7 +4,8 @@ export default function AboutHeyatPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 animate-fade-in">
       <div className="text-center">
-        <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-[#0b3d2e] text-5xl font-extrabold text-[#14a3a2]">ف</div>
+        <img src="/brand/heyat-mark.png" alt="هیئت فدائیان حضرت زهرا (س)" className="mx-auto h-40 w-auto object-contain" />
+        <img src="/brand/fadak-mark.png" alt="فدک" className="mx-auto mt-4 h-16 w-16 object-contain" />
         <h1 className="mt-6 text-3xl font-extrabold text-white">هیأت فدائیان حضرت زهرا (س)</h1>
         <p className="mt-2 text-white/70/70">فدک — پایگاه حفظ و نشر آثار</p>
       </div>
