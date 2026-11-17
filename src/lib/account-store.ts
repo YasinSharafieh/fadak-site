@@ -462,6 +462,11 @@ export async function toggleEngagement(
   };
 }
 
+export async function userIdByUsername(username: string) {
+  if (!accountsConfigured() || !username) return null;
+  return (await readJson<{ userId: string }>(`usernames/${username}.json`))?.userId || null;
+}
+
 export async function favoritesOf(userId: string) {
   const profile = await readJson<Profile>(`profiles/${userId}.json`);
   return profile?.saves || [];

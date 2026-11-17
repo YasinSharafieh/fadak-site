@@ -89,6 +89,7 @@ export default function Home() {
             <div className="text-center md:text-right">
               <div className="mb-6 flex flex-wrap items-center justify-center gap-4 md:justify-start">
                 <ThemeImage darkSrc="/brand/heyat-mark.png" lightSrc="/brand/heyat-mark-ink.png" alt="هیئت فدائیان حضرت زهرا" className="h-28 w-auto object-contain sm:h-36" />
+                <ThemeImage darkSrc="/brand/taheri-mark.png" lightSrc="/brand/taheri-mark-ink.png" alt="حسین طاهری" className="h-24 w-auto object-contain sm:h-32" />
                 <ThemeImage darkSrc="/brand/fadak-wordmark.png" lightSrc="/brand/fadak-wordmark-ink.png" alt="فدک" className="h-14 w-auto max-w-[16rem] object-contain sm:h-16" />
               </div>
               <span className="text-sm font-medium text-[#c9a227]">اطلاعیه</span>

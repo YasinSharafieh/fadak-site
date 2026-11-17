@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { destroySession, touchSession, userFromToken } from "@/lib/account-store";
+import { BOX_COOKIE } from "@/lib/engage-box";
 import {
   ADMIN_COOKIE,
   IDENTITY_COOKIE,
@@ -19,6 +20,7 @@ function clearAuth(res: NextResponse) {
   res.cookies.set(IDENTITY_COOKIE, "", dead);
   res.cookies.set(SESSION_COOKIE, "", dead);
   res.cookies.set(ADMIN_COOKIE, "", dead);
+  res.cookies.set(BOX_COOKIE, "", dead);
 }
 
 export async function GET() {
@@ -58,6 +60,8 @@ export async function GET() {
   res.cookies.set(IDENTITY_COOKIE, encodeIdentity({ username, role, seen: now }), identityCookieOptions());
   if (token) res.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
   if (role === "admin") res.cookies.set(ADMIN_COOKIE, "authenticated", adminCookieOptions());
+  const box = jar.get(BOX_COOKIE)?.value;
+  if (box) res.cookies.set(BOX_COOKIE, box, identityCookieOptions());
   res.headers.set("Cache-Control", "no-store");
   return res;
 }
