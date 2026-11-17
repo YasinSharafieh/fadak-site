@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { msUntilTehranMidnight } from "@/lib/jalali";
+import { useTehranNow } from "@/lib/useTehranNow";
 
 type DateParts = { weekday: string; day: string; month: string; year: string };
 
@@ -19,24 +18,9 @@ function partsFor(calendar: string, now: Date): DateParts {
   return { weekday: get("weekday"), day: get("day"), month: get("month"), year: get("year") };
 }
 
-/** تاریخ ریز هدر. نیمه‌شب به وقت تهران خودش عوض می‌شود. */
+/** تاریخ ریز هدر. هر سه تقویم با هم، ساعت ۰۰:۰۰ به وقت تهران عوض می‌شوند. */
 export default function TodayDates() {
-  const [now, setNow] = useState<Date | null>(null);
-
-  useEffect(() => {
-    let midnight = 0;
-    const refresh = () => {
-      setNow(new Date());
-      midnight = window.setTimeout(refresh, msUntilTehranMidnight());
-    };
-    refresh();
-    const backup = window.setInterval(() => setNow(new Date()), 60_000);
-    return () => {
-      window.clearTimeout(midnight);
-      window.clearInterval(backup);
-    };
-  }, []);
-
+  const now = useTehranNow();
   const shamsi = now ? partsFor("persian", now) : EMPTY;
   const qamari = now ? partsFor("islamic-umalqura", now) : EMPTY;
   const miladi = now ? partsFor("gregory", now) : EMPTY;
@@ -50,12 +34,10 @@ export default function TodayDates() {
       </p>
       <span className="header-dates-sep" aria-hidden="true" />
       <p>
-        <span className="header-dates-label">قمری</span>
         <strong>{qamari.day} {qamari.month} {qamari.year}</strong>
       </p>
       <span className="header-dates-sep" aria-hidden="true" />
       <p>
-        <span className="header-dates-label">میلادی</span>
         <strong>{miladi.day} {miladi.month} {miladi.year}</strong>
       </p>
     </div>

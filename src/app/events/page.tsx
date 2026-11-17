@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { fadakAddress, fadakMapUrl } from "@/data/mock";
 import { nextWeeklyMajles, type NextMajles } from "@/lib/jalali";
+import { useTehranNow } from "@/lib/useTehranNow";
 
 type Event = {
   id: string;
@@ -22,6 +23,11 @@ export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [nextMajles, setNextMajles] = useState<NextMajles | null>(null);
+  const tehranNow = useTehranNow();
+
+  useEffect(() => {
+    if (tehranNow) setNextMajles(nextWeeklyMajles(tehranNow));
+  }, [tehranNow]);
 
   useEffect(() => {
     async function load() {
@@ -32,7 +38,6 @@ export default function EventsPage() {
       setLoading(false);
     }
     load();
-    setNextMajles(nextWeeklyMajles());
   }, []);
 
   const upcoming = events.filter((e) => e.status === "upcoming");

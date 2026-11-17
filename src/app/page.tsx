@@ -11,6 +11,7 @@ import HeroSlides from "@/components/HeroSlides";
 import ThemeImage from "@/components/ThemeImage";
 import { ceremonyCardTitle, coverByEvent, shortPersianDate } from "@/lib/ceremony";
 import { artistFromTitle, comparePersianDates, formatViews, nextWeeklyMajles, toPersianDigits, type NextMajles } from "@/lib/jalali";
+import { useTehranNow } from "@/lib/useTehranNow";
 
 type Event = {
   id: string;
@@ -48,9 +49,13 @@ export default function Home() {
   const [covers, setCovers] = useState<Record<string, string>>({});
   const [nextMajles, setNextMajles] = useState<NextMajles | null>(null);
   const [loading, setLoading] = useState(true);
+  const tehranNow = useTehranNow();
 
   useEffect(() => {
-    setNextMajles(nextWeeklyMajles());
+    if (tehranNow) setNextMajles(nextWeeklyMajles(tehranNow));
+  }, [tehranNow]);
+
+  useEffect(() => {
     async function load() {
       if (supabase) {
         const [ev, nm, pop, ph] = await Promise.all([

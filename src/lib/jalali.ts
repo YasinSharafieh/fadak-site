@@ -89,10 +89,20 @@ export function tehranParts(now = new Date()) {
   };
 }
 
+export function tehranDateKey(now = new Date()) {
+  const t = tehranParts(now);
+  return `${t.y}-${t.m}-${t.d}`;
+}
+
+/** میلی‌ثانیه تا ساعت ۰۰:۰۰ به وقت تهران، کمی بعد از نیمه‌شب تا تاریخ جدید قطعی باشد. */
 export function msUntilTehranMidnight(now = new Date()) {
   const t = tehranParts(now);
-  const elapsed = ((t.hour * 60 + t.minute) * 60 + t.second) * 1000;
-  return 24 * 60 * 60 * 1000 - elapsed + 250;
+  if (t.hour >= 24) return 40;
+  const elapsed = ((t.hour * 60 + t.minute) * 60 + t.second) * 1000 + now.getMilliseconds();
+  const day = 24 * 60 * 60 * 1000;
+  const remain = day - elapsed;
+  if (remain <= 0 || remain > day) return 40;
+  return remain + 40;
 }
 
 /** روضه هفتگی فدک هر سه‌شنبه است. اگر امروز سه‌شنبه باشد، همان امروز اعلام می‌شود. */
