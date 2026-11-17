@@ -1,18 +1,5 @@
 @import "tailwindcss";
 
-/* فونت رسمی سایت نوریه (ساحل) — فقط برای نوشتهٔ «نوریه» کنار آیکون */
-@font-face {
-  font-family: "Sahel Noorieh";
-  src: url("/fonts/Sahel-Bold.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-.font-noorieh {
-  font-family: "Sahel Noorieh", sans-serif;
-}
-
 :root {
   --fadak-black: #0a0a0a;
   --fadak-dark: #111111;
