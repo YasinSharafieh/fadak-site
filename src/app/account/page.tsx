@@ -17,16 +17,25 @@ export default function AccountPage() {
 
   useEffect(() => {
     async function load() {
-      const res = await fetch("/api/account/favorites");
-      if (res.status === 401) {
+      const me = await fetch("/api/auth/me", { cache: "no-store" });
+      const who = await me.json();
+      if (!who.user) {
         window.location.href = "/login?next=/account";
         return;
       }
-      const data = await res.json();
-      setUser(data.user);
-      setName(data.user?.name || "");
-      setCity(data.user?.city || "");
-      setItems(data.items || []);
+      setUser(who.user);
+      setName(who.user.name || "");
+      setCity(who.user.city || "");
+      const res = await fetch("/api/account/favorites", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          setUser(data.user);
+          setName(data.user.name || "");
+          setCity(data.user.city || "");
+        }
+        setItems(data.items || []);
+      }
       setLoading(false);
     }
     load();

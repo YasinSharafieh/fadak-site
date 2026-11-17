@@ -16,7 +16,7 @@ const navItems = [
   { href: "/gallery", label: "تصویر" },
   { href: "/poems", label: "متن شعر" },
   { href: "/about-heyat", label: "درباره هیئت" },
-  { href: "/about-taheri", label: "درباره حسین طاهری" },
+  { href: "/about-taheri", label: "رسانه حسین طاهری" },
 ];
 
 function SunIcon() {
@@ -46,16 +46,27 @@ export default function Header() {
   const headerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    fetch("/api/auth/me")
-      .then((res) => res.json())
-      .then((data) => {
-        setAccountName(data.user ? data.user.name || data.user.username || "حساب من" : null);
+    let ignore = false;
+    async function load() {
+      try {
+        const res = await fetch("/api/auth/me", { cache: "no-store" });
+        const data = await res.json();
+        if (ignore) return;
+        setAccountName(data.user?.username || null);
         setIsAdmin(data.user?.role === "admin");
-      })
-      .catch(() => {
-        setAccountName(null);
-        setIsAdmin(false);
-      });
+      } catch {
+        if (!ignore) {
+          setAccountName(null);
+          setIsAdmin(false);
+        }
+      }
+    }
+    load();
+    window.addEventListener("focus", load);
+    return () => {
+      ignore = true;
+      window.removeEventListener("focus", load);
+    };
   }, []);
 
   useEffect(() => {
@@ -135,14 +146,14 @@ export default function Header() {
             )}
             <Link
               href={accountName ? "/account" : "/login"}
-              title={accountName ? "حساب من" : "ورود"}
+              title={accountName ? accountName : "ورود"}
               className="flex h-9 items-center gap-1 rounded-full border border-white/15 bg-white/10 px-2.5 text-xs font-bold transition hover:border-[#c9a227] hover:text-[#c9a227]"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <circle cx="12" cy="8" r="3.2" />
                 <path d="M5 19.2a7 7 0 0 1 14 0" />
               </svg>
-              <span className="hidden sm:inline">{accountName || "ورود"}</span>
+              <span className="max-w-[7.5rem] truncate">{accountName || "ورود"}</span>
             </Link>
             <button
               type="button"

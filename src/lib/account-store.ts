@@ -3,7 +3,7 @@ import { normalizeIranMobile } from "@/lib/phone";
 
 const BUCKET = "accounts";
 const OTP_TTL_MS = 5 * 60 * 1000;
-const SESSION_TTL_MS = 60 * 24 * 60 * 60 * 1000;
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 export type AccountRole = "user" | "admin";
 
@@ -314,7 +314,7 @@ export async function loginWithPassword(rawUsername: string, password: string) {
   if (!username || !password) return { ok: false as const, error: "نام کاربری یا رمز عبور اشتباه است." };
   const owner = adminPasswordOk(username, password);
   if (!accountsConfigured()) {
-    if (owner) return { ok: true as const, token: "", role: "admin" as const };
+    if (owner) return { ok: true as const, token: "", role: "admin" as const, username: "yasin" };
     return { ok: false as const, error: "ورود انجام نشد." };
   }
   let userId = (await readJson<{ userId: string }>(`usernames/${username}.json`))?.userId;
@@ -322,7 +322,7 @@ export async function loginWithPassword(rawUsername: string, password: string) {
     try {
       userId = await provisionOwner(password);
     } catch {
-      return { ok: true as const, token: "", role: "admin" as const };
+      return { ok: true as const, token: "", role: "admin" as const, username: "yasin" };
     }
   }
   if (!userId) return { ok: false as const, error: "نام کاربری یا رمز عبور اشتباه است." };
@@ -348,7 +348,15 @@ export async function loginWithPassword(rawUsername: string, password: string) {
   const token = randomBytes(32).toString("hex");
   await writeJson(`sessions/${sha(token)}.json`, { userId, expires: Date.now() + SESSION_TTL_MS } satisfies SessionFile);
   const role: AccountRole = profile?.role === "admin" || owner ? "admin" : "user";
-  return { ok: true as const, token, role };
+  return { ok: true as const, token, role, username: profile?.username || username };
+}
+
+export async function touchSession(token: string | undefined) {
+  if (!token || !accountsConfigured()) return;
+  const path = `sessions/${sha(token)}.json`;
+  const session = await readJson<SessionFile>(path);
+  if (!session || session.expires < Date.now()) return;
+  await writeJson(path, { userId: session.userId, expires: Date.now() + SESSION_TTL_MS } satisfies SessionFile);
 }
 
 export async function userFromToken(token: string | undefined) {
