@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { adminPasswordOk } from "@/lib/account-store";
 
 export async function POST(req: Request) {
   const form = await req.formData();
   const username = form.get("username")?.toString();
   const password = form.get("password")?.toString();
 
-  if (username === "yasin" && password === "fadak") {
+  if (adminPasswordOk(username, password)) {
     const cookieStore = await cookies();
     cookieStore.set("fadak_admin", "authenticated", { httpOnly: true, path: "/", maxAge: 60 * 60 * 24 * 7 });
     return NextResponse.json({ ok: true });

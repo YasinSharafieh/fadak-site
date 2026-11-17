@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
     const form = new FormData(e.currentTarget);
     const res = await fetch("/api/admin/login", { method: "POST", body: form });
     if (res.ok) {
-      window.location.href = "/admin/upload";
+      window.location.href = "/admin";
     } else {
       setError("نام کاربری یا رمز عبور اشتباه است");
       setLoading(false);

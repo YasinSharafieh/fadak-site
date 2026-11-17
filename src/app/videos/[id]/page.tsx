@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import VideoPlayer from "@/components/VideoPlayer";
 import ShareButton from "@/components/ShareButton";
+import EngageBar from "@/components/EngageBar";
 
 export const instant = false;
 
@@ -59,7 +60,8 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
           {video.duration && <span>⏱️ {video.duration}</span>}
           <span>📺 آپارات</span>
         </div>
-        <div className="mt-5 flex flex-wrap gap-3">
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <EngageBar type="video" id={video.id} title={video.title} href={`/videos/${video.id}`} thumb={video.thumbnail} />
           <a
             href={`https://www.aparat.com/v/${video.aparat_id}`}
             target="_blank"
@@ -78,7 +80,8 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
           <h2 className="text-xl font-extrabold text-white">ویدیوهای مرتبط</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((v: any) => (
-              <Link key={v.id} href={`/videos/${v.id}`} className="card-hover group overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/5">
+              <div key={v.id} className="card-hover group overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/5">
+              <Link href={`/videos/${v.id}`} className="block">
                 <div className="relative aspect-video bg-black">
                   {v.thumbnail ? (
                     <img src={v.thumbnail} alt={v.title} className="h-full w-full object-cover" />
@@ -96,6 +99,10 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
                   <h3 className="text-sm font-bold leading-5">{v.title}</h3>
                 </div>
               </Link>
+              <div className="px-3 pb-3">
+                <EngageBar type="video" id={v.id} title={v.title} href={`/videos/${v.id}`} thumb={v.thumbnail} compact />
+              </div>
+              </div>
             ))}
           </div>
         </div>

@@ -38,15 +38,21 @@ export default async function AdminDashboard() {
     { label: "ویدیوها", value: stats.videos, icon: "🎬", href: "/videos" },
     { label: "اشعار", value: stats.poems, icon: "📜", href: "/poems" },
     { label: "درخواست خادم", value: stats.khadam, icon: "🤝", href: "/admin/khadam" },
+    { label: "کاربران", value: "حساب‌ها", icon: "👤", href: "/admin/users" },
   ];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-extrabold text-white">داشبورد مدیریت</h1>
-        <Link href="/admin/upload" className="btn-gold rounded-full px-6 py-3">
-          + آپلود صوت
-        </Link>
+        <div className="flex gap-2">
+          <form action="/api/admin/logout" method="post">
+            <button className="rounded-full border border-white/20 px-4 py-3 text-sm">خروج</button>
+          </form>
+          <Link href="/admin/upload" className="btn-gold rounded-full px-6 py-3">
+            + آپلود صوت
+          </Link>
+        </div>
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

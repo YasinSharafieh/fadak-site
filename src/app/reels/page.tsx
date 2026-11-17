@@ -41,6 +41,25 @@ export default function ReelsPage() {
   }, []);
 
   useEffect(() => {
+    if (reels.length === 0) return;
+    const keys = reels.map((reel) => `reel:${reel.id}`).join(",");
+    fetch(`/api/engage?keys=${encodeURIComponent(keys)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const likedNext = new Set<string>();
+        const savedNext = new Set<string>();
+        reels.forEach((reel) => {
+          const mine = data.mine?.[`reel:${reel.id}`];
+          if (mine?.liked) likedNext.add(reel.id);
+          if (mine?.saved) savedNext.add(reel.id);
+        });
+        setLiked(likedNext);
+        setSaved(savedNext);
+      })
+      .catch(() => {});
+  }, [reels]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -64,20 +83,42 @@ export default function ReelsPage() {
     return () => observer.disconnect();
   }, [reels]);
 
-  const toggleLike = (id: string) => {
+  const toggleLike = async (id: string) => {
+    const res = await fetch("/api/engage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "reel", id, action: "like", title: reels.find((reel) => reel.id === id)?.title || "ریلز", href: "/reels" }),
+    });
+    if (res.status === 401) {
+      window.location.href = "/login?next=/reels";
+      return;
+    }
+    if (!res.ok) return;
+    const data = await res.json();
     setLiked((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (data.liked) next.add(id);
+      else next.delete(id);
       return next;
     });
   };
 
-  const toggleSave = (id: string) => {
+  const toggleSave = async (id: string) => {
+    const res = await fetch("/api/engage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "reel", id, action: "save", title: reels.find((reel) => reel.id === id)?.title || "ریلز", href: "/reels" }),
+    });
+    if (res.status === 401) {
+      window.location.href = "/login?next=/reels";
+      return;
+    }
+    if (!res.ok) return;
+    const data = await res.json();
     setSaved((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (data.saved) next.add(id);
+      else next.delete(id);
       return next;
     });
   };

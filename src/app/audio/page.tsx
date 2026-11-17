@@ -16,6 +16,7 @@ type Event = {
   id: string;
   title: string;
   date_fa: string;
+  slug?: string;
 };
 
 export default function AudioPage() {
@@ -30,7 +31,7 @@ export default function AudioPage() {
       if (supabase) {
         const [au, ev] = await Promise.all([
           supabase.from("audios").select("*").order("created_at", { ascending: false }),
-          supabase.from("events").select("id,title,date_fa").order("created_at", { ascending: false }),
+          supabase.from("events").select("id,title,date_fa,slug").order("created_at", { ascending: false }),
         ]);
         setAudios(au.data || []);
         setEvents(ev.data || []);
@@ -82,7 +83,7 @@ export default function AudioPage() {
           <p className="text-center text-white/70/60">صوتی یافت نشد.</p>
         ) : (
           filtered.map((a) => (
-            <AudioPlayer key={a.id} title={a.title} src={a.file_url} />
+            <AudioPlayer key={a.id} id={a.id} title={a.title} src={a.file_url} href={events.find((event) => event.id === a.event_id)?.slug ? `/archive/${events.find((event) => event.id === a.event_id)?.slug}` : "/audio"} />
           ))
         )}
       </div>

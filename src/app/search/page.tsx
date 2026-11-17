@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import EngageBar from "@/components/EngageBar";
 
 type Result = {
   type: "event" | "audio" | "video" | "photo";
@@ -149,14 +150,19 @@ export default function SearchPage() {
             <p className="mb-4 text-sm text-white/70/60">{results.length} نتیجه یافت شد</p>
             <div className="space-y-3">
               {results.map((r) => (
-                <Link key={`${r.type}-${r.id}`} href={r.url} className="card-hover flex items-center gap-4 rounded-2xl bg-[#1a1a1a] p-4 shadow">
-                  <span className="text-2xl">{getIcon(r.type)}</span>
-                  <div className="flex-1">
-                    <div className="font-bold">{r.title}</div>
-                    {r.subtitle && <div className="text-sm text-white/70/60">{r.subtitle}</div>}
-                  </div>
-                  <span className="text-[#14a3a2]">←</span>
-                </Link>
+                <div key={`${r.type}-${r.id}`} className="card-hover flex items-center gap-4 rounded-2xl bg-[#1a1a1a] p-4 shadow">
+                  <Link href={r.url} className="flex min-w-0 flex-1 items-center gap-4">
+                    <span className="text-2xl">{getIcon(r.type)}</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-bold">{r.title}</div>
+                      {r.subtitle && <div className="text-sm text-white/70/60">{r.subtitle}</div>}
+                    </div>
+                    <span className="text-[#14a3a2]">←</span>
+                  </Link>
+                  {(r.type === "video" || r.type === "audio") && (
+                    <EngageBar type={r.type} id={r.id} title={r.title} href={r.url} compact />
+                  )}
+                </div>
               ))}
             </div>
           </>

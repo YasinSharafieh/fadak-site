@@ -107,7 +107,7 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      <CeremonyTabs photos={onlyPhotos} audios={audios} videos={freshVideos} />
+      <CeremonyTabs photos={onlyPhotos} audios={audios} videos={freshVideos} ceremonyHref={`/archive/${slug}`} />
     </div>
   );
 }

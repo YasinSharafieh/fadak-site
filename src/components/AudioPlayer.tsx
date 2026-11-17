@@ -1,13 +1,18 @@
 "use client";
 
 import { useRef, useState } from "react";
+import EngageBar from "@/components/EngageBar";
 
 export default function AudioPlayer({
   title,
   src,
+  id,
+  href = "/audio",
 }: {
   title: string;
   src: string;
+  id?: string;
+  href?: string;
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -39,6 +44,7 @@ export default function AudioPlayer({
           />
         </div>
       </div>
+      {id && <EngageBar type="audio" id={id} title={title} href={href} compact />}
       <a
         href={src}
         download

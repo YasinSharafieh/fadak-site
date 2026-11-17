@@ -3,14 +3,16 @@
 import { useState } from "react";
 import AudioPlayer from "./AudioPlayer";
 import VideoPlayer from "./VideoPlayer";
+import EngageBar from "./EngageBar";
 
 type Props = {
   photos: { id: string; url: string; caption?: string }[];
   audios: { id: string; title: string; file_url: string }[];
   videos: { id: string; title: string; aparat_id: string; thumbnail?: string; duration?: string }[];
+  ceremonyHref?: string;
 };
 
-export default function CeremonyTabs({ photos, audios, videos }: Props) {
+export default function CeremonyTabs({ photos, audios, videos, ceremonyHref = "/audio" }: Props) {
   const [tab, setTab] = useState<"photos" | "audios" | "videos">("photos");
   const [playingId, setPlayingId] = useState<string | null>(null);
 
@@ -57,7 +59,7 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
           <div className="space-y-3">
             {audios.length === 0 && <p className="text-sm text-white/70/60">هنوز صوتی ثبت نشده.</p>}
             {audios.map((a) => (
-              <AudioPlayer key={a.id} title={a.title} src={a.file_url} />
+              <AudioPlayer key={a.id} id={a.id} title={a.title} src={a.file_url} href={ceremonyHref} />
             ))}
           </div>
         )}
@@ -85,7 +87,12 @@ export default function CeremonyTabs({ photos, audios, videos }: Props) {
                       </button>
                     )}
                   </div>
-                  <div className="p-4 text-center font-bold">{v.title}</div>
+                  <div className="p-4 text-center">
+                    <div className="font-bold">{v.title}</div>
+                    <div className="mt-2 flex justify-center">
+                      <EngageBar type="video" id={v.id} title={v.title} href={`/videos/${v.id}`} thumb={v.thumbnail} />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

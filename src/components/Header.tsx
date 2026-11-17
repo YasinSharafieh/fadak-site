@@ -40,8 +40,16 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [accountName, setAccountName] = useState<string | null>(null);
   const { theme, toggle } = useTheme();
   const headerRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => setAccountName(data.user ? data.user.name || "حساب من" : null))
+      .catch(() => setAccountName(null));
+  }, []);
 
   useEffect(() => {
     const node = headerRef.current;
@@ -110,6 +118,17 @@ export default function Header() {
                 <path d="M20 20l-3.5-3.5" />
               </svg>
             </button>
+            <Link
+              href={accountName ? "/account" : "/login"}
+              title={accountName ? "حساب من" : "ورود"}
+              className="flex h-9 items-center gap-1 rounded-full border border-white/15 bg-white/10 px-2.5 text-xs font-bold transition hover:border-[#c9a227] hover:text-[#c9a227]"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <circle cx="12" cy="8" r="3.2" />
+                <path d="M5 19.2a7 7 0 0 1 14 0" />
+              </svg>
+              <span className="hidden sm:inline">{accountName || "ورود"}</span>
+            </Link>
             <button
               type="button"
               onClick={toggle}

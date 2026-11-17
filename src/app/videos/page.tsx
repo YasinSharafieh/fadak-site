@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import EngageBar from "@/components/EngageBar";
 import { supabase } from "@/lib/supabase";
 
 type Video = {
@@ -49,10 +50,13 @@ export default function VideosPage() {
               <p className="col-span-full text-center text-white/50">در حال بارگذاری...</p>
             ) : (
               namahang.map((v) => (
-                <Link
+                <div
                   key={v.id}
-                  href={`/videos/${v.id}`}
                   className="card-hover group overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/5"
+                >
+                <Link
+                  href={`/videos/${v.id}`}
+                  className="block"
                 >
                   <div className="relative aspect-video bg-black">
                     {v.thumbnail ? (
@@ -73,6 +77,10 @@ export default function VideosPage() {
                     <p className="mt-1 text-xs text-white/50">کربلایی حسین طاهری • آپارات</p>
                   </div>
                 </Link>
+                <div className="px-4 pb-4">
+                  <EngageBar type="video" id={v.id} title={v.title} href={`/videos/${v.id}`} thumb={v.thumbnail} compact />
+                </div>
+                </div>
               ))
             )}
           </div>

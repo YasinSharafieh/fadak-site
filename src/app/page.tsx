@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { collections, fadakAddress, fadakMapEmbed, fadakMapUrl } from "@/data/mock";
 import { popularIds, popularViews } from "@/data/popular-videos";
 import CarouselRow from "@/components/CarouselRow";
+import EngageBar from "@/components/EngageBar";
 import CeremonyCard from "@/components/CeremonyCard";
 import HeroSlides from "@/components/HeroSlides";
 import ThemeImage from "@/components/ThemeImage";
@@ -152,10 +153,13 @@ export default function Home() {
 
           <CarouselRow className="mt-5">
             {namahang.map((v) => (
-              <Link
+              <div
                 key={v.id}
-                href={`/videos/${v.id}`}
                 className="group relative w-64 shrink-0 overflow-hidden rounded-2xl border border-white/5 bg-[#1a1a1a] transition-all duration-500 hover:w-80 hover:border-[#0e7c7b]/50"
+              >
+              <Link
+                href={`/videos/${v.id}`}
+                className="block"
               >
                 <div className="relative aspect-video bg-black">
                   {v.thumbnail ? (
@@ -177,6 +181,10 @@ export default function Home() {
                   <p className="mt-1 text-xs text-white/50">{artistFromTitle(v.title)}</p>
                 </div>
               </Link>
+              <div className="px-3 pb-3">
+                <EngageBar type="video" id={v.id} title={v.title} href={`/videos/${v.id}`} thumb={v.thumbnail} compact />
+              </div>
+              </div>
             ))}
           </CarouselRow>
           <p className="mt-1 text-xs text-white/40">برای مشاهده ویدئوهای بیشتر بکشید ←</p>
@@ -225,10 +233,13 @@ export default function Home() {
           </div>
           <CarouselRow className="mt-5">
             {popular.map((v) => (
-              <Link
+              <div
                 key={v.id}
-                href={`/videos/${v.id}`}
                 className="group relative w-64 shrink-0 overflow-hidden rounded-2xl border border-white/5 bg-[#1a1a1a] transition-all duration-500 hover:w-80 hover:border-[#0e7c7b]/50"
+              >
+              <Link
+                href={`/videos/${v.id}`}
+                className="block"
               >
                 <div className="relative aspect-video bg-black">
                   {v.thumbnail ? (
@@ -246,6 +257,10 @@ export default function Home() {
                   <h3 className="text-sm font-bold leading-5 transition group-hover:text-[#14a3a2]">{v.title}</h3>
                 </div>
               </Link>
+              <div className="px-3 pb-3">
+                <EngageBar type="video" id={v.id} title={v.title} href={`/videos/${v.id}`} thumb={v.thumbnail} compact />
+              </div>
+              </div>
             ))}
           </CarouselRow>
         </div>
