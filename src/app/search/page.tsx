@@ -57,30 +57,34 @@ export default function SearchPage() {
       }
     });
 
-    // جستجو در صوت‌ها
+    const eventById = new Map((events || []).map((e) => [e.id, e]));
+
+    // جستجو در صوت‌ها — لینک به همان مراسمی که صوت مال آن است
     const { data: audios } = await supabase.from("audios").select("*");
     audios?.forEach((a) => {
       if (normalizePersian(a.title).includes(normalized)) {
+        const event = a.event_id ? eventById.get(a.event_id) : null;
         allResults.push({
           type: "audio",
           id: a.id,
           title: a.title,
-          subtitle: "صوت",
-          url: `/audio`,
+          subtitle: event?.title ? `صوت · ${event.title}` : "صوت",
+          url: event?.slug ? `/archive/${event.slug}` : "/audio",
         });
       }
     });
 
-    // جستجو در ویدیوها
+    // جستجو در ویدیوها و نماهنگ‌ها — لینک به صفحهٔ همان ویدیو، نه فهرست
     const { data: videos } = await supabase.from("videos").select("*");
     videos?.forEach((v) => {
       if (normalizePersian(v.title).includes(normalized)) {
+        const isNamahang = normalizePersian(v.title || "").includes("نماهنگ");
         allResults.push({
           type: "video",
           id: v.id,
           title: v.title,
-          subtitle: "ویدیو",
-          url: `/videos`,
+          subtitle: isNamahang ? "نماهنگ" : "ویدیو",
+          url: `/videos/${v.id}`,
         });
       }
     });

@@ -97,9 +97,10 @@ export default function Header() {
               target="_blank"
               rel="noopener noreferrer"
               title="پایگاه اطلاع‌رسانی نوریه"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition hover:scale-105"
+              className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-0.5 transition hover:opacity-90"
             >
-              <img src="/brand/noorieh-icon.png" alt="نوریه" className="h-8 w-8 rounded-md object-contain" />
+              <img src="/brand/noorieh-icon.png" alt="" className="h-8 w-8 rounded-md object-contain" />
+              <span className="font-noorieh text-[15px] font-bold leading-none">نوریه</span>
             </a>
             <Link href="/donate" className="btn-green hidden rounded-full px-4 py-2 text-sm sm:block">
               کمک به هیئت
