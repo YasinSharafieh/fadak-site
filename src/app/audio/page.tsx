@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import AudioPlayer from "@/components/AudioPlayer";
+import SectionSkeleton from "@/components/SectionSkeleton";
 
 type Audio = {
   id: string;
@@ -78,7 +79,7 @@ export default function AudioPage() {
       {/* لیست صوت‌ها */}
       <div className="mt-8 space-y-3">
         {loading ? (
-          <p className="text-center text-white/70/60">در حال بارگذاری...</p>
+          <SectionSkeleton kind="audio" />
         ) : filtered.length === 0 ? (
           <p className="text-center text-white/70/60">صوتی یافت نشد.</p>
         ) : (

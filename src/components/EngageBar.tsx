@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ShareButton from "@/components/ShareButton";
 import { toPersianDigits } from "@/lib/jalali";
 
 type Kind = "video" | "audio" | "reel";
@@ -12,6 +13,7 @@ type Props = {
   href: string;
   thumb?: string;
   compact?: boolean;
+  share?: boolean;
 };
 
 type State = { count: number; liked: boolean; saved: boolean };
@@ -70,7 +72,7 @@ async function flush() {
   }
 }
 
-export default function EngageBar({ type, id, title, href, thumb, compact }: Props) {
+export default function EngageBar({ type, id, title, href, thumb, compact, share = true }: Props) {
   const [state, setState] = useState<State>({ count: 0, liked: false, saved: false });
   const [busy, setBusy] = useState(false);
 
@@ -148,6 +150,7 @@ export default function EngageBar({ type, id, title, href, thumb, compact }: Pro
           <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
         </svg>
       </button>
+      {share && <ShareButton title={title} path={href} compact />}
     </div>
   );
 }

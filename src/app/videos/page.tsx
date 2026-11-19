@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import EngageBar from "@/components/EngageBar";
+import SectionSkeleton from "@/components/SectionSkeleton";
 import { supabase } from "@/lib/supabase";
 
 type Video = {
@@ -41,15 +42,21 @@ export default function VideosPage() {
         </a>
       </div>
 
+      {loading && (
+        <section className="mt-12">
+          <h2 className="text-2xl font-extrabold text-white">نماهنگ‌ها</h2>
+          <div className="mt-6">
+            <SectionSkeleton kind="video-grid" />
+          </div>
+        </section>
+      )}
+
       {/* نماهنگ‌ها */}
-      {namahang.length > 0 && (
+      {!loading && namahang.length > 0 && (
         <section className="mt-12">
           <h2 className="text-2xl font-extrabold text-white">نماهنگ‌ها</h2>
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {loading ? (
-              <p className="col-span-full text-center text-white/50">در حال بارگذاری...</p>
-            ) : (
-              namahang.map((v) => (
+            {namahang.map((v) => (
                 <div
                   key={v.id}
                   className="card-hover group overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/5"
@@ -81,8 +88,7 @@ export default function VideosPage() {
                   <EngageBar type="video" id={v.id} title={v.title} href={`/videos/${v.id}`} thumb={v.thumbnail} compact />
                 </div>
                 </div>
-              ))
-            )}
+              ))}
           </div>
         </section>
       )}

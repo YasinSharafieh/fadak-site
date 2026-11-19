@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import EngageBar from "@/components/EngageBar";
+import SectionSkeleton from "@/components/SectionSkeleton";
 
 type Result = {
   type: "event" | "audio" | "video" | "photo";
@@ -142,7 +143,7 @@ export default function SearchPage() {
 
       <div className="mt-8">
         {loading ? (
-          <p className="text-center text-white/70/60">در حال جستجو...</p>
+          <SectionSkeleton kind="search" />
         ) : query && results.length === 0 ? (
           <p className="text-center text-white/70/60">نتیجه‌ای یافت نشد.</p>
         ) : results.length > 0 ? (

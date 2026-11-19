@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import SectionSkeleton from "@/components/SectionSkeleton";
 import { supabase } from "@/lib/supabase";
 
 type Poem = {
@@ -94,7 +95,7 @@ export default function PoemsPage() {
 
       <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {loading ? (
-          <p className="col-span-full text-center text-white/70/60">در حال بارگذاری...</p>
+          <SectionSkeleton kind="poems" />
         ) : filtered.length === 0 ? (
           <p className="col-span-full text-center text-white/70/60">شعری یافت نشد.</p>
         ) : (

@@ -61,7 +61,7 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
           <span>📺 آپارات</span>
         </div>
         <div className="mt-5 flex flex-wrap items-center gap-3">
-          <EngageBar type="video" id={video.id} title={video.title} href={`/videos/${video.id}`} thumb={video.thumbnail} />
+          <EngageBar type="video" id={video.id} title={video.title} href={`/videos/${video.id}`} thumb={video.thumbnail} share={false} />
           <a
             href={`https://www.aparat.com/v/${video.aparat_id}`}
             target="_blank"

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import SectionSkeleton from "@/components/SectionSkeleton";
 import { supabase } from "@/lib/supabase";
 import { fadakAddress, fadakMapUrl } from "@/data/mock";
 import { nextWeeklyMajles, type NextMajles } from "@/lib/jalali";
@@ -55,7 +56,7 @@ export default function EventsPage() {
         <h2 className="text-2xl font-extrabold text-white">مراسم آینده</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {loading ? (
-            <p className="col-span-full text-center text-white/70/60">در حال بارگذاری...</p>
+            <SectionSkeleton kind="events" />
           ) : upcoming.length === 0 ? (
             <div className="col-span-full gold-frame rounded-2xl bg-[#1a1a1a] p-8 text-center">
               <div className="text-4xl">🕌</div>

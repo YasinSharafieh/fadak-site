@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import SectionSkeleton from "@/components/SectionSkeleton";
 import { supabase } from "@/lib/supabase";
 import { comparePersianDates } from "@/lib/jalali";
 import { ceremonyCardTitle, coverByEvent, shortPersianDate } from "@/lib/ceremony";
@@ -88,7 +89,7 @@ export default function ArchivePage() {
 
       <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
         {loading ? (
-          <p className="col-span-full text-center text-white/60">در حال بارگذاری...</p>
+          <SectionSkeleton kind="archive" />
         ) : filtered.length === 0 ? (
           <p className="col-span-full text-center text-white/60">مراسمی یافت نشد.</p>
         ) : (

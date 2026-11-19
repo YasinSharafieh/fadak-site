@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { rememberEngage } from "@/components/EngageBar";
+import SectionSkeleton from "@/components/SectionSkeleton";
 import { displayIranMobile } from "@/lib/phone";
 
 type User = {
@@ -24,6 +25,7 @@ export default function AccountPage() {
   const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [durable, setDurable] = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -34,6 +36,7 @@ export default function AccountPage() {
         return;
       }
       applyUser(who.user);
+      setDurable(who.durable !== false);
       const res = await fetch("/api/account/favorites", { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
@@ -95,7 +98,12 @@ export default function AccountPage() {
     if (type && id) rememberEngage(type, id, { saved: false });
   }
 
-  if (loading) return <p className="px-4 py-20 text-center text-white/60">در حال بارگذاری حساب...</p>;
+  async function reenter() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/login?next=/account";
+  }
+
+  if (loading) return <SectionSkeleton kind="account" />;
   if (!user) return null;
 
   const fullName = [user.name, user.family].filter(Boolean).join(" ");
@@ -121,7 +129,12 @@ export default function AccountPage() {
 
       <section className="mt-8 rounded-3xl border border-[#c9a227]/30 bg-[#111] p-6">
         <h2 className="text-lg font-extrabold">اطلاعات من</h2>
-        {profileReady ? (
+        {!durable ? (
+          <div className="mt-4">
+            <p className="text-sm leading-7 text-white/75">برای اینکه نام، لایک و ذخیره‌ها روی همین حساب بمانند و با خروج نپرند، یک بار دوباره وارد شوید.</p>
+            <button type="button" onClick={reenter} className="btn-green mt-4 rounded-full px-6 py-2.5 text-sm">ورود دوباره</button>
+          </div>
+        ) : profileReady ? (
           <dl className="mt-4 grid gap-3 sm:grid-cols-2">
             <Info label="نام" value={user.name} />
             <Info label="نام خانوادگی" value={user.family} />

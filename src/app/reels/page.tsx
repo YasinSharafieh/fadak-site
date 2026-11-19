@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { shareLink } from "@/components/ShareButton";
+import SectionSkeleton from "@/components/SectionSkeleton";
 import { supabase } from "@/lib/supabase";
 
 type Reel = {
@@ -18,6 +20,7 @@ export default function ReelsPage() {
   const [muted, setMuted] = useState(true);
   const [liked, setLiked] = useState<Set<string>>(new Set());
   const [saved, setSaved] = useState<Set<string>>(new Set());
+  const [copiedId, setCopiedId] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
@@ -123,10 +126,18 @@ export default function ReelsPage() {
     });
   };
 
+  async function shareReel(id: string, title: string) {
+    const result = await shareLink(title, `/reels#${id}`);
+    if (result === "copied") {
+      setCopiedId(id);
+      window.setTimeout(() => setCopiedId((current) => (current === id ? "" : current)), 2000);
+    }
+  }
+
   if (reels.length === 0) {
     return (
-      <div className="reels-container flex items-center justify-center bg-black text-white">
-        <p>در حال بارگذاری ریلزها...</p>
+      <div className="reels-container bg-black text-white">
+        <SectionSkeleton kind="reel" />
       </div>
     );
   }
@@ -179,9 +190,14 @@ export default function ReelsPage() {
                 <span className="text-xs">نظر</span>
               </button>
 
-              <button className="flex flex-col items-center gap-1 text-white">
+              <button
+                type="button"
+                onClick={() => shareReel(reel.id, reel.title)}
+                className="flex flex-col items-center gap-1 text-white"
+                aria-label="اشتراک‌گذاری"
+              >
                 <span className="text-3xl">↗️</span>
-                <span className="text-xs">اشتراک</span>
+                <span className="text-xs">{copiedId === reel.id ? "کپی شد" : "اشتراک"}</span>
               </button>
             </div>
 

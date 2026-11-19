@@ -4,6 +4,8 @@ export const SESSION_COOKIE = "fadak_session";
 export const ADMIN_COOKIE = "fadak_admin";
 export const IDENTITY_COOKIE = "fadak_identity";
 export const PROFILE_COOKIE = "fadak_profile";
+export const ACCESS_COOKIE = "fadak_access";
+export const REFRESH_COOKIE = "fadak_refresh";
 
 export type SavedProfile = { name: string; family: string; city: string };
 export const IDLE_SECONDS = 7 * 24 * 60 * 60;

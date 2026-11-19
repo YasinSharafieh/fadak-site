@@ -291,19 +291,28 @@ async function deliverSms(phone: string, code: string): Promise<{ ok: true } | {
   return { ok: false, error: "ارسال کد انجام نشد." };
 }
 
-async function createAuthUser(phone: string, meta: { username: string; name: string; family: string; city: string }) {
+function authEmail(username: string) {
+  if (/^[a-z0-9._]+$/.test(username)) return `${username}@users.fadak.invalid`;
+  return `u${sha(username).slice(0, 24)}@users.fadak.invalid`;
+}
+
+async function createAuthUser(phone: string, meta: { username: string; name: string; family: string; city: string }, password: string) {
   const res = await fetch(`${projectUrl()}/auth/v1/admin/users`, {
     method: "POST",
     headers: { ...authHeaders(), "Content-Type": "application/json" },
     body: JSON.stringify({
-      email: `${phone}@users.fadak.invalid`,
+      email: authEmail(meta.username),
+      password,
       email_confirm: true,
       user_metadata: {
         phone,
         username: meta.username,
-        display_name: `${meta.name} ${meta.family}`.trim(),
+        name: meta.name,
         family: meta.family,
         city: meta.city,
+        display_name: `${meta.name} ${meta.family}`.trim(),
+        likes: [],
+        saves: [],
       },
     }),
   });
@@ -377,7 +386,7 @@ export async function finishSignup(
 
   let userId = "";
   try {
-    userId = await createAuthUser(pending.phone, { username, name, family, city });
+    userId = await createAuthUser(pending.phone, { username, name, family, city }, password);
     if (!(await confirmClaim(namePath, reservation, userId))) {
       await releaseOwned(namePath, reservation, userId);
       await releaseOwned(phonePath, reservation, userId);
@@ -653,6 +662,13 @@ export async function userIdByUsername(raw: string) {
   const file = await readJson<IndexFile>(usernamePath(username));
   if (!file?.userId || isPending(file)) return null;
   return file.userId;
+}
+
+export async function mirrorEngagement(userId: string, likes: string[], saves: Profile["saves"]) {
+  if (!accountsConfigured() || !userId) return;
+  const profile = await readJson<Profile>(`profiles/${userId}.json`);
+  if (!profile) return;
+  await writeJson(`profiles/${userId}.json`, { ...profile, likes, saves, version: (profile.version || 0) + 1 });
 }
 
 export async function favoritesOf(userId: string) {

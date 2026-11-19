@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { collections, fadakAddress, fadakMapEmbed, fadakMapUrl } from "@/data/mock";
 import { popularIds, popularViews } from "@/data/popular-videos";
 import CarouselRow from "@/components/CarouselRow";
+import SectionSkeleton from "@/components/SectionSkeleton";
 import EngageBar from "@/components/EngageBar";
 import CeremonyCard from "@/components/CeremonyCard";
 import HeroSlides from "@/components/HeroSlides";
@@ -126,7 +127,7 @@ export default function Home() {
 
         <CarouselRow className="mt-5 gap-4">
           {loading ? (
-            <p className="text-sm text-white/50">در حال بارگذاری...</p>
+            <SectionSkeleton kind="ceremony-row" />
           ) : events.map((e) => (
               <CeremonyCard
                 key={e.id}
@@ -153,7 +154,7 @@ export default function Home() {
           </div>
 
           <CarouselRow className="mt-5">
-            {namahang.map((v) => (
+            {loading ? <SectionSkeleton kind="video-row" /> : namahang.map((v) => (
               <div
                 key={v.id}
                 className="group relative w-64 shrink-0 overflow-hidden rounded-2xl border border-white/5 bg-[#1a1a1a] transition-all duration-500 hover:w-80 hover:border-[#0e7c7b]/50"
@@ -233,7 +234,7 @@ export default function Home() {
             <Link href="/videos" className="shrink-0 text-sm text-[#14a3a2] hover:underline">همه نماهنگ‌ها</Link>
           </div>
           <CarouselRow className="mt-5">
-            {popular.map((v) => (
+            {loading ? <SectionSkeleton kind="video-row" /> : popular.map((v) => (
               <div
                 key={v.id}
                 className="group relative w-64 shrink-0 overflow-hidden rounded-2xl border border-white/5 bg-[#1a1a1a] transition-all duration-500 hover:w-80 hover:border-[#0e7c7b]/50"
