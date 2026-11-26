@@ -235,6 +235,7 @@ export async function POST(req: Request) {
 📅 ${data.date_fa}
 ${data.speaker ? `🎤 سخنران: ${data.speaker}\n` : ""}🎙️ مداحان: ${data.maddah}
 📍 ${data.location || "حسینیه سیدالشهدا (ع)"}
+🗺️ https://maps.app.goo.gl/VH1DNAbp3PgNZ9zK8
 
 جزئیات: https://fadak-site-murex.vercel.app/archive/${data.slug}`);
           } else {
@@ -308,6 +309,7 @@ https://fadak-site-murex.vercel.app/link
 
 مجلس روضه هفتگی — هر سه‌شنبه، ساعت ۱۹:۳۰
 حسینیه سیدالشهدا (ع)، تهران
+🗺️ https://maps.app.goo.gl/VH1DNAbp3PgNZ9zK8
 
 جزئیات: https://fadak-site-murex.vercel.app/events`);
       } else {

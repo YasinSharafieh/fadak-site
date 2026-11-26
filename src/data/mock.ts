@@ -12,11 +12,12 @@ export type EventItem = {
 };
 
 export const fadakAddress = "تهران، میدان هفتم تیر، خیابان مفتح جنوبی، خیابان ورزنده (جنب ورزشگاه شهید شیرودی)، خیابان ملک الشعراء بهار، حسینیه سیدالشهدا (ع)";
-// داخل کوچه ملک‌الشعرا بهار، پایین‌تر از سر کوچه و جنب ورزشگاه شهید شیرودی.
-export const fadakLat = 35.70855;
-export const fadakLon = 51.42752;
-export const fadakMapUrl = `https://www.openstreetmap.org/?mlat=${fadakLat}&mlon=${fadakLon}#map=18/${fadakLat}/${fadakLon}`;
-export const fadakMapEmbed = `https://www.openstreetmap.org/export/embed.html?bbox=51.4252%2C35.7068%2C51.4298%2C35.7103&layer=mapnik&marker=${fadakLat}%2C${fadakLon}`;
+// نقطهٔ دقیق پین گوگل‌مپ هیئت: https://maps.app.goo.gl/VH1DNAbp3PgNZ9zK8
+export const fadakLat = 35.7089559;
+export const fadakLon = 51.4273495;
+export const fadakMapPlace = "https://maps.app.goo.gl/VH1DNAbp3PgNZ9zK8";
+export const fadakMapUrl = `https://www.google.com/maps/dir/?api=1&destination=${fadakLat},${fadakLon}`;
+export const fadakMapEmbed = `https://maps.google.com/maps?q=${fadakLat},${fadakLon}&hl=fa&z=17&output=embed`;
 
 export const upcomingEvents: EventItem[] = [
   {
