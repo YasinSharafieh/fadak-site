@@ -89,7 +89,7 @@ function asSaves(value: unknown): SavedItem[] {
 
 function asLikes(value: unknown) {
   if (!Array.isArray(value)) return [];
-  return value.filter((key): key is string => typeof key === "string" && /^(video|audio|reel):[A-Za-z0-9_-]+$/.test(key)).slice(-LIKE_CAP);
+  return value.filter((key): key is string => typeof key === "string" && /^(video|audio|reel|poem):[A-Za-z0-9_-]+$/.test(key)).slice(-LIKE_CAP);
 }
 
 function accountFromAuth(raw: AuthUser | undefined, fallbackUsername = ""): CloudSession["user"] & { likes: string[]; saves: SavedItem[] } {
@@ -269,7 +269,7 @@ export async function toggleCloudEngage(
 }
 
 export async function removeCloudSave(session: CloudSession, key: string) {
-  if (!/^(video|audio|reel):[A-Za-z0-9_-]+$/.test(key)) return null;
+  if (!/^(video|audio|reel|poem):[A-Za-z0-9_-]+$/.test(key)) return null;
   const saves = session.saves.filter((item) => item.key !== key);
   const raw = await updateMeta(session.accessToken, {
     username: session.user.username,
@@ -292,7 +292,7 @@ async function loadCounts() {
   const safe: Record<string, number> = {};
   if (items && typeof items === "object") {
     for (const [key, value] of Object.entries(items)) {
-      if (/^(video|audio|reel):[A-Za-z0-9_-]+$/.test(key) && Number.isFinite(value)) safe[key] = Math.max(0, Math.floor(value));
+      if (/^(video|audio|reel|poem):[A-Za-z0-9_-]+$/.test(key) && Number.isFinite(value)) safe[key] = Math.max(0, Math.floor(value));
     }
   }
   countsCache = { at: Date.now(), items: safe };

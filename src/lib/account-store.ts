@@ -587,7 +587,7 @@ export async function engagementFor(userId: string | null, keys: string[]) {
 
 export async function toggleEngagement(
   userId: string,
-  type: "video" | "audio" | "reel",
+  type: "video" | "audio" | "reel" | "poem",
   id: string,
   action: "like" | "save",
   meta: { title: string; href: string; thumb?: string },
@@ -647,7 +647,7 @@ export async function absorbBox(userId: string, box: EngageBox) {
 }
 
 export async function removeSave(userId: string, key: string) {
-  if (!/^(video|audio|reel):[A-Za-z0-9_-]+$/.test(key)) return null;
+  if (!/^(video|audio|reel|poem):[A-Za-z0-9_-]+$/.test(key)) return null;
   const profile = await mutateProfile(userId, (current) => {
     current.saves = current.saves.filter((item) => item.key !== key);
     return current;

@@ -13,7 +13,7 @@ import {
   identityFresh,
 } from "@/lib/session";
 
-const types = new Set(["video", "audio", "reel"]);
+const types = new Set(["video", "audio", "reel", "poem"]);
 
 function clearBox(res: NextResponse) {
   res.cookies.set(BOX_COOKIE, "", { httpOnly: true, path: "/", maxAge: 0 });
@@ -24,7 +24,7 @@ export async function GET(req: Request) {
   const keys = (url.searchParams.get("keys") || "")
     .split(",")
     .map((key) => key.trim())
-    .filter((key) => /^(video|audio|reel):[A-Za-z0-9_-]+$/.test(key))
+    .filter((key) => /^(video|audio|reel|poem):[A-Za-z0-9_-]+$/.test(key))
     .slice(0, 80);
   const jar = await cookies();
   const cloud = await cloudFromCookies(jar.get(ACCESS_COOKIE)?.value, jar.get(REFRESH_COOKIE)?.value);
@@ -113,7 +113,7 @@ export async function POST(req: Request) {
   }
 
   const moved = stored ? await absorbBox(stored.id, decodeBox(jar.get(BOX_COOKIE)?.value)).catch(() => false) : false;
-  const result = await toggleEngagement(stored!.id, type as "video" | "audio" | "reel", id, action, meta);
+  const result = await toggleEngagement(stored!.id, type as "video" | "audio" | "reel" | "poem", id, action, meta);
   if (!result) return NextResponse.json({ ok: false }, { status: 500 });
   const res = NextResponse.json({ ok: true, key, ...result });
   if (moved) clearBox(res);

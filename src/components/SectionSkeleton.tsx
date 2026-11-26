@@ -108,15 +108,15 @@ export default function SectionSkeleton({ kind }: { kind: Kind }) {
         </div>
       )}
       {kind === "poems" && (
-        <div className="col-span-full grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }, (_, i) => (
-            <div key={i} className="space-y-3 rounded-2xl border border-[#c9a227]/20 bg-[#1a1a1a] p-6">
-              <Bone className="h-5 w-1/2 rounded" />
-              <Bone className="h-3 w-full rounded" />
-              <Bone className="h-3 w-5/6 rounded" />
-              <Bone className="h-3 w-2/3 rounded" />
-            </div>
-          ))}
+        <div className="col-span-full">
+          <div className="flex justify-center gap-5">
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className="flex w-[108px] flex-col items-center gap-3">
+                <Bone className="h-[110px] w-[110px] rounded-full" />
+                <Bone className="h-3 w-16 rounded" />
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {kind === "events" && (

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ShareButton from "@/components/ShareButton";
 import { toPersianDigits } from "@/lib/jalali";
 
-type Kind = "video" | "audio" | "reel";
+type Kind = "video" | "audio" | "reel" | "poem";
 
 type Props = {
   type: Kind;

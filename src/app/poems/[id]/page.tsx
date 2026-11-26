@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import CopyPoem from "@/components/CopyPoem";
+import EngageBar from "@/components/EngageBar";
 import { supabase } from "@/lib/supabase";
 
 export const instant = false;
@@ -23,7 +24,7 @@ export default async function PoemPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 animate-fade-in">
-      <Link href="/poems" className="text-sm text-[#14a3a2] hover:underline">
+      <Link href={poem.event_id ? `/poems?night=${poem.event_id}` : "/poems"} className="text-sm text-[#14a3a2] hover:underline">
         ← بازگشت به اشعار
       </Link>
 
@@ -38,8 +39,9 @@ export default async function PoemPage({ params }: { params: Promise<{ id: strin
 
         <div className="poem-text mt-8 whitespace-pre-line text-center text-lg leading-loose text-white/90">{body}</div>
 
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <CopyPoem text={copyText} />
+          <EngageBar type="poem" id={String(poem.id)} title={String(poem.title || "شعر")} href={`/poems/${poem.id}`} />
         </div>
       </article>
     </div>
