@@ -82,7 +82,11 @@ export default function SectionSkeleton({ kind }: { kind: Kind }) {
                 <Bone className="h-12 w-12 shrink-0 rounded-full" />
                 <div className="min-w-0 flex-1 space-y-2">
                   <Bone className="h-4 w-2/3 rounded" />
-                  <Bone className="h-2 w-full rounded-full" />
+                  <div className="flex items-center gap-2">
+                    <Bone className="h-9 w-12 shrink-0 rounded-full" />
+                    <Bone className="h-2 min-w-0 flex-1 rounded-full" />
+                    <Bone className="h-9 w-12 shrink-0 rounded-full" />
+                  </div>
                   <div className="grid grid-cols-3 gap-1.5">
                     <Bone className="h-10 rounded-xl" />
                     <Bone className="h-10 rounded-xl" />
