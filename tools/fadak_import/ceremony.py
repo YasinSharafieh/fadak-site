@@ -7,11 +7,46 @@ import re
 from datetime import timedelta
 
 from .parse import extract_date, get_subtitle, is_announcement, normalize, parse_ceremony, same_date
+
+WEST_TO_FA = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
+
+
+def _search_forms(date_key: str) -> list[str]:
+    western = normalize(date_key)
+    forms = []
+    for item in (date_key, western, western.translate(WEST_TO_FA)):
+        if item and item not in forms:
+            forms.append(item)
+    return forms
+
+
 from .store import SUPABASE_SAFE_BYTES, FileTooLarge, Store, guess_type
 
 
+# اسلاگ فارسی در آدرس سایت پیدا نمی‌شود و صفحهٔ مراسم خالی می‌ماند.
+MONTH_SLUG = {
+    "فروردین": "farvardin",
+    "اردیبهشت": "ordibehesht",
+    "خرداد": "khordad",
+    "تیر": "tir",
+    "مرداد": "mordad",
+    "شهریور": "shahrivar",
+    "مهر": "mehr",
+    "آبان": "aban",
+    "آذر": "azar",
+    "دی": "dey",
+    "بهمن": "bahman",
+    "اسفند": "esfand",
+}
+
+
 def _slug(date_key: str) -> str:
-    return "majles-" + re.sub(r"\s+", "-", date_key)
+    text = normalize(date_key)
+    for fa, en in MONTH_SLUG.items():
+        text = text.replace(fa, en)
+    text = re.sub(r"[^0-9a-z]+", "-", text.lower())
+    text = re.sub(r"-+", "-", text).strip("-")
+    return "majles-" + text
 
 
 def _kind(msg) -> str:
@@ -37,15 +72,16 @@ async def _collect(client, entity, date_key: str) -> tuple[object | None, list]:
     found = []
     seen = set()
 
-    async for msg in client.iter_messages(entity, search=date_key, limit=200):
-        if msg.id in seen:
-            continue
-        seen.add(msg.id)
-        text = msg.message or ""
-        if is_announcement(text) and same_date(text, date_key):
-            if announcement is None or msg.id < announcement.id:
-                announcement = msg
-        found.append(msg)
+    for form in _search_forms(date_key):
+        async for msg in client.iter_messages(entity, search=form, limit=200):
+            if msg.id in seen:
+                continue
+            seen.add(msg.id)
+            text = msg.message or ""
+            if is_announcement(text) and same_date(text, date_key):
+                if announcement is None or msg.id < announcement.id:
+                    announcement = msg
+            found.append(msg)
 
     if announcement is None:
         return None, found

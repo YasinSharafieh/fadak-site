@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import CeremonyTabs from "@/components/CeremonyTabs";
 import { getAparatVideoInfo } from "@/lib/aparat";
@@ -9,20 +10,18 @@ export const instant = false;
 const LEGACY_SLUGS: Record<string, string> = {
   "majles-7-مهر": "majles-7-mehr",
   "majles-27-اردیبهشت": "majles-27-ordibehesht",
+  "tg-75-1794574084194": "majles-12-aban",
 };
 
 async function getEvent(slug: string) {
   if (!supabase) return null;
-  const keys = [slug, LEGACY_SLUGS[slug]].filter((key, index, all) => key && all.indexOf(key) === index);
-  for (const key of keys) {
-    const { data } = await supabase.from("events").select("*").eq("slug", key).maybeSingle();
-    if (data) return data;
-  }
-  return null;
+  const { data } = await supabase.from("events").select("*").eq("slug", slug).maybeSingle();
+  return data;
 }
 
 export default async function ArchiveDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  if (LEGACY_SLUGS[slug]) redirect(`/archive/${LEGACY_SLUGS[slug]}`);
   const event = await getEvent(slug);
 
   const title = event?.title || "مراسم فدک";
@@ -114,7 +113,7 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      <CeremonyTabs photos={onlyPhotos} audios={audios} videos={freshVideos} ceremonyHref={`/archive/${slug}`} />
+      <CeremonyTabs photos={onlyPhotos} audios={audios} videos={freshVideos} ceremonyHref={`/archive/${event?.slug || slug}`} />
     </div>
   );
 }

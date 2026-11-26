@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { englishCeremonySlug } from "@/lib/ceremony";
 
 // استخراج تاریخ شمسی از متن
 function extractDate(text: string): string | null {
@@ -60,10 +61,6 @@ function extractMaddahs(text: string): string {
   return names.length > 0 ? names.join("، ") : "کربلایی حسین طاهری";
 }
 
-function slugify(s: string) {
-  return s.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\u0600-\u06FF-]/g, "").slice(0, 80) || `event-${Date.now()}`;
-}
-
 function getSubtitle(text: string): string {
   if (!text) return "";
   let sub = text.split("\n")[0].trim();
@@ -77,7 +74,6 @@ function getSubtitle(text: string): string {
 async function findOrCreateEvent(text: string) {
   if (!supabase) return null;
   const date = extractDate(text);
-  const firstLine = text.split("\n")[0].trim().slice(0, 120);
 
   if (date) {
     const { data: existing } = await supabase
@@ -88,9 +84,8 @@ async function findOrCreateEvent(text: string) {
       .limit(1);
     if (existing && existing.length > 0) return existing[0];
 
-    const title = firstLine.includes(date) ? firstLine : `روضه هفتگی ${date}`;
-    const slug = slugify(title);
     const parsed = parseCeremony(text);
+    const slug = englishCeremonySlug(parsed.dateFa || date);
     const { data: created } = await supabase
       .from("events")
       .insert({ title: parsed.title, slug, date_fa: parsed.dateFa || date, speaker: parsed.speaker, status: "past", maddah: parsed.maddah, description: parsed.description })

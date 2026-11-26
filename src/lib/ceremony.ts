@@ -1,6 +1,7 @@
 import { parsePersianDate, toPersianDigits } from "@/lib/jalali";
 
 const MONTHS = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+const MONTH_SLUG = ["farvardin", "ordibehesht", "khordad", "tir", "mordad", "shahrivar", "mehr", "aban", "azar", "dey", "bahman", "esfand"];
 
 export type CeremonyPhoto = {
   event_id?: string | null;
@@ -16,6 +17,14 @@ export function shortPersianDate(dateFa: string) {
   const month = MONTHS[parsed.m - 1] || "";
   const year = parsed.y ? ` ${toPersianDigits(parsed.y)}` : "";
   return `${toPersianDigits(parsed.d)} ${month}${year}`.trim();
+}
+
+/** آدرس مراسم همیشه لاتین است. اسلاگ فارسی صفحه را خالی می‌کند. */
+export function englishCeremonySlug(dateFa: string) {
+  const parsed = parsePersianDate(dateFa || "");
+  const month = parsed?.m ? MONTH_SLUG[parsed.m - 1] : "";
+  if (parsed?.d && month) return `majles-${parsed.d}-${month}`;
+  return `majles-${Date.now()}`;
 }
 
 /** عنوان کارت. اگر تاریخ داخل عنوان نباشد، تاریخ خود همان مراسم به آن اضافه می‌شود. */

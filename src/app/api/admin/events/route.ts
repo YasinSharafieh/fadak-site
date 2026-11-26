@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
+import { englishCeremonySlug } from "@/lib/ceremony";
 
 export async function POST(req: Request) {
   const cookieStore = await cookies();
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   const supabase = createClient(supabaseUrl, serviceKey);
 
-  const slug = title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\u0600-\u06FF-]/g, "").slice(0, 80) || `event-${Date.now()}`;
+  const slug = englishCeremonySlug(dateFa);
 
   const { error } = await supabase.from("events").insert({
     title,
