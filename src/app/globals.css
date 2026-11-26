@@ -159,11 +159,22 @@ html.reels-open footer {
   z-index: 1;
   display: flex;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: safe center;
   gap: 0.7rem;
+  width: min(100%, calc(8 * 5.15rem + 7 * 0.7rem + 1.7rem + 1.35rem));
+  margin-inline: auto;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   padding: 0.35rem 0.85rem 0.7rem;
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(232, 199, 102, 0.62) transparent;
+}
+.reel-orbit-row::-webkit-scrollbar { height: 6px; }
+.reel-orbit-row::-webkit-scrollbar-track { background: transparent; }
+.reel-orbit-row::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(232, 199, 102, 0.55);
 }
 .reel-orbit-item {
   display: flex;
@@ -234,6 +245,7 @@ html.reels-open footer {
   object-position: center 22%;
 }
 .reel-orbit-row.is-long { justify-content: flex-start; }
+.reel-orbit-row.is-long .reel-orbit-item { scroll-snap-align: start; }
 .reel-shelf-card {
   overflow: hidden;
   border-radius: 1.15rem;
@@ -299,7 +311,11 @@ html[data-theme="light"] .reel-shelf-card {
   to { transform: scale(1.12); }
 }
 @media (min-width: 640px) {
-  .reel-orbit-row { gap: 1.2rem; padding-inline: 1.5rem; }
+  .reel-orbit-row {
+    gap: 1.2rem;
+    width: min(100%, calc(8 * 6.6rem + 7 * 1.2rem + 3rem + 1.7rem));
+    padding-inline: 1.5rem;
+  }
   .reel-orbit-item { width: 6.6rem; }
   .reel-orbit-slot { height: 6.15rem; }
   .reel-orbit-disc { width: 5.55rem; height: 5.55rem; }
@@ -317,6 +333,8 @@ html[data-theme="light"] .reel-orbit::before {
   background: radial-gradient(ellipse, rgba(201, 162, 39, 0.34), rgba(14, 124, 123, 0.08) 46%, transparent 72%);
 }
 html[data-theme="light"] .reel-orbit-face { border-color: #f4f0e8; }
+html[data-theme="light"] .reel-orbit-row { scrollbar-color: rgba(138, 109, 18, 0.55) transparent; }
+html[data-theme="light"] .reel-orbit-row::-webkit-scrollbar-thumb { background: rgba(138, 109, 18, 0.45); }
 html[data-theme="light"] .reel-orbit-name { color: #3f3830; }
 html[data-theme="light"] .reel-orbit-item:hover .reel-orbit-name,
 html[data-theme="light"] .reel-orbit-item:focus-visible .reel-orbit-name { color: #8a6d12; }

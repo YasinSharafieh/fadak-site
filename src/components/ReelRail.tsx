@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
@@ -10,8 +10,14 @@ type Reel = {
   cover_url?: string | null;
 };
 
+const ORBIT_VISIBLE = 8;
+const ORBIT_LIMIT = 12;
+
 export default function ReelRail() {
   const [reels, setReels] = useState<Reel[] | null>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const shown = reels === null ? null : reels.slice(0, ORBIT_LIMIT);
+  const isLong = shown !== null && shown.length > ORBIT_VISIBLE;
 
   useEffect(() => {
     let gone = false;
@@ -32,12 +38,17 @@ export default function ReelRail() {
     };
   }, []);
 
+  useLayoutEffect(() => {
+    const el = rowRef.current;
+    if (el) el.scrollLeft = 0;
+  }, [shown?.length]);
+
   if (reels && reels.length === 0) return null;
 
   return (
     <section className="reel-orbit" aria-label="ریلز">
-      <div className={`reel-orbit-row no-scrollbar ${reels && reels.length > 4 ? "is-long" : ""}`} role={reels === null ? "status" : undefined} aria-busy={reels === null}>
-        {reels === null
+      <div ref={rowRef} className={`reel-orbit-row ${isLong ? "is-long" : ""}`} role={reels === null ? "status" : undefined} aria-busy={reels === null}>
+        {shown === null
           ? [0, 1, 2].map((item) => (
               <span key={item} className={`reel-orbit-item ${item === 0 ? "is-live" : ""}`} aria-hidden="true">
                 <span className="reel-orbit-slot">
@@ -49,7 +60,7 @@ export default function ReelRail() {
                 <span className="reel-orbit-name is-bone fadak-shimmer" />
               </span>
             ))
-          : reels.map((reel, index) => (
+          : shown.map((reel, index) => (
               <Link
                 key={reel.id}
                 href={`/reels#${reel.id}`}
