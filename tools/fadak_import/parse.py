@@ -6,7 +6,7 @@ MONTHS = (
     "فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند"
 )
 FA_DIGITS = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
-STOP_MARKS = ("📅", "⬇️", "🔹", "www.", "💠", "📷")
+STOP_MARKS = ("📅", "🗓", "⬇️", "🔹", "www.", "💠", "📷")
 
 
 def normalize(text: str) -> str:
@@ -26,9 +26,9 @@ def get_subtitle(text: str) -> str:
         return ""
     sub = text.split("\n")[0].strip()
     sub = sub.split("مجلس")[0].strip()
-    sub = re.sub(r"\|\s*$", "", sub).strip()
     sub = re.sub(r"#\S+", "", sub).strip()
-    sub = re.sub(r"^[🔊📷🎬📌📅\s]+", "", sub).strip()
+    sub = re.sub(r"^[🔊📷🎬📌📅🗓🎙\s|]+", "", sub).strip()
+    sub = re.sub(r"[|\s]+$", "", sub).strip()
     return sub[:80]
 
 
@@ -76,6 +76,7 @@ def parse_ceremony(text: str) -> dict:
     if not speaker and speaker_idx >= 0 and speaker_idx + 1 < len(lines):
         speaker = lines[speaker_idx + 1].strip()
 
+    maddahs = [name for name in maddahs if "🗓" not in name and "📅" not in name and not extract_date(name)]
     maddah = "، ".join(dict.fromkeys(maddahs)) if maddahs else extract_maddahs(text)
     description = "\n".join(
         part
