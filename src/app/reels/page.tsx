@@ -499,7 +499,7 @@ export default function ReelsPage() {
 
   if (loading) {
     return (
-      <div className="reels-shell keep-contrast">
+      <div className="reels-shell">
         <SectionSkeleton kind="reel" />
       </div>
     );
@@ -507,7 +507,7 @@ export default function ReelsPage() {
 
   if (reels.length === 0) {
     return (
-      <div className="reels-shell keep-contrast flex items-center justify-center px-6 text-center">
+      <div className="reels-shell flex items-center justify-center px-6 text-center">
         <p className="text-sm text-white/60">هنوز ریلزی ثبت نشده.</p>
       </div>
     );
@@ -516,7 +516,7 @@ export default function ReelsPage() {
   const active = reels[index];
 
   return (
-    <div ref={shellRef} className="reels-shell keep-contrast relative select-none text-white">
+    <div ref={shellRef} className="reels-shell relative select-none">
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         {reels.map((reel, at) =>
           reel.cover_url ? (
@@ -528,7 +528,7 @@ export default function ReelsPage() {
             />
           ) : null
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/75" />
+        <div className="reel-veil absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/75" />
       </div>
 
       <div ref={stageRef} className="reels-stage relative z-10" onScroll={onStageScroll}>
@@ -549,7 +549,7 @@ export default function ReelsPage() {
                     }}
                     src={reel.video_url}
                     poster={reel.cover_url || undefined}
-                    className="h-full w-full bg-black object-cover"
+                    className="reel-frame h-full w-full bg-black object-cover"
                     data-reel="1"
                     loop
                     muted={muted}
@@ -573,7 +573,7 @@ export default function ReelsPage() {
                     <span className="reel-heart-pop pointer-events-none absolute left-1/2 top-1/2 text-7xl text-[#e8c766]">♥</span>
                   )}
                   {paused && live && (
-                    <span className="pointer-events-none absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white">
+                    <span className="on-media pointer-events-none absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white">
                       <PlayIcon />
                     </span>
                   )}
@@ -584,14 +584,14 @@ export default function ReelsPage() {
                   <button
                     type="button"
                     onClick={toggleMute}
-                    className="absolute left-3 top-3 z-10 flex h-10 items-center gap-1.5 rounded-full border border-white/15 bg-black/45 px-2.5 text-white backdrop-blur"
+                    className="on-media absolute left-3 top-3 z-10 flex h-10 items-center gap-1.5 rounded-full border border-white/15 bg-black/45 px-2.5 text-white backdrop-blur"
                     aria-label={muted ? "روشن کردن صدا" : "قطع صدا"}
                   >
                     {muted ? <MuteIcon /> : <SoundIcon />}
                     {muted && <span className="pe-1 text-[11px] font-bold">صدا</span>}
                   </button>
 
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/75 to-transparent px-4 pb-4 pt-20 pe-16 sm:pe-4">
+                  <div className="on-media pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/75 to-transparent px-4 pb-4 pt-20 pe-16 sm:pe-4">
                     <div className="pointer-events-auto">
                       <SeekBar
                         progress={live ? progress : 0}
@@ -626,7 +626,7 @@ export default function ReelsPage() {
                     </a>
                   </div>
 
-                  <div className="absolute bottom-28 left-3 z-10 flex flex-col items-center gap-3 sm:hidden">
+                  <div className="on-media absolute bottom-28 left-3 z-10 flex flex-col items-center gap-3 sm:hidden">
                     <Rail state={state} copied={copiedId === reel.id} onLike={() => act(reel.id, "like")} onSave={() => act(reel.id, "save")} onShare={() => shareReel(reel, setCopiedId)} />
                   </div>
                 </div>
@@ -649,15 +649,17 @@ export default function ReelsPage() {
         </button>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 top-3 z-20 text-center text-[11px] font-bold text-white/80">
-        {toPersianDigits(index + 1)} از {toPersianDigits(reels.length)}
-        {active ? <span className="sr-only"> {active.title}</span> : null}
+      <div className="pointer-events-none absolute inset-x-0 top-3 z-20 flex justify-center">
+        <span className="on-media rounded-full bg-black/55 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+          {toPersianDigits(index + 1)} از {toPersianDigits(reels.length)}
+          {active ? <span className="sr-only"> {active.title}</span> : null}
+        </span>
       </div>
 
-      {edge && <div className="reel-edge pointer-events-none absolute left-1/2 top-12 z-30 rounded-full bg-black/70 px-3 py-1.5 text-xs font-bold text-white">{edge}</div>}
+      {edge && <div className="reel-edge on-media pointer-events-none absolute left-1/2 top-12 z-30 rounded-full bg-black/70 px-3 py-1.5 text-xs font-bold text-white">{edge}</div>}
       {hint && index === 0 && (
         <div className="pointer-events-none absolute inset-x-0 top-12 z-30 flex justify-center">
-          <span className="rounded-full border border-white/10 bg-black/60 px-3 py-1.5 text-xs font-bold text-white backdrop-blur">
+          <span className="on-media rounded-full border border-white/10 bg-black/60 px-3 py-1.5 text-xs font-bold text-white backdrop-blur">
             <span className="reel-hint-chevron me-1 inline-block">↑</span>
             {hint}
           </span>
@@ -770,7 +772,7 @@ function RailButton({
     : "border-white/15 bg-black/45 text-white";
   return (
     <button type="button" onClick={onClick} aria-label={label} title={label} className="flex flex-col items-center gap-1 text-white">
-      <span className={`flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur ${on}`}>{children}</span>
+      <span className={`on-media flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur ${on}`}>{children}</span>
       <span className="text-[10px] font-bold">{count || label}</span>
     </button>
   );

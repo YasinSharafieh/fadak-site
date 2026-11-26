@@ -89,10 +89,10 @@ export default function Home() {
         <div className="relative mx-auto max-w-7xl px-4 py-8 md:py-12">
           <div className="grid items-center gap-8 lg:grid-cols-[0.92fr_1.08fr]">
             <div className="text-center md:text-right">
-              <div className="mb-5 flex items-center justify-center gap-3 md:justify-start">
-                <ThemeImage darkSrc="/brand/heyat-mark.png" lightSrc="/brand/heyat-mark-ink.png" alt="هیئت فدائیان حضرت زهرا" className="h-16 w-auto object-contain sm:h-[4.5rem]" />
-                <ThemeImage darkSrc="/brand/taheri-mark.png" lightSrc="/brand/taheri-mark-ink.png" alt="حسین طاهری" className="h-16 w-auto object-contain sm:h-[4.5rem]" />
-                <ThemeImage darkSrc="/brand/fadak-wordmark.png" lightSrc="/brand/fadak-wordmark-ink.png" alt="فدک" className="h-16 w-auto max-w-[11rem] object-contain sm:h-[4.5rem] sm:max-w-[12.5rem]" />
+              <div className="mb-5 flex flex-wrap items-center justify-center gap-3 md:justify-start">
+                <ThemeImage darkSrc="/brand/heyat-mark.png" lightSrc="/brand/heyat-mark-ink.png" alt="هیئت فدائیان حضرت زهرا" className="h-14 w-auto object-contain sm:h-[4.5rem]" />
+                <ThemeImage darkSrc="/brand/taheri-mark.png" lightSrc="/brand/taheri-mark-ink.png" alt="حسین طاهری" className="h-14 w-auto object-contain sm:h-[4.5rem]" />
+                <ThemeImage darkSrc="/brand/fadak-wordmark.png" lightSrc="/brand/fadak-wordmark-ink.png" alt="فدک" className="h-12 w-auto max-w-[7.5rem] object-contain sm:h-[4.5rem] sm:max-w-[12.5rem]" />
               </div>
               <span className="text-sm font-medium text-[#c9a227]">اطلاعیه</span>
               <h1 className="mt-3 text-3xl font-extrabold text-white md:text-5xl">مجلس روضه هفتگی</h1>
@@ -120,7 +120,7 @@ export default function Home() {
       <ReelRail />
 
       <section className="mx-auto max-w-7xl px-4 py-10">
-        <div className="flex items-start justify-between">
+        <div className="section-head flex items-start justify-between gap-3">
           <div>
             <h2 className="text-2xl font-extrabold text-white">آخرین مراسم‌ها</h2>
             <p className="mt-1 text-sm text-white/60">جدیدترین مراسم‌های ثبت‌شده در آرشیو فدک را مشاهده و دنبال کنید.</p>
@@ -147,7 +147,7 @@ export default function Home() {
 
       <section className="bg-[#111111] py-10">
         <div className="mx-auto max-w-7xl px-4">
-          <div className="flex items-start justify-between">
+          <div className="section-head flex items-start justify-between gap-3">
             <div>
               <span className="text-xs text-[#14a3a2]">ویدئو</span>
               <h2 className="mt-1 text-2xl font-extrabold text-white">جدیدترین نماهنگ‌ها</h2>
@@ -197,7 +197,7 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-10">
-        <div className="flex items-start justify-between">
+        <div className="section-head flex items-start justify-between gap-3">
           <div>
             <span className="text-xs text-[#14a3a2]">آرشیو</span>
             <h2 className="mt-1 text-2xl font-extrabold text-white">مجموعه‌ها</h2>
@@ -228,7 +228,7 @@ export default function Home() {
 
       <section className="bg-[#111111] py-10">
         <div className="mx-auto max-w-7xl px-4">
-          <div className="flex items-start justify-between">
+          <div className="section-head flex items-start justify-between gap-3">
             <div>
               <span className="text-xs text-[#14a3a2]">ویدئوهای برگزیده</span>
               <h2 className="mt-1 text-2xl font-extrabold text-white">محبوب‌ترین ویدئوها</h2>
@@ -298,7 +298,7 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-4">
-        <div className="flex items-end justify-between">
+        <div className="section-head flex items-end justify-between gap-3">
           <div>
             <span className="text-xs text-[#14a3a2]">اخبار و اعلامیه</span>
             <h2 className="mt-1 text-2xl font-extrabold text-white">آخرین خبرهای هیئت</h2>

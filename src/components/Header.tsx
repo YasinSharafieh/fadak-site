@@ -97,17 +97,17 @@ export default function Header() {
       <TodayDates />
       <div className="mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between gap-3 py-2.5">
-          <Link href="/" className="flex shrink-0 items-center">
+          <Link href="/" className="flex min-w-0 shrink items-center">
             <ThemeImage
               darkSrc="/brand/fadak-wordmark.png"
               lightSrc="/brand/fadak-wordmark-ink.png"
               alt="فدک"
-              className="h-11 w-auto object-contain sm:h-14"
+              className="h-9 w-auto max-w-[7.4rem] object-contain min-[400px]:h-11 sm:h-12 sm:max-w-none lg:h-14"
             />
           </Link>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <form onSubmit={handleSearch} className="hidden min-[480px]:block">
+            <form onSubmit={handleSearch} className="hidden md:block">
               <label htmlFor="header-search" className="sr-only">جستجو</label>
               <div className="relative">
                 <input
@@ -115,7 +115,7 @@ export default function Header() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="جستجو..."
-                  className="header-search w-32 rounded-full border border-white/15 bg-white/10 py-1.5 pe-8 ps-3 text-xs text-white outline-none placeholder:text-white/50 sm:w-40 md:w-48"
+                  className="header-search w-36 rounded-full border border-white/15 bg-white/10 py-1.5 pe-8 ps-3 text-xs text-white outline-none placeholder:text-white/50 lg:w-48"
                 />
                 <button type="submit" aria-label="جستجو" title="جستجو" className="absolute end-1 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-[#14a3a2] transition hover:bg-[#0e7c7b] hover:text-white">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
@@ -128,7 +128,7 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setSearchOpen((open) => !open)}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 min-[480px]:hidden"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 md:hidden"
               aria-label="جستجو"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
@@ -147,13 +147,14 @@ export default function Header() {
             <Link
               href={accountName ? "/account" : "/login"}
               title={accountName ? accountName : "ورود"}
+              aria-label={accountName ? accountName : "ورود"}
               className="flex h-9 items-center gap-1 rounded-full border border-white/15 bg-white/10 px-2.5 text-xs font-bold transition hover:border-[#c9a227] hover:text-[#c9a227]"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <circle cx="12" cy="8" r="3.2" />
                 <path d="M5 19.2a7 7 0 0 1 14 0" />
               </svg>
-              <span className="max-w-[7.5rem] truncate">{accountName || "ورود"}</span>
+              <span className="hidden max-w-[7.5rem] truncate sm:inline">{accountName || "ورود"}</span>
             </Link>
             <button
               type="button"
@@ -164,7 +165,7 @@ export default function Header() {
             >
               {theme === "dark" ? <SunIcon /> : <MoonIcon />}
             </button>
-            <div className="flex shrink-0 items-center gap-1">
+            <div className="hidden shrink-0 items-center gap-1 md:flex">
               <a
                 href="https://noorieh.ir/"
                 target="_blank"
@@ -208,7 +209,7 @@ export default function Header() {
         </div>
 
         {searchOpen && (
-          <form onSubmit={handleSearch} className="pb-3 min-[480px]:hidden">
+          <form onSubmit={handleSearch} className="pb-3 md:hidden">
             <div className="relative max-w-xs">
               <input
                 value={searchQuery}
@@ -257,6 +258,16 @@ export default function Header() {
                   {item.label}
                 </Link>
               ))}
+            </div>
+            <div className="mt-3 flex items-center justify-center gap-2 border-t border-white/10 pt-3 md:hidden">
+              <a href="https://noorieh.ir/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-2 text-xs font-bold">
+                <ThemeImage darkSrc="/brand/noorieh-logo.png" lightSrc="/brand/noorieh-logo-ink.png" alt="" className="h-4 w-auto max-w-[3.2rem] object-contain" />
+                نوریه
+              </a>
+              <a href="https://gharaar.net/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-2 text-xs font-bold">
+                <img src="/brand/gharar-mark.png" alt="" className="h-5 w-5 object-contain" />
+                قرار بی‌قرارها
+              </a>
             </div>
           </nav>
         )}

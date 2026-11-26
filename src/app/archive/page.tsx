@@ -65,7 +65,7 @@ export default function ArchivePage() {
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 rounded-full border border-[#0e7c7b]/40 bg-[#1a1a1a] px-5 py-3"
         />
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setFilter("all")}
             className={`rounded-full px-5 py-3 transition ${filter === "all" ? "bg-[#0b3d2e] text-white" : "border hover:bg-[#111111]"}`}

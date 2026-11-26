@@ -181,8 +181,8 @@ export default function SectionSkeleton({ kind }: { kind: Kind }) {
         </div>
       )}
       {kind === "reel" && (
-        <div className="flex h-full w-full items-center justify-center bg-black">
-          <div className="relative h-full w-full overflow-hidden bg-[#111] sm:h-[min(92%,860px)] sm:w-auto sm:aspect-[9/16] sm:rounded-[28px] sm:ring-1 sm:ring-[#14a3a2]/40">
+        <div className="flex h-full w-full items-center justify-center">
+          <div className="reel-frame relative h-full w-full overflow-hidden bg-black sm:h-[min(92%,860px)] sm:w-auto sm:aspect-[9/16] sm:rounded-[28px] sm:ring-1 sm:ring-[#14a3a2]/40">
             <Bone className="absolute inset-0 rounded-none" />
             <div className="absolute inset-x-5 bottom-8 space-y-3">
               <Bone className="h-4 w-1/2 rounded" />

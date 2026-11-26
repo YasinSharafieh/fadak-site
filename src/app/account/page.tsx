@@ -114,14 +114,14 @@ export default function AccountPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <div className="flex items-end justify-between gap-3">
-        <div>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
           <p className="text-sm text-[#c9a227]">حساب کاربری</p>
           <h1 className="mt-1 text-3xl font-extrabold">{fullName || user.username || "کاربر فدک"}</h1>
           {fullName && user.username && <p className="mt-1 text-sm text-white/60">{user.username}</p>}
           {user.phone && <p className="mt-1 text-sm text-white/60" dir="ltr">{displayIranMobile(user.phone)}</p>}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {user.role === "admin" && <Link href="/admin" className="rounded-full border border-[#c9a227]/50 px-4 py-2 text-sm text-[#c9a227]">مدیریت</Link>}
           <button onClick={logout} className="rounded-full border border-white/15 px-4 py-2 text-sm hover:border-red-400 hover:text-red-300">خروج</button>
         </div>

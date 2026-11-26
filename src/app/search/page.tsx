@@ -119,7 +119,7 @@ export default function SearchPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="mt-8">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <div className="relative min-w-0 flex-1">
             <input
               type="text"

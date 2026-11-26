@@ -69,15 +69,15 @@ export default function EventsPage() {
           ) : (
             upcoming.map((e) => (
               <article key={e.id} className="card-hover gold-frame rounded-2xl bg-[#1a1a1a] p-6">
-                <div className="flex items-start justify-between">
-                  <div>
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0">
                     <h3 className="text-lg font-extrabold">{e.title}</h3>
                     <p className="mt-2 text-sm text-white/70/80">{e.date_fa} {e.date_hijri && `| ${e.date_hijri}`}</p>
                     {e.speaker && <p className="mt-1 text-sm">سخنران: {e.speaker}</p>}
                     {e.maddah && <p className="mt-1 text-sm">مداحان: {e.maddah}</p>}
                     <p className="mt-1 text-sm text-white/70/70">{e.location || "حسینیه سیدالشهدا (ع)"}</p>
                   </div>
-                  <span className="rounded-full bg-[#0e7c7b] px-3 py-1 text-xs font-bold text-white">آینده</span>
+                  <span className="shrink-0 rounded-full bg-[#0e7c7b] px-3 py-1 text-xs font-bold text-white">آینده</span>
                 </div>
                 <div className="mt-5 flex flex-wrap gap-2">
                   <Link href={`/archive/${e.slug}`} className="btn-green rounded-full px-5 py-2 text-sm">جزئیات</Link>
@@ -92,7 +92,7 @@ export default function EventsPage() {
 
       {/* مراسم گذشته */}
       <section className="mt-12">
-        <div className="flex items-center justify-between">
+        <div className="section-head flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-2xl font-extrabold text-white">مراسم‌های گذشته</h2>
           <Link href="/archive" className="text-sm font-bold text-[#14a3a2] hover:underline">آرشیو کامل ←</Link>
         </div>

@@ -110,7 +110,7 @@ export default function EngageBar({ type, id, title, href, thumb, compact, share
   }
 
   return (
-    <div className={`flex items-center gap-1.5 ${compact ? "" : "mt-1"}`}>
+    <div className={`flex flex-wrap items-center gap-1.5 ${compact ? "" : "mt-1"}`}>
       <button
         type="button"
         onClick={(e) => {

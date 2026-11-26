@@ -93,7 +93,7 @@ export default function GlobalVideoPlayer() {
       ref={containerRef}
       className={
         minimized
-          ? "fixed bottom-4 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl"
+          ? "fixed bottom-4 right-4 z-50 w-80 max-w-[calc(100%-2rem)] overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl"
           : "fixed z-30 bg-black"
       }
       style={minimized ? undefined : { top: 0, left: 0 }}

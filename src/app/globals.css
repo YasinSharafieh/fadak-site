@@ -140,11 +140,155 @@ html.reels-open footer {
 }
 .reel-home {
   background:
-    radial-gradient(ellipse at 12% 0%, rgba(20, 163, 162, 0.22), transparent 52%),
-    radial-gradient(ellipse at 92% 120%, rgba(201, 162, 39, 0.14), transparent 46%),
-    #07110f;
+    radial-gradient(ellipse at 12% 0%, rgba(20, 163, 162, 0.28), transparent 46%),
+    radial-gradient(ellipse at 92% 120%, rgba(201, 162, 39, 0.16), transparent 42%),
+    linear-gradient(180deg, #07110f, #0c1614);
   border: 1px solid rgba(20, 163, 162, 0.28);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+}
+.reel-home-glow {
+  position: absolute;
+  left: -3rem;
+  bottom: -4.5rem;
+  width: 14rem;
+  height: 14rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(201, 162, 39, 0.2), transparent 68%);
+  animation: reel-glow 7s ease-in-out infinite;
+  pointer-events: none;
+}
+.reel-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #14a3a2;
+  font-size: 12px;
+  font-weight: 800;
+}
+.reel-live {
+  width: 0.45rem;
+  height: 0.45rem;
+  flex: none;
+  border-radius: 999px;
+  background: #14a3a2;
+  box-shadow: 0 0 0 0 rgba(20, 163, 162, 0.7);
+  animation: reel-pulse 1.8s ease-out infinite;
+}
+.reel-ig-mark {
+  display: flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.reel-all {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  border-radius: 999px;
+  background: #0e7c7b;
+  padding: 0.45rem 0.9rem;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+.reel-all:hover { background: #14a3a2; }
+.reel-card-home {
+  width: min(42vw, 168px);
+  max-width: min(42vw, 168px);
+  flex: 0 0 min(42vw, 168px);
+}
+.reel-card-home.is-featured {
+  width: min(48vw, 188px);
+  max-width: min(48vw, 188px);
+  flex-basis: min(48vw, 188px);
+}
+.reel-cover {
+  position: relative;
+  display: block;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: 1.35rem;
+  background: #111;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.38);
+  outline: 1px solid rgba(20, 163, 162, 0.35);
+}
+.reel-card-home.is-featured .reel-cover {
+  outline: 1px solid rgba(232, 199, 102, 0.75);
+}
+.reel-card-home.is-featured .reel-cover img {
+  animation: reel-ken 8s ease-in-out infinite alternate;
+}
+.reel-play {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  z-index: 2;
+  display: flex;
+  height: 2.75rem;
+  width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(14, 124, 123, 0.92);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.reel-cover:hover .reel-play { transform: translate(-50%, -50%) scale(1.06); background: #14a3a2; }
+.reel-fresh {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  z-index: 2;
+  border-radius: 999px;
+  background: #c9a227;
+  padding: 0.15rem 0.45rem;
+  color: #1c1915;
+  font-size: 10px;
+  font-weight: 800;
+}
+@keyframes reel-glow {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.7; }
+  50% { transform: translate3d(16px, -8px, 0) scale(1.08); opacity: 1; }
+}
+@keyframes reel-pulse {
+  70% { box-shadow: 0 0 0 7px rgba(20, 163, 162, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(20, 163, 162, 0); }
+}
+@keyframes reel-ken {
+  from { transform: scale(1); }
+  to { transform: scale(1.07); }
+}
+@media (min-width: 640px) {
+  .reel-card-home,
+  .reel-card-home.is-featured {
+    width: 176px;
+    max-width: 176px;
+    flex-basis: 176px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reel-live,
+  .reel-home-glow,
+  .reel-card-home.is-featured .reel-cover img { animation: none; }
+}
+html[data-theme="light"] .reel-home {
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(14, 124, 123, 0.14), transparent 46%),
+    radial-gradient(ellipse at 92% 120%, rgba(201, 162, 39, 0.2), transparent 42%),
+    linear-gradient(180deg, #f7f1e4, #fffdf9 58%, #f4efe6);
+  border-color: rgba(11, 61, 46, 0.14);
+  box-shadow: 0 16px 36px rgba(80, 60, 20, 0.08);
+}
+html[data-theme="light"] .reel-ig-mark {
+  background: rgba(28, 25, 21, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(28, 25, 21, 0.08);
 }
 
 /* نوار بالا روی ویدیو نمی‌آید: وقتی ویدیو به محدودهٔ نوار می‌رسد، نوار کنار می‌رود. */
@@ -403,6 +547,40 @@ html[data-theme="light"] .site-shell .keep-contrast.border-\[\#c9a227\]\/40 {
 }
 html[data-theme="light"] .site-shell .keep-contrast .border-white\/30 {
   border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* نوشتهٔ روی ویدیو و کاور در حالت روز هم سفید می‌ماند. اطراف صفحه جداگانه تم می‌گیرد. */
+html[data-theme="light"] .site-shell .on-media,
+html[data-theme="light"] .site-shell .on-media.text-white,
+html[data-theme="light"] .site-shell .on-media .text-white,
+html[data-theme="light"] .site-shell .on-media .text-white\/80,
+html[data-theme="light"] .site-shell .on-media .text-white\/70,
+html[data-theme="light"] .site-shell .on-media .text-white\/60,
+html[data-theme="light"] .site-shell .on-media .text-white\/50,
+html[data-theme="light"] .site-shell .on-media .text-white\/40 {
+  color: #fff !important;
+}
+html[data-theme="light"] .site-shell .on-media.text-black,
+html[data-theme="light"] .site-shell .on-media .text-black {
+  color: #111 !important;
+}
+html[data-theme="light"] .reels-shell {
+  background: #f3eee6;
+  color: #1c1915;
+}
+html[data-theme="light"] .reel-veil {
+  background: linear-gradient(180deg, rgba(244, 240, 232, 0.82), rgba(244, 240, 232, 0.58) 48%, rgba(244, 240, 232, 0.9)) !important;
+}
+.reel-frame { background: #000; }
+html[data-theme="light"] .site-shell .reel-frame,
+html[data-theme="light"] .site-shell .reel-frame.bg-black,
+html[data-theme="light"] .site-shell .reel-frame.bg-\[\#111\] {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+@media (max-width: 640px) {
+  .section-head { flex-wrap: wrap; row-gap: 0.35rem; }
+  .section-head > :first-child { min-width: 0; flex: 1 1 12rem; }
 }
 
 /* نوار جابه‌جایی پلیر صوت. بقیهٔ ورودی‌های سایت دست نمی‌خورند. */
