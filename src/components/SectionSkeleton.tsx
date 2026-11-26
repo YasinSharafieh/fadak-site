@@ -77,13 +77,20 @@ export default function SectionSkeleton({ kind }: { kind: Kind }) {
       {kind === "audio" && (
         <div className="space-y-3">
           {Array.from({ length: 5 }, (_, i) => (
-            <div key={i} className="flex items-center gap-3 rounded-2xl bg-[#1a1a1a] p-4">
-              <Bone className="h-12 w-12 shrink-0 rounded-full" />
-              <div className="min-w-0 flex-1 space-y-2">
-                <Bone className="h-4 w-2/3 rounded" />
-                <Bone className="h-1.5 w-full rounded-full" />
+            <div key={i} className="rounded-2xl bg-[#1a1a1a] p-4">
+              <div className="flex items-start gap-3">
+                <Bone className="h-12 w-12 shrink-0 rounded-full" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <Bone className="h-4 w-2/3 rounded" />
+                  <Bone className="h-2 w-full rounded-full" />
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <Bone className="h-10 rounded-xl" />
+                    <Bone className="h-10 rounded-xl" />
+                    <Bone className="h-10 rounded-xl" />
+                  </div>
+                </div>
               </div>
-              {i === 0 && <Mark />}
+              {i === 0 && <div className="mt-3"><Mark /></div>}
             </div>
           ))}
         </div>
