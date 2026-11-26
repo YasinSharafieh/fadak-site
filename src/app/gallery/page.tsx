@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import SectionSkeleton from "@/components/SectionSkeleton";
 import { supabase } from "@/lib/supabase";
 
+function visibleCaption(caption?: string) {
+  const text = (caption || "").trim();
+  if (!text || text === "عکس مراسم") return "";
+  return text;
+}
+
 type Photo = {
   id: string;
   url: string;
@@ -78,13 +84,13 @@ export default function GalleryPage() {
             >
               <img
                 src={photo.url}
-                alt={photo.caption || "عکس مراسم"}
+                alt=""
                 className="aspect-square w-full object-cover transition group-hover:scale-105"
                 loading="lazy"
               />
-              {photo.caption && (
+              {visibleCaption(photo.caption) && (
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-right text-xs text-white opacity-0 transition group-hover:opacity-100">
-                  {photo.caption}
+                  {visibleCaption(photo.caption)}
                 </div>
               )}
             </button>
@@ -103,9 +109,9 @@ export default function GalleryPage() {
           onClick={() => setLightbox(null)}
         >
           <div className="max-w-4xl" onClick={(e) => e.stopPropagation()}>
-            <img src={lightbox.url} alt={lightbox.caption || ""} className="max-h-[80vh] w-auto rounded-2xl" />
-            {lightbox.caption && (
-              <p className="mt-4 text-center text-white">{lightbox.caption}</p>
+            <img src={lightbox.url} alt="" className="max-h-[80vh] w-auto rounded-2xl" />
+            {visibleCaption(lightbox.caption) && (
+              <p className="mt-4 text-center text-white">{visibleCaption(lightbox.caption)}</p>
             )}
             <button
               onClick={() => setLightbox(null)}

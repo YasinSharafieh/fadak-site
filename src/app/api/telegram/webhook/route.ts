@@ -121,6 +121,10 @@ async function downloadAndUpload(fileId: string, bucket: string, ext: string) {
   }
 }
 
+function isUnrelatedPhoto(text: string) {
+  return /نماهنگ|پیام تقدیر|پیام تسلیت|﷽|Music|آپارات/.test(text || "");
+}
+
 async function handlePost(post: any) {
   if (!supabase) return;
   const text = (post.text as string) || (post.caption as string) || "";
@@ -144,7 +148,7 @@ async function handlePost(post: any) {
   if (post.photo?.length) {
     const fileId = post.photo[post.photo.length - 1].file_id;
     const url = await downloadAndUpload(fileId, "photos", "jpg");
-    if (url) await supabase.from("photos").insert({ event_id: event.id, url, caption: subtitle || "عکس مراسم" });
+    if (url && !isUnrelatedPhoto(text)) await supabase.from("photos").insert({ event_id: event.id, url, caption: null });
   }
 
   const audioFile = post.voice || post.audio;

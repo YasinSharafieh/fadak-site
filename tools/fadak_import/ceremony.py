@@ -49,6 +49,15 @@ def _slug(date_key: str) -> str:
     return "majles-" + text
 
 
+# این‌ها عکس مراسم نیستند. حتی اگر نزدیک تاریخ مراسم منتشر شده باشند وارد آلبوم نمی‌شوند.
+UNRELATED_PHOTO_MARKERS = ("نماهنگ", "پیام تقدیر", "پیام تسلیت", "﷽", "Music", "آپارات")
+
+
+def _unrelated_photo(text: str) -> bool:
+    src = text or ""
+    return any(marker in src for marker in UNRELATED_PHOTO_MARKERS)
+
+
 def _kind(msg) -> str:
     if msg.photo and not msg.video:
         return "photo"
@@ -134,7 +143,33 @@ async def import_ceremony(client, channel: str, date: str, commit: bool) -> str:
         )
 
     parsed = parse_ceremony(announcement.message or "") if announcement else None
-    photos = [r for r in rows if r["kind"] == "photo" and r["date"] in ("", date_key)]
+    by_id = {m.id: m for m in messages}
+    section_end = None
+    if announcement:
+        for msg in messages:
+            text = msg.message or ""
+            if msg.id > announcement.id and ("گزارش صوتی" in text or "گزارش ویدیویی" in text):
+                section_end = msg.id
+                break
+    photos = []
+    for row in rows:
+        if row["kind"] != "photo" or row["date"] not in ("", date_key):
+            continue
+        msg = by_id[row["id"]]
+        text = msg.message or ""
+        # پوستر نماهنگ، پیام تقدیر و تسلیت عکس مراسم نیستند.
+        if _unrelated_photo(text):
+            continue
+        # فقط آلبوم گزارش تصویری، تا قبل از گزارش صوتی. پست‌های بعدی کانال وارد مراسم نمی‌شوند.
+        if announcement and section_end and msg.id >= section_end:
+            continue
+        if announcement and msg.id < announcement.id:
+            same_album = bool(
+                getattr(msg, "grouped_id", None) and msg.grouped_id == getattr(announcement, "grouped_id", None)
+            )
+            if not same_album:
+                continue
+        photos.append(row)
     audios = [r for r in rows if r["kind"] == "audio" and r["date"] in ("", date_key)]
     videos = [r for r in rows if r["kind"] == "video"]
     too_big = [r for r in audios + photos if r["size"] > SUPABASE_SAFE_BYTES]
@@ -169,7 +204,6 @@ async def import_ceremony(client, channel: str, date: str, commit: bool) -> str:
     else:
         report["skipped"].append({"event_exists": event["id"], "slug": event.get("slug")})
 
-    by_id = {m.id: m for m in messages}
     channel_name = str(getattr(entity, "username", None) or channel)
 
     for row in photos:
@@ -192,7 +226,7 @@ async def import_ceremony(client, channel: str, date: str, commit: bool) -> str:
             continue
         inserted = store.insert(
             "photos",
-            {"event_id": event["id"], "url": url, "caption": row["subtitle"] or "عکس مراسم"},
+            {"event_id": event["id"], "url": url, "caption": None},
         )
         store.mark(channel_name, row["id"], "photo", inserted["id"])
         report["written"].append({"photo": inserted["id"]})
