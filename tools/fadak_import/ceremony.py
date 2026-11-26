@@ -260,4 +260,10 @@ async def import_ceremony(client, channel: str, date: str, commit: bool) -> str:
 
     if videos:
         report["note"] = "ویدیوهای تلگرام عمداً آپلود نشدند. ویدیو فقط از آپارات، با همان عنوان صوت، و با پلیر داخل سایت اضافه می‌شود."
+    try:
+        from .poems import sync_event_poems
+
+        report["poems"] = await sync_event_poems(client, event, commit=True)
+    except Exception as exc:  # noqa: BLE001 — مراسم نماند، شعر در گزارش بماند
+        report["poems_error"] = str(exc)
     return json.dumps(report, ensure_ascii=False, indent=2)

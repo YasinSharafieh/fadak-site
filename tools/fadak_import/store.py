@@ -63,6 +63,20 @@ class Store:
         self.ledger["messages"][f"{channel}:{message_id}"] = {"kind": kind, "ref": ref}
         self.save_ledger()
 
+    def list_events(self) -> list[dict]:
+        query = urllib.parse.urlencode({"select": "id,title,date_fa,slug", "order": "created_at.desc", "limit": "100"})
+        status, raw = _request("GET", f"{self.base}/rest/v1/events?{query}", headers=self._headers())
+        if status != 200:
+            raise RuntimeError(f"خواندن مراسم‌ها ناموفق: {status} {raw[:300]!r}")
+        return json.loads(raw.decode() or "[]")
+
+    def poem_bodies(self, event_id: str) -> list[str]:
+        query = urllib.parse.urlencode({"select": "body", "event_id": f"eq.{event_id}", "limit": "200"})
+        status, raw = _request("GET", f"{self.base}/rest/v1/poems?{query}", headers=self._headers())
+        if status != 200:
+            raise RuntimeError(f"خواندن شعرها ناموفق: {status} {raw[:300]!r}")
+        return [row.get("body") or "" for row in json.loads(raw.decode() or "[]")]
+
     def find_event(self, date_key: str) -> dict | None:
         query = urllib.parse.urlencode(
             {

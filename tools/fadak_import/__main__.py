@@ -106,6 +106,18 @@ async def cmd_search(channel: str, query: str, limit: int) -> None:
     await tg.disconnect()
 
 
+async def cmd_poems(commit: bool) -> None:
+    from .poems import sync_site_poems
+
+    tg = client()
+    await tg.connect()
+    if not await tg.is_user_authorized():
+        raise SystemExit("اول باید ورود تلگرام انجام شود")
+    report = await sync_site_poems(tg, commit=commit)
+    await tg.disconnect()
+    print(report)
+
+
 async def cmd_ceremony(channel: str, date: str, commit: bool) -> None:
     from .ceremony import import_ceremony
 
@@ -143,6 +155,9 @@ def main() -> None:
     p.add_argument("--date", required=True, help="مثلاً ۱۲ آبان")
     p.add_argument("--commit", action="store_true")
 
+    p = sub.add_parser("poems", help="شعر مراسم‌های موجود را از کانال دو خط شعر هماهنگ می‌کند")
+    p.add_argument("--commit", action="store_true")
+
     args = parser.parse_args()
     if args.cmd == "login-request":
         asyncio.run(cmd_login_request(args.phone))
@@ -154,6 +169,8 @@ def main() -> None:
         asyncio.run(cmd_search(args.channel, args.query, args.limit))
     elif args.cmd == "ceremony":
         asyncio.run(cmd_ceremony(args.channel, args.date, args.commit))
+    elif args.cmd == "poems":
+        asyncio.run(cmd_poems(args.commit))
 
 
 if __name__ == "__main__":
