@@ -147,10 +147,10 @@ html.reels-open footer {
   content: "";
   position: absolute;
   left: 50%;
-  top: 58%;
-  width: min(34rem, 88vw);
-  height: 5.5rem;
-  transform: translate(-50%, -50%);
+  top: 2.15rem;
+  width: min(28rem, 86vw);
+  height: 4rem;
+  transform: translate(-50%, 0);
   background: radial-gradient(ellipse, rgba(20, 163, 162, 0.28), rgba(201, 162, 39, 0.08) 42%, transparent 72%);
   pointer-events: none;
 }
@@ -158,31 +158,45 @@ html.reels-open footer {
   position: relative;
   z-index: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  gap: 0.8rem;
+  gap: 0.7rem;
   overflow-x: auto;
-  padding: 0.45rem 1rem 0.95rem;
+  padding: 0.35rem 0.85rem 0.7rem;
   scroll-snap-type: x mandatory;
 }
 .reel-orbit-item {
-  position: relative;
-  width: 4.85rem;
-  height: 4.85rem;
+  display: flex;
+  width: 5.15rem;
   flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
   scroll-snap-align: center;
+  color: inherit;
+  text-decoration: none;
+}
+.reel-orbit-slot {
+  display: flex;
+  height: 4.55rem;
+  align-items: center;
+  justify-content: center;
+}
+.reel-orbit-disc {
+  position: relative;
+  width: 4.15rem;
+  height: 4.15rem;
   border-radius: 999px;
   transition: transform 0.28s ease;
 }
-.reel-orbit-item.is-live {
-  width: 5.45rem;
-  height: 5.45rem;
+.reel-orbit-item.is-live .reel-orbit-disc {
+  width: 4.5rem;
+  height: 4.5rem;
 }
-.reel-orbit-item:hover,
-.reel-orbit-item:focus-visible {
-  transform: translateY(-3px) scale(1.045);
-  outline: none;
+.reel-orbit-item:hover .reel-orbit-disc,
+.reel-orbit-item:focus-visible .reel-orbit-disc {
+  transform: translateY(-2px) scale(1.04);
 }
+.reel-orbit-item:focus-visible { outline: none; }
 .reel-orbit-ring {
   position: absolute;
   inset: 0;
@@ -223,8 +237,8 @@ html.reels-open footer {
   top: 50%;
   z-index: 1;
   display: flex;
-  height: 1.7rem;
-  width: 1.7rem;
+  height: 1.35rem;
+  width: 1.35rem;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
@@ -234,27 +248,59 @@ html.reels-open footer {
   transform: translate(-50%, -50%);
   backdrop-filter: blur(6px);
 }
+.reel-orbit-name {
+  display: -webkit-box;
+  width: 100%;
+  min-height: 2.9em;
+  margin-top: 0.32rem;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: rgba(247, 243, 232, 0.9);
+  transition: color 0.2s ease;
+}
+.reel-orbit-item:hover .reel-orbit-name,
+.reel-orbit-item:focus-visible .reel-orbit-name { color: #e8c766; }
+.reel-orbit-name.is-bone {
+  display: block;
+  width: 72%;
+  min-height: 0;
+  height: 0.45rem;
+  margin-top: 0.5rem;
+  border-radius: 999px;
+}
 @keyframes reel-spin { to { transform: rotate(1turn); } }
 @keyframes reel-ken {
   from { transform: scale(1); }
   to { transform: scale(1.12); }
 }
 @media (min-width: 640px) {
-  .reel-orbit-row { gap: 1.35rem; padding-inline: 1.5rem; }
-  .reel-orbit-item { width: 7.15rem; height: 7.15rem; }
-  .reel-orbit-item.is-live { width: 8.15rem; height: 8.15rem; }
-  .reel-orbit-face { inset: 4px; }
-  .reel-orbit-play { height: 2.15rem; width: 2.15rem; }
+  .reel-orbit-row { gap: 1.2rem; padding-inline: 1.5rem; }
+  .reel-orbit-item { width: 6.6rem; }
+  .reel-orbit-slot { height: 6.15rem; }
+  .reel-orbit-disc { width: 5.55rem; height: 5.55rem; }
+  .reel-orbit-item.is-live .reel-orbit-disc { width: 6rem; height: 6rem; }
+  .reel-orbit-face { inset: 3px; }
+  .reel-orbit-play { height: 1.7rem; width: 1.7rem; }
+  .reel-orbit-name { margin-top: 0.4rem; font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .reel-orbit-ring,
   .reel-orbit-face img { animation: none; }
-  .reel-orbit-item:hover { transform: none; }
+  .reel-orbit-item:hover .reel-orbit-disc { transform: none; }
 }
 html[data-theme="light"] .reel-orbit::before {
   background: radial-gradient(ellipse, rgba(201, 162, 39, 0.34), rgba(14, 124, 123, 0.08) 46%, transparent 72%);
 }
 html[data-theme="light"] .reel-orbit-face { border-color: #f4f0e8; }
+html[data-theme="light"] .reel-orbit-name { color: #3f3830; }
+html[data-theme="light"] .reel-orbit-item:hover .reel-orbit-name,
+html[data-theme="light"] .reel-orbit-item:focus-visible .reel-orbit-name { color: #8a6d12; }
 
 /* نوار بالا روی ویدیو نمی‌آید: وقتی ویدیو به محدودهٔ نوار می‌رسد، نوار کنار می‌رود. */
 .site-header {

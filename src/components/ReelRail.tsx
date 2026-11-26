@@ -44,8 +44,13 @@ export default function ReelRail() {
         {reels === null
           ? [0, 1, 2].map((item) => (
               <span key={item} className={`reel-orbit-item ${item === 0 ? "is-live" : ""}`} aria-hidden="true">
-                <span className="reel-orbit-ring" />
-                <span className="reel-orbit-face fadak-shimmer" />
+                <span className="reel-orbit-slot">
+                  <span className="reel-orbit-disc">
+                    <span className="reel-orbit-ring" />
+                    <span className="reel-orbit-face fadak-shimmer" />
+                  </span>
+                </span>
+                <span className="reel-orbit-name is-bone fadak-shimmer" />
               </span>
             ))
           : reels.map((reel, index) => (
@@ -55,19 +60,20 @@ export default function ReelRail() {
                 className={`reel-orbit-item ${index === 0 ? "is-live" : ""}`}
                 aria-label={reel.title}
               >
-                <span className="reel-orbit-ring" aria-hidden="true" />
-                <span className="reel-orbit-face">
-                  {reel.cover_url ? (
-                    <img src={reel.cover_url} alt="" />
-                  ) : (
-                    <span className="reel-orbit-empty" />
-                  )}
-                  <span className="reel-orbit-play" aria-hidden="true">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
+                <span className="reel-orbit-slot">
+                  <span className="reel-orbit-disc">
+                    <span className="reel-orbit-ring" aria-hidden="true" />
+                    <span className="reel-orbit-face">
+                      {reel.cover_url ? <img src={reel.cover_url} alt="" /> : <span className="reel-orbit-empty" />}
+                      <span className="reel-orbit-play" aria-hidden="true">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </span>
+                    </span>
                   </span>
                 </span>
+                <span className="reel-orbit-name">{reel.title}</span>
               </Link>
             ))}
       </div>
