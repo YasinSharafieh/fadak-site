@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import ThemeImage from "@/components/ThemeImage";
 import CenteredScroller from "@/components/CenteredScroller";
+import MediaScroller from "@/components/MediaScroller";
 
 export const metadata = { title: "رسانه حسین طاهری | فدک" };
 
@@ -89,7 +90,7 @@ const alireza: Row[] = [
 
 function Rows({ items }: { items: Row[] }) {
   return (
-    <div className="mt-3 flex flex-col gap-1">
+    <div className="flex flex-col gap-1">
       {items.map((item) => (
         <a
           key={item.href + item.name}
@@ -149,7 +150,9 @@ export default function AboutTaheriPage() {
           <div className="media-board">
             <section className="media-col">
               <Crest darkSrc="/brand/meydan-mark.png" lightSrc="/brand/meydan-mark-ink.png" alt="میدان انقلاب" caption="اجتماع به عشق وطن" />
-              <Rows items={meydan} />
+              <MediaScroller label="لینک‌های میدان انقلاب">
+                <Rows items={meydan} />
+              </MediaScroller>
             </section>
             <section className="media-col">
               <div className="media-head">
@@ -158,11 +161,15 @@ export default function AboutTaheriPage() {
                 </span>
                 <p className="media-caption">فدک</p>
               </div>
-              <Rows items={fadak} />
+              <MediaScroller label="لینک‌های فدک">
+                <Rows items={fadak} />
+              </MediaScroller>
             </section>
             <section className="media-col media-col-center" data-center="">
               <Crest darkSrc="/brand/taheri-mark.png" lightSrc="/brand/taheri-mark-ink.png" alt="حسین طاهری" caption="حسین طاهری" large />
-              <Rows items={taheri} />
+              <MediaScroller label="لینک‌های حسین طاهری">
+                <Rows items={taheri} />
+              </MediaScroller>
             </section>
             <section className="media-col">
               <div className="media-head">
@@ -171,11 +178,15 @@ export default function AboutTaheriPage() {
                 </span>
                 <p className="media-caption">نوریه</p>
               </div>
-              <Rows items={noorieh} />
+              <MediaScroller label="لینک‌های نوریه">
+                <Rows items={noorieh} />
+              </MediaScroller>
             </section>
             <section className="media-col">
               <Crest darkSrc="/brand/alireza-mark.png" lightSrc="/brand/alireza-mark-ink.png" alt="علیرضا طاهری" caption="علیرضا طاهری" />
-              <Rows items={alireza} />
+              <MediaScroller label="لینک‌های علیرضا طاهری">
+                <Rows items={alireza} />
+              </MediaScroller>
             </section>
           </div>
         </CenteredScroller>
@@ -196,20 +207,24 @@ export default function AboutTaheriPage() {
           display: grid;
           grid-template-columns: repeat(5, minmax(10.4rem, 1fr));
           gap: .55rem;
-          align-items: start;
+          align-items: stretch;
           width: max(100%, 56rem);
         }
         @media (min-width: 1180px) {
           .media-board { width: 100%; gap: .75rem; }
         }
         .media-col {
+          display: flex;
+          flex-direction: column;
+          height: min(34rem, calc(100dvh - var(--site-header-h, 7.5rem) - 9.5rem));
+          min-height: 18rem;
           border: 1px solid rgba(201,162,39,.28);
           border-radius: 1.25rem;
           background:
             linear-gradient(180deg, rgba(255,255,255,.05), transparent 18%),
             #141210;
           box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 14px 30px rgba(0,0,0,.24);
-          padding: .75rem .45rem .9rem;
+          padding: .75rem .45rem .55rem;
         }
         .media-col-center {
           border-color: rgba(201,162,39,.55);
@@ -218,7 +233,39 @@ export default function AboutTaheriPage() {
             0 18px 40px rgba(0,0,0,.36),
             0 0 0 1px rgba(201,162,39,.15);
         }
-        .media-head { display: flex; min-height: 6.4rem; flex-direction: column; align-items: center; justify-content: flex-end; }
+        .media-head { display: flex; min-height: 6.4rem; flex: none; flex-direction: column; align-items: center; justify-content: flex-end; }
+        .media-links-frame { position: relative; display: flex; min-height: 0; flex: 1 1 auto; flex-direction: column; }
+        .media-links {
+          min-height: 0;
+          flex: 1 1 auto;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          scrollbar-gutter: stable;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(201,162,39,.62) transparent;
+          padding: .7rem .15rem .85rem;
+        }
+        .media-links:focus-visible { outline: none; }
+        .media-links::-webkit-scrollbar { width: 6px; }
+        .media-links::-webkit-scrollbar-thumb { background: rgba(201,162,39,.55); border-radius: 999px; }
+        .media-links-frame.has-more::after,
+        .media-links-frame.has-top::before {
+          content: "";
+          pointer-events: none;
+          position: absolute;
+          left: .35rem;
+          right: .55rem;
+          height: 1.15rem;
+          z-index: 1;
+        }
+        .media-links-frame.has-more::after {
+          bottom: 0;
+          background: linear-gradient(to top, #141210, transparent);
+        }
+        .media-links-frame.has-top::before {
+          top: 0;
+          background: linear-gradient(to bottom, #141210, transparent);
+        }
         .media-col-center .media-head { min-height: 7.6rem; }
         .media-medallion, .media-crest, .media-word {
           display: flex;
@@ -289,6 +336,10 @@ export default function AboutTaheriPage() {
           background: linear-gradient(180deg, rgba(255,255,255,.8), #fffdf9 30%);
           box-shadow: inset 0 1px 0 #fff, 0 12px 24px rgba(70,52,20,.08);
         }
+        html[data-theme="light"] .media-links { scrollbar-color: rgba(138,109,18,.55) transparent; }
+        html[data-theme="light"] .media-links::-webkit-scrollbar-thumb { background: rgba(138,109,18,.45); }
+        html[data-theme="light"] .media-links-frame.has-more::after { background: linear-gradient(to top, #fffdf9, transparent); }
+        html[data-theme="light"] .media-links-frame.has-top::before { background: linear-gradient(to bottom, #fffdf9, transparent); }
         html[data-theme="light"] .media-name,
         html[data-theme="light"] .media-caption { color: #1c1915; }
         html[data-theme="light"] .media-line { color: rgba(28,25,21,.5); }
