@@ -95,15 +95,15 @@ export default function Header() {
       className="site-header sticky top-0 z-40 border-b border-white/10 bg-black text-white"
     >
       <TodayDates />
-      <div className="mx-auto max-w-7xl px-4">
-        <div className="flex items-center justify-between gap-3 py-2.5">
-          <div className="flex min-w-0 items-center gap-1.5">
+      <div className="mx-auto max-w-7xl px-3 sm:px-4">
+        <div className="flex items-center justify-between gap-2 py-2 sm:gap-3 sm:py-2.5">
+          <div className="flex min-w-0 items-center gap-1">
             <Link href="/" className="flex min-w-0 shrink items-center">
               <ThemeImage
                 darkSrc="/brand/fadak-wordmark.png"
                 lightSrc="/brand/fadak-wordmark-ink.png"
                 alt="فدک"
-                className="h-9 w-auto max-w-[6.2rem] object-contain min-[400px]:max-w-[7.4rem] min-[400px]:h-11 sm:h-12 sm:max-w-none lg:h-14"
+                className="h-8 w-auto max-w-[5.2rem] object-contain min-[400px]:h-9 min-[400px]:max-w-[6.4rem] sm:h-11 sm:max-w-none lg:h-14"
               />
             </Link>
             <Link
@@ -112,17 +112,17 @@ export default function Header() {
                 setMobileOpen(false);
                 setSearchOpen(false);
               }}
-              className="inline-flex h-9 shrink-0 items-center gap-1 rounded-full border border-white/15 bg-white/10 px-2.5 text-xs font-bold transition hover:border-[#c9a227] hover:text-[#c9a227] lg:hidden"
+              className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full border border-white/15 bg-white/10 px-2 text-[11px] font-bold transition hover:border-[#c9a227] hover:text-[#c9a227] sm:h-9 sm:px-2.5 sm:text-xs lg:hidden"
               aria-label="خانه"
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" aria-hidden="true">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" aria-hidden="true">
                 <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z" />
               </svg>
               خانه
             </Link>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
             <form onSubmit={handleSearch} className="hidden md:block">
               <label htmlFor="header-search" className="sr-only">جستجو</label>
               <div className="relative">
@@ -144,10 +144,10 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setSearchOpen((open) => !open)}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 md:hidden"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 sm:h-9 sm:w-9 md:hidden"
               aria-label="جستجو"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
                 <circle cx="11" cy="11" r="7" />
                 <path d="M20 20l-3.5-3.5" />
               </svg>
@@ -164,9 +164,9 @@ export default function Header() {
               href={accountName ? "/account" : "/login"}
               title={accountName ? accountName : "ورود"}
               aria-label={accountName ? accountName : "ورود"}
-              className="flex h-9 items-center gap-1 rounded-full border border-white/15 bg-white/10 px-2.5 text-xs font-bold transition hover:border-[#c9a227] hover:text-[#c9a227]"
+              className="flex h-8 shrink-0 items-center gap-1 rounded-full border border-white/15 bg-white/10 px-2 text-[11px] font-bold transition hover:border-[#c9a227] hover:text-[#c9a227] sm:h-9 sm:px-2.5 sm:text-xs"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <circle cx="12" cy="8" r="3.2" />
                 <path d="M5 19.2a7 7 0 0 1 14 0" />
               </svg>
@@ -177,7 +177,7 @@ export default function Header() {
               onClick={toggle}
               aria-label={theme === "dark" ? "حالت روز" : "حالت شب"}
               title={theme === "dark" ? "حالت روز" : "حالت شب"}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 transition hover:border-[#c9a227] hover:text-[#c9a227]"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 transition hover:border-[#c9a227] hover:text-[#c9a227] sm:h-9 sm:w-9"
             >
               {theme === "dark" ? <SunIcon /> : <MoonIcon />}
             </button>
@@ -216,7 +216,7 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setMobileOpen((open) => !open)}
-              className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-white/10 lg:hidden"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-white/10 sm:h-9 sm:w-9 lg:hidden"
               aria-label="منو"
             >
               {mobileOpen ? "✕" : "☰"}

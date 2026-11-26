@@ -5,7 +5,7 @@ import Link from "next/link";
 import SectionSkeleton from "@/components/SectionSkeleton";
 import { supabase } from "@/lib/supabase";
 import { fadakAddress, fadakMapUrl } from "@/data/mock";
-import { nextWeeklyMajles, type NextMajles } from "@/lib/jalali";
+import { comparePersianDates, nextWeeklyMajles, type NextMajles } from "@/lib/jalali";
 import { useTehranNow } from "@/lib/useTehranNow";
 
 type Event = {
@@ -34,7 +34,7 @@ export default function EventsPage() {
     async function load() {
       if (supabase) {
         const { data } = await supabase.from("events").select("*").order("created_at", { ascending: false });
-        setEvents(data || []);
+        setEvents([...(data || [])].sort((a, b) => comparePersianDates(a.date_fa || "", b.date_fa || "")));
       }
       setLoading(false);
     }
