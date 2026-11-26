@@ -21,6 +21,17 @@ type Engage = { count: number; liked: boolean; saved: boolean };
 
 const MUTE_KEY = "fadak-reels-muted";
 const HINT_KEY = "fadak-reels-hint";
+const NAV_START = "fadak-reels-from-nav";
+
+function takeNavStart() {
+  try {
+    if (sessionStorage.getItem(NAV_START) !== "1") return false;
+    sessionStorage.removeItem(NAV_START);
+    return true;
+  } catch {
+    return false;
+  }
+}
 const INSTAGRAM = "https://www.instagram.com/hoseintaheri_official/";
 
 function clamp(value: number, min: number, max: number) {
@@ -209,10 +220,38 @@ export default function ReelsPage() {
     requestAnimationFrame(jump);
   }, []);
 
+  const restartFromNewest = useCallback(() => {
+    takeNavStart();
+    indexRef.current = 0;
+    setIndex(0);
+    setPaused(false);
+    moving.current = true;
+    place(0, "auto");
+    const stage = stageRef.current;
+    if (stage) paint(stage);
+    if (window.location.pathname === "/reels" && window.location.hash) {
+      history.replaceState(null, "", "/reels");
+    }
+    window.setTimeout(() => {
+      moving.current = false;
+    }, 80);
+  }, [place]);
+
+  useEffect(() => {
+    const onStart = () => {
+      if (!countRef.current) return;
+      restartFromNewest();
+    };
+    window.addEventListener("fadak-reels-from-start", onStart);
+    return () => window.removeEventListener("fadak-reels-from-start", onStart);
+  }, [restartFromNewest]);
+
   useLayoutEffect(() => {
     if (!reels.length || placed.current) return;
     placed.current = true;
-    const hash = window.location.hash.replace("#", "");
+    const fromNav = takeNavStart();
+    const hash = fromNav ? "" : window.location.hash.replace("#", "");
+    if (fromNav && window.location.hash) history.replaceState(null, "", "/reels");
     const hashed = reels.findIndex((reel) => reel.id === hash);
     const start = hashed >= 0 ? hashed : 0;
     indexRef.current = start;

@@ -88,6 +88,20 @@ export default function Header() {
     }
   };
 
+  const openReelsFromStart = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    setMobileOpen(false);
+    setSearchOpen(false);
+    try {
+      sessionStorage.setItem("fadak-reels-from-nav", "1");
+    } catch {
+      /* نشست در دسترس نیست */
+    }
+    window.dispatchEvent(new Event("fadak-reels-from-start"));
+    if (window.location.pathname === "/reels") {
+      event.preventDefault();
+    }
+  };
+
   return (
     <header
       ref={headerRef}
@@ -249,6 +263,7 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={item.href === "/reels" ? openReelsFromStart : undefined}
               className="rounded-full px-3 py-1.5 text-sm hover:bg-white/10 hover:text-[#14a3a2]"
             >
               {item.label}
@@ -268,7 +283,7 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={item.href === "/reels" ? openReelsFromStart : () => setMobileOpen(false)}
                   className="rounded-xl bg-white/10 px-4 py-3 text-sm hover:bg-[#0e7c7b] hover:text-white"
                 >
                   {item.label}
