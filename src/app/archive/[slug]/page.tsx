@@ -6,9 +6,16 @@ import { fadakMapUrl } from "@/data/mock";
 
 export const instant = false;
 
+const LEGACY_SLUGS: Record<string, string> = {
+  "majles-7-مهر": "majles-7-mehr",
+  "majles-27-اردیبهشت": "majles-27-ordibehesht",
+};
+
 async function getEvent(slug: string) {
-  if (supabase) {
-    const { data } = await supabase.from("events").select("*").eq("slug", slug).single();
+  if (!supabase) return null;
+  const keys = [slug, LEGACY_SLUGS[slug]].filter((key, index, all) => key && all.indexOf(key) === index);
+  for (const key of keys) {
+    const { data } = await supabase.from("events").select("*").eq("slug", key).maybeSingle();
     if (data) return data;
   }
   return null;
