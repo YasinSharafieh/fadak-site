@@ -44,7 +44,7 @@ export default function CeremonyTabs({ photos, audios, videos, ceremonyHref = "/
         {tab === "photos" && (
           <div>
             {photos.length === 0 && <p className="text-sm text-white/70/60">هنوز عکسی ثبت نشده.</p>}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
               {photos.map((p) => (
                 <figure key={p.id}>
                   <img src={p.url} alt={p.caption || ""} className="aspect-square w-full rounded-2xl object-cover" />

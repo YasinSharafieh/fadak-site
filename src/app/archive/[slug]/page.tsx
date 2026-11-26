@@ -33,9 +33,9 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
   let videos: any[] = [];
   if (supabase && event?.id) {
     const [a, p, v] = await Promise.all([
-      supabase.from("audios").select("*").eq("event_id", event.id),
-      supabase.from("photos").select("*").eq("event_id", event.id),
-      supabase.from("videos").select("*").eq("event_id", event.id),
+      supabase.from("audios").select("*").eq("event_id", event.id).order("created_at", { ascending: true }),
+      supabase.from("photos").select("*").eq("event_id", event.id).order("created_at", { ascending: true }),
+      supabase.from("videos").select("*").eq("event_id", event.id).order("created_at", { ascending: true }),
     ]);
     audios = a.data || [];
     photos = p.data || [];
