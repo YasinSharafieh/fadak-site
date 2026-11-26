@@ -11,6 +11,7 @@ import EngageBar from "@/components/EngageBar";
 import CeremonyCard from "@/components/CeremonyCard";
 import HeroSlides from "@/components/HeroSlides";
 import ThemeImage from "@/components/ThemeImage";
+import ReelRail from "@/components/ReelRail";
 import { ceremonyCardTitle, coverByEvent, shortPersianDate } from "@/lib/ceremony";
 import { artistFromTitle, comparePersianDates, formatViews, nextWeeklyMajles, toPersianDigits, type NextMajles } from "@/lib/jalali";
 import { useTehranNow } from "@/lib/useTehranNow";
@@ -115,6 +116,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <ReelRail />
 
       <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="flex items-start justify-between">
