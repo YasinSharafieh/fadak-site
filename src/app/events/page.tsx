@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SectionSkeleton from "@/components/SectionSkeleton";
+import CeremonyCard from "@/components/CeremonyCard";
 import { supabase } from "@/lib/supabase";
 import { fadakAddress, fadakMapUrl } from "@/data/mock";
 import { comparePersianDates, nextWeeklyMajles, type NextMajles } from "@/lib/jalali";
+import { ceremonyCardTitle, coverByEvent, shortPersianDate } from "@/lib/ceremony";
 import { useTehranNow } from "@/lib/useTehranNow";
 
 type Event = {
@@ -18,10 +20,12 @@ type Event = {
   maddah?: string;
   location?: string;
   status: string;
+  poster_url?: string | null;
 };
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [covers, setCovers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [nextMajles, setNextMajles] = useState<NextMajles | null>(null);
   const tehranNow = useTehranNow();
@@ -33,8 +37,12 @@ export default function EventsPage() {
   useEffect(() => {
     async function load() {
       if (supabase) {
-        const { data } = await supabase.from("events").select("*").order("created_at", { ascending: false });
-        setEvents([...(data || [])].sort((a, b) => comparePersianDates(a.date_fa || "", b.date_fa || "")));
+        const [ev, ph] = await Promise.all([
+          supabase.from("events").select("*").order("created_at", { ascending: false }),
+          supabase.from("photos").select("event_id,url,caption,created_at").order("created_at", { ascending: true }),
+        ]);
+        setEvents([...(ev.data || [])].sort((a, b) => comparePersianDates(a.date_fa || "", b.date_fa || "")));
+        setCovers(coverByEvent(ph.data || []));
       }
       setLoading(false);
     }
@@ -96,17 +104,23 @@ export default function EventsPage() {
           <h2 className="text-2xl font-extrabold text-white">مراسم‌های گذشته</h2>
           <Link href="/archive" className="text-sm font-bold text-[#14a3a2] hover:underline">آرشیو کامل ←</Link>
         </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {past.slice(0, 6).map((e) => (
-            <Link key={e.id} href={`/archive/${e.slug}`} className="card-hover overflow-hidden rounded-2xl bg-[#1a1a1a] shadow">
-              <div className="islamic-pattern flex h-36 items-center justify-center bg-gradient-to-br from-[#0B3D2E] to-[#0E7C7B] text-4xl text-white/90">🕌</div>
-              <div className="p-5">
-                <h3 className="font-bold">{e.title}</h3>
-                <p className="mt-1 text-sm text-white/70/70">{e.date_fa}</p>
-                {e.maddah && <p className="mt-1 text-xs text-white/70/60">{e.maddah}</p>}
-              </div>
-            </Link>
-          ))}
+        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+          {loading ? (
+            <SectionSkeleton kind="archive" />
+          ) : past.length === 0 ? (
+            <p className="col-span-full text-center text-sm text-white/60">هنوز مراسم گذشته‌ای ثبت نشده.</p>
+          ) : (
+            past.map((e) => (
+              <CeremonyCard
+                key={e.id}
+                href={`/archive/${e.slug}`}
+                title={ceremonyCardTitle(e.title, e.date_fa)}
+                dateLabel={shortPersianDate(e.date_fa)}
+                coverUrl={e.poster_url || covers[e.id]}
+                className="w-full"
+              />
+            ))
+          )}
         </div>
       </section>
     </div>
