@@ -7,7 +7,7 @@ import EngageBar from "@/components/EngageBar";
 import SectionSkeleton from "@/components/SectionSkeleton";
 
 type Result = {
-  type: "event" | "audio" | "video" | "photo" | "reel";
+  type: "event" | "audio" | "video" | "photo" | "reel" | "poem";
   id: string;
   title: string;
   subtitle?: string;
@@ -92,6 +92,21 @@ export default function SearchPage() {
       }
     });
 
+    const { data: poems } = await supabase.from("poems").select("id,title,body,event_id");
+    poems?.forEach((poem) => {
+      const event = poem.event_id ? eventById.get(poem.event_id) : null;
+      const haystack = `${poem.title || ""} ${poem.body || ""}`;
+      if (normalizePersian(haystack).includes(normalized)) {
+        allResults.push({
+          type: "poem",
+          id: poem.id,
+          title: poem.title,
+          subtitle: event?.date_fa ? `شعر · ${event.date_fa}` : "شعر",
+          url: `/poems/${poem.id}`,
+        });
+      }
+    });
+
     const { data: reels } = await supabase.from("reels").select("id,title,cover_url");
     reels?.forEach((reel) => {
       if (normalizePersian(reel.title || "").includes(normalized)) {
@@ -122,6 +137,7 @@ export default function SearchPage() {
       case "audio": return "🎵";
       case "video": return "🎬";
       case "reel": return "🎞️";
+      case "poem": return "📜";
       case "photo": return "📷";
       default: return "📄";
     }

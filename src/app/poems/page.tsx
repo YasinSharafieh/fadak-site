@@ -1,124 +1,171 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import SectionSkeleton from "@/components/SectionSkeleton";
+import CopyPoem from "@/components/CopyPoem";
 import { supabase } from "@/lib/supabase";
+import { comparePersianDates } from "@/lib/jalali";
 
 type Poem = {
   id: string;
   title: string;
-  poet?: string;
-  text: string;
-  event_id?: string;
+  poet?: string | null;
+  body?: string | null;
+  event_id?: string | null;
   created_at: string;
 };
 
+type Event = {
+  id: string;
+  title: string;
+  date_fa: string;
+  slug: string;
+};
+
+function poemBody(poem: Poem) {
+  return (poem.body || "").trim();
+}
+
+function excerpt(poem: Poem) {
+  const lines = poemBody(poem)
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((line) => line !== poem.title);
+  return (lines.length ? lines : poemBody(poem).split("\n")).slice(0, 2).join(" / ");
+}
+
 export default function PoemsPage() {
   const [poems, setPoems] = useState<Poem[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [search, setSearch] = useState("");
-  const [selectedPoem, setSelectedPoem] = useState<Poem | null>(null);
+  const [ceremony, setCeremony] = useState("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       if (supabase) {
-        const { data } = await supabase.from("poems").select("*").order("created_at", { ascending: false });
-        setPoems(data || []);
+        const [poemRows, eventRows] = await Promise.all([
+          supabase.from("poems").select("id,title,poet,body,event_id,created_at").order("created_at", { ascending: true }),
+          supabase.from("events").select("id,title,date_fa,slug"),
+        ]);
+        setPoems(poemRows.data || []);
+        setEvents(eventRows.data || []);
       }
       setLoading(false);
     }
     load();
   }, []);
 
-  const filtered = poems.filter((p) => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    return (
-      p.title.toLowerCase().includes(q) ||
-      p.text.toLowerCase().includes(q) ||
-      (p.poet && p.poet.toLowerCase().includes(q))
-    );
+  const eventById = useMemo(() => new Map(events.map((event) => [event.id, event])), [events]);
+
+  const filtered = poems.filter((poem) => {
+    if (ceremony !== "all" && poem.event_id !== ceremony) return false;
+    if (!search.trim()) return true;
+    const event = poem.event_id ? eventById.get(poem.event_id) : undefined;
+    const haystack = [poem.title, poem.poet, poemBody(poem), event?.title, event?.date_fa].filter(Boolean).join(" ");
+    return haystack.includes(search.trim());
   });
 
-  if (selectedPoem) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-12 animate-fade-in">
-        <button onClick={() => setSelectedPoem(null)} className="text-sm text-[#14a3a2] hover:underline">
-          ← بازگشت به اشعار
-        </button>
+  const groups = useMemo(() => {
+    const byEvent = new Map<string, Poem[]>();
+    for (const poem of filtered) {
+      const key = poem.event_id || "none";
+      const list = byEvent.get(key) || [];
+      list.push(poem);
+      byEvent.set(key, list);
+    }
+    return [...byEvent.entries()].sort((a, b) => {
+      const left = eventById.get(a[0])?.date_fa || "";
+      const right = eventById.get(b[0])?.date_fa || "";
+      return comparePersianDates(left, right);
+    });
+  }, [filtered, eventById]);
 
-        <div className="paper-texture gold-frame mt-6 rounded-3xl bg-[#1a1a1a] p-8 md:p-12">
-          <h1 className="text-center text-2xl font-extrabold text-white">{selectedPoem.title}</h1>
-          {selectedPoem.poet && (
-            <p className="mt-2 text-center text-sm text-white/70/70">شاعر: {selectedPoem.poet}</p>
-          )}
-
-          <div className="poem-text mt-8 whitespace-pre-line text-center text-lg leading-loose text-[#1a2e28]">
-            {selectedPoem.text}
-          </div>
-
-          <div className="mt-8 flex justify-center gap-3">
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(selectedPoem.text);
-                alert("متن شعر کپی شد!");
-              }}
-              className="rounded-full border px-5 py-2 text-sm hover:bg-[#111111] transition"
-            >
-              📋 کپی متن
-            </button>
-            <button className="rounded-full border px-5 py-2 text-sm hover:bg-[#111111] transition">
-              📤 اشتراک‌گذاری
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const ceremonyOptions = [...events]
+    .filter((event) => poems.some((poem) => poem.event_id === event.id))
+    .sort((a, b) => comparePersianDates(a.date_fa, b.date_fa));
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
+    <div className="mx-auto max-w-5xl px-4 py-12 animate-fade-in">
       <div className="text-center">
         <h1 className="text-3xl font-extrabold text-white">اشعار و متون</h1>
-        <p className="mt-2 text-white/70/70">آرشیو اشعار با جستجوی متن کامل</p>
+        <p className="mt-2 text-white/70">شعرهای اجراشده در مراسم‌های فدک، جدا برای هر مراسم</p>
       </div>
 
       <div className="mx-auto mt-8 max-w-xl">
         <input
           type="text"
-          placeholder="جستجو در اشعار... (یک بیت هم می‌تونی بنویسی)"
+          placeholder="جستجو در عنوان یا یک تکه از شعر..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(event) => setSearch(event.target.value)}
           className="w-full rounded-full border border-[#0e7c7b]/40 bg-[#1a1a1a] px-6 py-4"
         />
       </div>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {loading ? (
-          <SectionSkeleton kind="poems" />
-        ) : filtered.length === 0 ? (
-          <p className="col-span-full text-center text-white/70/60">شعری یافت نشد.</p>
-        ) : (
-          filtered.map((poem) => (
-            <button
-              key={poem.id}
-              onClick={() => setSelectedPoem(poem)}
-              className="card-hover paper-texture gold-frame rounded-2xl bg-[#1a1a1a] p-6 text-right"
-            >
-              <h3 className="font-extrabold text-white">{poem.title}</h3>
-              {poem.poet && <p className="mt-1 text-sm text-white/70/70">شاعر: {poem.poet}</p>}
-              <p className="poem-text mt-3 line-clamp-3 text-sm leading-7 text-white/70/80">
-                {poem.text}
-              </p>
-              <span className="mt-3 inline-block text-sm font-bold text-[#14a3a2]">خواندن شعر ←</span>
-            </button>
-          ))
-        )}
+      <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
+        <button
+          type="button"
+          onClick={() => setCeremony("all")}
+          className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${ceremony === "all" ? "bg-[#0b3d2e] text-[#F7F3E8]" : "bg-[#1a1a1a] text-white/70"}`}
+        >
+          همه مراسم‌ها
+        </button>
+        {ceremonyOptions.map((event) => (
+          <button
+            key={event.id}
+            type="button"
+            onClick={() => setCeremony(event.id)}
+            className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${ceremony === event.id ? "bg-[#0b3d2e] text-[#F7F3E8]" : "bg-[#1a1a1a] text-white/70"}`}
+          >
+            {event.date_fa.replace("سه‌شنبه ", "").replace("یکشنبه ", "")}
+          </button>
+        ))}
       </div>
 
-      <p className="mt-8 text-center text-sm text-white/70/60">
-        {filtered.length} شعر از {poems.length} شعر
-      </p>
+      {loading ? (
+        <div className="mt-8">
+          <SectionSkeleton kind="poems" />
+        </div>
+      ) : groups.length === 0 ? (
+        <p className="mt-10 text-center text-sm text-white/60">شعری یافت نشد.</p>
+      ) : (
+        <div className="mt-8 space-y-10">
+          {groups.map(([eventId, items]) => {
+            const event = eventById.get(eventId);
+            return (
+              <section key={eventId}>
+                <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+                  <div>
+                    <h2 className="text-xl font-extrabold text-white">{event?.date_fa || "مراسم"}</h2>
+                    <p className="mt-1 text-sm text-white/60">{event?.title}</p>
+                  </div>
+                  {event?.slug && (
+                    <Link href={`/archive/${event.slug}`} className="text-sm font-bold text-[#14a3a2] hover:underline">
+                      صفحه مراسم
+                    </Link>
+                  )}
+                </div>
+                <div className="grid gap-3">
+                  {items.map((poem) => (
+                    <article key={poem.id} className="gold-frame rounded-2xl bg-[#1a1a1a] p-5">
+                      <h3 className="font-extrabold text-white">{poem.title}</h3>
+                      <p className="poem-text mt-2 line-clamp-2 text-sm leading-7 text-white/70">{excerpt(poem)}</p>
+                      <div className="mt-4 flex items-center justify-between gap-3">
+                        <Link href={`/poems/${poem.id}`} className="text-sm font-bold text-[#14a3a2] hover:underline">
+                          متن کامل
+                        </Link>
+                        <CopyPoem text={[poem.title, poemBody(poem)].filter(Boolean).join("\n\n")} compact />
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
