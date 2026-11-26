@@ -12,6 +12,7 @@ const navItems = [
   { href: "/archive", label: "آرشیو مراسم" },
   { href: "/audio", label: "صوت" },
   { href: "/videos", label: "نماهنگ" },
+  { href: "/live", label: "پخش زنده" },
   { href: "/reels", label: "ریلز" },
   { href: "/gallery", label: "تصویر" },
   { href: "/poems", label: "متن شعر" },
