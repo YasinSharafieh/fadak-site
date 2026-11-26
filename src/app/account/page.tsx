@@ -108,9 +108,10 @@ export default function AccountPage() {
 
   const fullName = [user.name, user.family].filter(Boolean).join(" ");
   const profileReady = Boolean(user.name && user.family);
-  const videos = items.filter((item) => item.key.startsWith("video:") || item.key.startsWith("reel:"));
+  const videos = items.filter((item) => item.key.startsWith("video:"));
+  const reels = items.filter((item) => item.key.startsWith("reel:"));
   const audios = items.filter((item) => item.key.startsWith("audio:"));
-  const rest = items.filter((item) => !videos.includes(item) && !audios.includes(item));
+  const rest = items.filter((item) => !videos.includes(item) && !audios.includes(item) && !reels.includes(item));
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
@@ -160,8 +161,9 @@ export default function AccountPage() {
 
       <section className="mt-8">
         <h2 className="text-lg font-extrabold">علاقه‌مندی‌ها</h2>
-        <p className="mt-1 text-sm text-white/55">ویدیوها و صوت‌هایی که ذخیره کرده‌اید.</p>
+        <p className="mt-1 text-sm text-white/55">ویدیوها، ریلزها و صوت‌هایی که ذخیره کرده‌اید.</p>
         {items.length === 0 && <p className="mt-4 rounded-2xl bg-[#1a1a1a] p-5 text-sm text-white/60">هنوز چیزی ذخیره نکرده‌اید.</p>}
+        {reels.length > 0 && <SavedList title="ریلزها" items={reels} onRemove={removeItem} portrait />}
         {videos.length > 0 && <SavedList title="ویدیوها" items={videos} onRemove={removeItem} />}
         {audios.length > 0 && <SavedList title="صوت‌ها" items={audios} onRemove={removeItem} />}
         {rest.length > 0 && <SavedList title="سایر" items={rest} onRemove={removeItem} />}
@@ -179,7 +181,7 @@ function Info({ label, value }: { label: string; value: string }) {
   );
 }
 
-function SavedList({ title, items, onRemove }: { title: string; items: Saved[]; onRemove: (key: string) => void }) {
+function SavedList({ title, items, onRemove, portrait = false }: { title: string; items: Saved[]; onRemove: (key: string) => void; portrait?: boolean }) {
   return (
     <div className="mt-4">
       <h3 className="text-sm font-bold text-[#14a3a2]">{title}</h3>
@@ -187,7 +189,7 @@ function SavedList({ title, items, onRemove }: { title: string; items: Saved[]; 
         {items.map((item) => (
           <div key={item.key} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#1a1a1a] p-3">
             <Link href={item.href || "/"} className="flex min-w-0 flex-1 items-center gap-3 hover:text-[#e8c766]">
-              {item.thumb ? <img src={item.thumb} alt="" className="h-12 w-16 rounded-lg object-cover" /> : <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#0b3d2e]">♪</span>}
+              {item.thumb ? <img src={item.thumb} alt="" className={portrait ? "h-16 w-11 rounded-lg object-cover" : "h-12 w-16 rounded-lg object-cover"} /> : <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#0b3d2e]">♪</span>}
               <span className="min-w-0 flex-1 truncate font-bold">{item.title}</span>
             </Link>
             <button

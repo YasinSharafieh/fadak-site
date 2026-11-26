@@ -229,7 +229,26 @@ html.reels-open footer {
   height: 100%;
   object-fit: cover;
 }
-.reel-orbit-face img { animation: reel-ken 9s ease-in-out infinite alternate; }
+.reel-orbit-face img {
+  animation: reel-ken 9s ease-in-out infinite alternate;
+  object-position: center 22%;
+}
+.reel-orbit-row.is-long { justify-content: flex-start; }
+.reel-shelf-card {
+  overflow: hidden;
+  border-radius: 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #1a1a1a;
+}
+.reel-shelf-scroll {
+  width: 9.6rem;
+  flex: 0 0 auto;
+}
+.reel-shelf-card.fadak-shimmer { height: 18rem; }
+html[data-theme="light"] .reel-shelf-card {
+  background: #fffdf9;
+  border-color: rgba(28, 25, 21, 0.1);
+}
 .reel-orbit-empty { background: radial-gradient(circle at 50% 35%, #0e7c7b, #07110f 72%); }
 .reel-orbit-play {
   position: absolute;

@@ -7,11 +7,12 @@ import EngageBar from "@/components/EngageBar";
 import SectionSkeleton from "@/components/SectionSkeleton";
 
 type Result = {
-  type: "event" | "audio" | "video" | "photo";
+  type: "event" | "audio" | "video" | "photo" | "reel";
   id: string;
   title: string;
   subtitle?: string;
   url: string;
+  thumb?: string;
 };
 
 // نرمال‌سازی فارسی
@@ -91,6 +92,20 @@ export default function SearchPage() {
       }
     });
 
+    const { data: reels } = await supabase.from("reels").select("id,title,cover_url");
+    reels?.forEach((reel) => {
+      if (normalizePersian(reel.title || "").includes(normalized)) {
+        allResults.push({
+          type: "reel",
+          id: reel.id,
+          title: reel.title,
+          subtitle: "ریلز",
+          url: `/reels#${reel.id}`,
+          thumb: reel.cover_url || undefined,
+        });
+      }
+    });
+
     setResults(allResults);
     setLoading(false);
   }
@@ -106,6 +121,7 @@ export default function SearchPage() {
       case "event": return "🕌";
       case "audio": return "🎵";
       case "video": return "🎬";
+      case "reel": return "🎞️";
       case "photo": return "📷";
       default: return "📄";
     }
@@ -115,7 +131,7 @@ export default function SearchPage() {
     <div className="mx-auto max-w-4xl px-4 py-12 animate-fade-in">
       <div className="text-center">
         <h1 className="text-3xl font-extrabold text-white">جستجوی سراسری</h1>
-        <p className="mt-2 text-white/70/70">جستجو در مراسم‌ها، صوت‌ها، ویدیوها و اشعار</p>
+        <p className="mt-2 text-white/70/70">جستجو در مراسم‌ها، صوت‌ها، ویدیوها، ریلزها و اشعار</p>
       </div>
 
       <form onSubmit={handleSubmit} className="mt-8">
@@ -125,7 +141,7 @@ export default function SearchPage() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="نام مراسم، مداح، عنوان صوت..."
+              placeholder="نام مراسم، مداح، عنوان صوت یا ریلز..."
               className="w-full rounded-full border border-[#0e7c7b]/40 bg-[#1a1a1a] py-4 pe-16 ps-6 text-lg"
             />
             <button type="submit" aria-label="جستجو" title="جستجو" className="absolute end-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#0e7c7b] text-white shadow-lg transition hover:bg-[#14a3a2]">
@@ -160,8 +176,8 @@ export default function SearchPage() {
                     </div>
                     <span className="text-[#14a3a2]">←</span>
                   </Link>
-                  {(r.type === "video" || r.type === "audio") && (
-                    <EngageBar type={r.type} id={r.id} title={r.title} href={r.url} compact />
+                  {(r.type === "video" || r.type === "audio" || r.type === "reel") && (
+                    <EngageBar type={r.type} id={r.id} title={r.title} href={r.url} thumb={r.thumb} compact />
                   )}
                 </div>
               ))}

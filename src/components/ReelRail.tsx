@@ -20,15 +20,11 @@ export default function ReelRail() {
         if (!gone) setReels([]);
         return;
       }
-      const primary = await supabase
+      const { data } = await supabase
         .from("reels")
-        .select("id,title,cover_url")
-        .order("published_at", { ascending: false })
-        .limit(8);
-      const result = primary.error
-        ? await supabase.from("reels").select("id,title,cover_url").order("created_at", { ascending: false }).limit(8)
-        : primary;
-      if (!gone) setReels((result.data || []) as Reel[]);
+        .select("id,title,cover_url,created_at")
+        .order("created_at", { ascending: false });
+      if (!gone) setReels((data || []) as Reel[]);
     }
     load();
     return () => {
@@ -40,7 +36,7 @@ export default function ReelRail() {
 
   return (
     <section className="reel-orbit" aria-label="ریلز">
-      <div className="reel-orbit-row no-scrollbar" role={reels === null ? "status" : undefined} aria-busy={reels === null}>
+      <div className={`reel-orbit-row no-scrollbar ${reels && reels.length > 4 ? "is-long" : ""}`} role={reels === null ? "status" : undefined} aria-busy={reels === null}>
         {reels === null
           ? [0, 1, 2].map((item) => (
               <span key={item} className={`reel-orbit-item ${item === 0 ? "is-live" : ""}`} aria-hidden="true">
