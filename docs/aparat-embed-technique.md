@@ -62,9 +62,10 @@ https://www.aparat.com/video/video/embed/videohash/{APARAT_ID}/vt/frame
 
 ## ۶٫۱) پخش زنده
 - صفحهٔ سایت: `/live` — فقط همین صفحه، نه پلیر سراسری نماهنگ.
-- امبد دائمی کانال فدک: `https://www.aparat.com/fadakinfo/live?embed&fa`
-- وقتی مراسم زنده باشد همان امبد پخش را نشان می‌دهد. وقتی نباشد، کاور آمادهٔ آپارات می‌ماند.
-- این iframe را داخل `VideoPlayer` نگذار. جابه‌جایی یا جایگزینی iframe پلیر نماهنگ ممنوع است.
+- امبد دائمی، همان الگوی پلیر ویدیو: `https://www.aparat.com/embed/live/fadakinfo/vt/frame`
+- ⚠️ آدرس `fadakinfo/live?embed` پلیر نیست و تصویر خراب نشان می‌دهد.
+- `referrerpolicy=no-referrer` نگذار. مجوزها همان پلیر ویدیو باشد: `autoplay; fullscreen; encrypted-media; picture-in-picture`.
+- این iframe را داخل `VideoPlayer` نگذار و در DOM جابه‌جا نکن. پلیر نماهنگ جدا می‌ماند.
 
 ## ۷) کانال آپارات فدک
 - نام کاربری: `fadakinfo` — آیدی کانال: `547634`

@@ -3,7 +3,7 @@ import ShareButton from "@/components/ShareButton";
 export const metadata = { title: "پخش زنده | فدک" };
 export const instant = false;
 
-const LIVE_EMBED = "https://www.aparat.com/fadakinfo/live?embed&fa";
+const LIVE_EMBED = "https://www.aparat.com/embed/live/fadakinfo/vt/frame";
 const LIVE_PAGE = "https://www.aparat.com/fadakinfo/live";
 
 export default function LivePage() {
@@ -15,25 +15,22 @@ export default function LivePage() {
       </div>
 
       <div className="gold-frame mt-6 overflow-hidden rounded-3xl bg-black shadow-2xl">
-        <iframe
-          src={LIVE_EMBED}
-          title="پخش زنده فدک"
-          className="aspect-video w-full bg-black"
-          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-          allowFullScreen
-        />
+        <div className="relative aspect-video w-full bg-black">
+          <iframe
+            src={LIVE_EMBED}
+            title="پخش زنده فدک"
+            className="absolute inset-0 h-full w-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-white/10 bg-[#1a1a1a] p-6">
-        <p className="max-w-xl text-sm leading-7 text-white/70">
-          وقتی مراسم زنده باشد، همین‌جا پخش می‌شود. در زمان‌های دیگر، تصویر آمادهٔ آپارات دیده می‌شود.
-        </p>
-        <div className="flex flex-wrap items-center gap-3">
-          <a href={LIVE_PAGE} target="_blank" rel="noopener noreferrer" className="btn-green rounded-full px-5 py-2 text-sm">
-            آپارات فدک
-          </a>
-          <ShareButton title="پخش زنده فدک" path="/live" />
-        </div>
+      <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
+        <a href={LIVE_PAGE} target="_blank" rel="noopener noreferrer" className="btn-green rounded-full px-5 py-2 text-sm">
+          آپارات فدک
+        </a>
+        <ShareButton title="پخش زنده فدک" path="/live" />
       </div>
     </div>
   );
