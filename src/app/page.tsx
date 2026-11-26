@@ -84,6 +84,7 @@ export default function Home() {
 
   return (
     <div>
+      <ReelRail />
       <section className="relative overflow-hidden bg-black">
         <div className="islamic-pattern-dark absolute inset-0" />
         <div className="relative mx-auto max-w-7xl px-4 py-8 md:py-12">
@@ -116,8 +117,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      <ReelRail />
 
       <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="section-head flex items-start justify-between gap-3">
