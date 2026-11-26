@@ -38,6 +38,20 @@ function clock(seconds: number) {
   return toPersianDigits(`${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`);
 }
 
+function isLeavingLink(anchor: HTMLAnchorElement) {
+  if (anchor.target === "_blank" || anchor.hasAttribute("download")) return false;
+  const href = anchor.getAttribute("href") || "";
+  if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return false;
+  let url: URL;
+  try {
+    url = new URL(anchor.href, window.location.href);
+  } catch {
+    return false;
+  }
+  if (url.origin !== window.location.origin) return false;
+  return url.pathname !== window.location.pathname || url.search !== window.location.search;
+}
+
 function paint(stage: HTMLElement) {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const height = stage.clientHeight || 1;
@@ -78,18 +92,61 @@ export default function ReelsPage() {
   const lastTap = useRef(0);
   const playingBeforeTap = useRef(false);
   const placed = useRef(false);
+  const left = useRef(false);
+  const silenceRef = useRef<(hard?: boolean) => void>(() => {});
   const goRef = useRef<(delta: number) => void>(() => {});
   const seekRef = useRef<(seconds: number) => void>(() => {});
   const toggleRef = useRef<() => void>(() => {});
   const muteRef = useRef<() => void>(() => {});
 
-  const stopAll = useCallback(() => {
-    videoRefs.current.forEach((video) => video?.pause());
+  const collectVideos = useCallback(() => {
+    const nodes = new Set<HTMLVideoElement>();
+    videoRefs.current.forEach((video) => {
+      if (video) nodes.add(video);
+    });
+    document.querySelectorAll(".reels-shell video, video[data-reel]").forEach((node) => {
+      if (node instanceof HTMLVideoElement) nodes.add(node);
+    });
+    return nodes;
   }, []);
+
+  const silence = useCallback((hard = false) => {
+    left.current = true;
+    collectVideos().forEach((video) => {
+      try {
+        video.pause();
+      } catch {
+        /* عنصر در حال جمع شدن است */
+      }
+      if (!hard) return;
+      video.removeAttribute("src");
+      video.querySelectorAll("source").forEach((source) => source.remove());
+      try {
+        video.load();
+      } catch {
+        /* منبع همین حالا برداشته شده */
+      }
+    });
+  }, [collectVideos]);
+  silenceRef.current = silence;
 
   useLayoutEffect(() => {
     document.documentElement.classList.add("reels-open");
-    return () => document.documentElement.classList.remove("reels-open");
+    const onClick = (event: MouseEvent) => {
+      const anchor = (event.target as Element | null)?.closest?.("a");
+      if (anchor instanceof HTMLAnchorElement && isLeavingLink(anchor)) silenceRef.current(false);
+    };
+    const onLeave = () => silenceRef.current(false);
+    document.addEventListener("click", onClick, true);
+    window.addEventListener("pagehide", onLeave);
+    window.addEventListener("popstate", onLeave);
+    return () => {
+      document.removeEventListener("click", onClick, true);
+      window.removeEventListener("pagehide", onLeave);
+      window.removeEventListener("popstate", onLeave);
+      document.documentElement.classList.remove("reels-open");
+      silenceRef.current(true);
+    };
   }, []);
 
   useEffect(() => {
@@ -225,6 +282,7 @@ export default function ReelsPage() {
     const video = videoRefs.current[indexRef.current];
     if (!video) return;
     if (video.paused) {
+      left.current = false;
       setPaused(false);
       video.play().catch(() => {});
     } else {
@@ -294,18 +352,28 @@ export default function ReelsPage() {
   }, [reels.length]);
 
   useEffect(() => {
+    if (left.current) {
+      silence(true);
+      return;
+    }
     videoRefs.current.forEach((video, at) => {
       if (!video) return;
       video.muted = muted;
-      if (at !== index) {
+      if (at !== index || paused) {
         video.pause();
         return;
       }
-      if (paused) {
+      video.play().then(() => {
+        if (!left.current) return;
         video.pause();
-        return;
-      }
-      video.play().catch(() => {
+        video.removeAttribute("src");
+        try {
+          video.load();
+        } catch {
+          /* خروج از صفحه منبع را بسته است */
+        }
+      }).catch(() => {
+        if (left.current) return;
         if (!video.muted) {
           video.muted = true;
           setMuted(true);
@@ -315,7 +383,10 @@ export default function ReelsPage() {
         setPaused(true);
       });
     });
-  }, [index, muted, paused, reels.length]);
+    return () => {
+      videoRefs.current.forEach((video) => video?.pause());
+    };
+  }, [index, muted, paused, reels.length, silence]);
 
   useEffect(() => {
     const reel = reels[index];
@@ -356,18 +427,15 @@ export default function ReelsPage() {
 
   useEffect(() => {
     const onHide = () => {
-      if (document.hidden) stopAll();
+      if (document.hidden) collectVideos().forEach((video) => video.pause());
     };
     document.addEventListener("visibilitychange", onHide);
-    window.addEventListener("pagehide", onHide);
-    return () => {
-      document.removeEventListener("visibilitychange", onHide);
-      window.removeEventListener("pagehide", onHide);
-      stopAll();
-    };
-  }, [stopAll]);
+    return () => document.removeEventListener("visibilitychange", onHide);
+  }, [collectVideos]);
 
-  useEffect(() => () => stopAll(), [pathname, stopAll]);
+  useLayoutEffect(() => {
+    return () => silenceRef.current(true);
+  }, [pathname]);
 
   function onStageScroll() {
     const stage = stageRef.current;
@@ -482,6 +550,7 @@ export default function ReelsPage() {
                     src={reel.video_url}
                     poster={reel.cover_url || undefined}
                     className="h-full w-full bg-black object-cover"
+                    data-reel="1"
                     loop
                     muted={muted}
                     playsInline
