@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import CeremonyTabs from "@/components/CeremonyTabs";
 import { getAparatVideoInfo } from "@/lib/aparat";
 import { fadakMapUrl } from "@/data/mock";
+import { coverByEvent } from "@/lib/ceremony";
 
 export const instant = false;
 
@@ -31,7 +32,6 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
   const speaker = event?.speaker || "";
   const location = event?.location || "حسینیه سیدالشهدا (ع)، تهران";
   const address = event?.address || "";
-  const posterUrl = event?.poster_url || "";
   const mapUrl = event?.map_url || fadakMapUrl;
 
   let audios: any[] = [];
@@ -48,6 +48,7 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
     videos = v.data || [];
   }
 
+  const posterUrl = event?.poster_url || coverByEvent(photos)[event?.id || ""] || "";
   const tgVideos = photos.filter((p) => (p.caption || "").includes("ویدیو"));
   const onlyPhotos = photos.filter((p) => !(p.caption || "").includes("ویدیو"));
   const allVideos = [...videos, ...tgVideos.map((p) => ({ id: p.id, title: p.caption || "ویدیو مراسم", aparat_id: "", thumbnail: p.url }))];

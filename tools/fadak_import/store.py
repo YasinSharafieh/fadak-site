@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import mimetypes
 import os
+import random
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -116,6 +117,51 @@ class Store:
             raise RuntimeError(f"ساخت مراسم ناموفق: {status} {raw[:400]!r}")
         rows = json.loads(raw.decode() or "[]")
         return rows[0]
+
+    def lock_random_poster(self, event_id: str) -> str | None:
+        """یک عکس تصادفی از همان مراسم را یک‌بار قفل می‌کند. اگر پوستر باشد، عوضش نمی‌کند."""
+        query = urllib.parse.urlencode({"select": "id,poster_url", "id": f"eq.{event_id}", "limit": "1"})
+        status, raw = _request("GET", f"{self.base}/rest/v1/events?{query}", headers=self._headers())
+        if status != 200:
+            raise RuntimeError(f"خواندن پوستر ناموفق: {status} {raw[:300]!r}")
+        rows = json.loads(raw.decode() or "[]")
+        if not rows:
+            return None
+        locked = rows[0].get("poster_url") or ""
+        if locked:
+            return locked
+
+        photo_query = urllib.parse.urlencode(
+            {
+                "select": "url,caption,created_at",
+                "event_id": f"eq.{event_id}",
+                "order": "created_at.asc",
+                "limit": "500",
+            }
+        )
+        status, raw = _request("GET", f"{self.base}/rest/v1/photos?{photo_query}", headers=self._headers())
+        if status != 200:
+            raise RuntimeError(f"خواندن عکس‌های پوستر ناموفق: {status} {raw[:300]!r}")
+        eligible = [
+            row
+            for row in json.loads(raw.decode() or "[]")
+            if row.get("url") and "ویدیو" not in (row.get("caption") or "")
+        ]
+        eligible.sort(key=lambda row: (row.get("created_at") or "", row.get("url") or ""))
+        if not eligible:
+            return None
+        pool = eligible[1:] if len(eligible) > 1 else eligible
+        chosen = random.choice(pool)["url"]
+        payload = json.dumps({"poster_url": chosen}, ensure_ascii=False).encode()
+        status, raw = _request(
+            "PATCH",
+            f"{self.base}/rest/v1/events?id=eq.{event_id}",
+            payload,
+            self._headers({"Content-Type": "application/json", "Prefer": "return=minimal"}),
+        )
+        if status not in (200, 204):
+            raise RuntimeError(f"قفل پوستر ناموفق: {status} {raw[:300]!r}")
+        return chosen
 
     def audio_exists(self, event_id: str, title: str) -> bool:
         query = urllib.parse.urlencode(

@@ -258,6 +258,10 @@ async def import_ceremony(client, channel: str, date: str, commit: bool) -> str:
         store.mark(channel_name, row["id"], "audio", inserted["id"])
         report["written"].append({"audio": inserted["id"], "title": title})
 
+    poster = store.lock_random_poster(event["id"])
+    if poster:
+        report["poster_locked"] = True
+
     if videos:
         report["note"] = "ویدیوهای تلگرام عمداً آپلود نشدند. ویدیو فقط از آپارات، با همان عنوان صوت، و با پلیر داخل سایت اضافه می‌شود."
     try:

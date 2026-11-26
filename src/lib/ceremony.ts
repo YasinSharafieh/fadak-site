@@ -35,20 +35,41 @@ export function ceremonyCardTitle(title: string, dateFa: string) {
   return date ? `${clean} – ${date}` : clean;
 }
 
+/** اگر چند عکس باشد، ایندکس ۰ (قدیمی‌ترین) انتخاب نمی‌شود. نتیجه برای یک مراسم ثابت است. */
+function stablePhotoIndex(eventId: string, count: number) {
+  if (count <= 1) return 0;
+  let hash = 2166136261;
+  for (let i = 0; i < eventId.length; i++) {
+    hash ^= eventId.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return ((hash >>> 0) % (count - 1)) + 1;
+}
+
 /**
- * برای هر مراسم یک عکس ثابت از عکس‌های همان مراسم.
- * اولین عکس (قدیمی‌ترین) انتخاب می‌شود تا با رفرش کاور عوض نشود.
- * poster_url اگر باشد، در خود کارت بر این مقدار اولویت دارد.
+ * جایگزین، فقط وقتی poster_url هنوز قفل نشده.
+ * یک عکس از عکس‌های همان مراسم، نه همیشه عکس اول، و در همهٔ صفحه‌ها یکی.
+ * poster_url اگر باشد بر این مقدار اولویت دارد و دیگر عوض نمی‌شود.
  */
 export function coverByEvent(photos: CeremonyPhoto[]) {
-  const covers: Record<string, string> = {};
-  const sorted = [...photos].sort((a, b) => (a.created_at || "").localeCompare(b.created_at || ""));
-  for (const photo of sorted) {
+  const grouped = new Map<string, CeremonyPhoto[]>();
+  for (const photo of photos) {
     const eventId = photo.event_id || "";
     const url = photo.url || "";
-    if (!eventId || !url || covers[eventId]) continue;
+    if (!eventId || !url) continue;
     if ((photo.caption || "").includes("ویدیو")) continue;
-    covers[eventId] = url;
+    const list = grouped.get(eventId) || [];
+    list.push(photo);
+    grouped.set(eventId, list);
+  }
+
+  const covers: Record<string, string> = {};
+  for (const [eventId, list] of grouped) {
+    const sorted = [...list].sort(
+      (a, b) => (a.created_at || "").localeCompare(b.created_at || "") || (a.url || "").localeCompare(b.url || "")
+    );
+    const chosen = sorted[stablePhotoIndex(eventId, sorted.length)];
+    if (chosen?.url) covers[eventId] = chosen.url;
   }
   return covers;
 }
