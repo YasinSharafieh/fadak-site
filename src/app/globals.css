@@ -85,16 +85,66 @@ body {
   letter-spacing: 0.01em;
 }
 
-/* ریلز */
-.reels-container {
-  scroll-snap-type: y mandatory;
-  height: calc(100dvh - var(--site-header-h, 7.5rem));
-  overflow-y: scroll;
+/* ریلز: صفحه قفل می‌شود تا اسکرول سایت با اسکرول ریلز قاطی نشود. */
+html.reels-open body {
+  overflow: hidden !important;
+  padding-bottom: 0 !important;
 }
-
-.reel-item {
-  scroll-snap-align: start;
+html.reels-open footer {
+  display: none;
+}
+.reels-shell {
   height: calc(100dvh - var(--site-header-h, 7.5rem));
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+}
+.reels-stage {
+  height: 100%;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior: none;
+  scrollbar-width: none;
+  touch-action: pan-y;
+  background: transparent;
+}
+.reels-stage::-webkit-scrollbar { display: none; }
+.reel-slide {
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+.reel-card {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  transform-origin: center center;
+  will-change: transform, opacity;
+  background: #000;
+}
+@media (min-width: 640px) {
+  .reel-card {
+    height: min(92%, 860px);
+    width: auto;
+    aspect-ratio: 9 / 16;
+    border-radius: 28px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(20, 163, 162, 0.4);
+  }
+  .reel-card[data-active="true"] {
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(232, 199, 102, 0.55);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reel-card { will-change: auto; }
+}
+.reel-home {
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(20, 163, 162, 0.22), transparent 52%),
+    radial-gradient(ellipse at 92% 120%, rgba(201, 162, 39, 0.14), transparent 46%),
+    #07110f;
+  border: 1px solid rgba(20, 163, 162, 0.28);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
 }
 
 /* نوار بالا روی ویدیو نمی‌آید: وقتی ویدیو به محدودهٔ نوار می‌رسد، نوار کنار می‌رود. */
@@ -393,3 +443,15 @@ html[data-theme="light"] .fadak-seek-thumb {
 .reel-heart-pop {
   animation: reelHeart 0.72s ease-out forwards;
 }
+@keyframes reelHint {
+  0%, 100% { transform: translateY(0); opacity: 0.55; }
+  50% { transform: translateY(-7px); opacity: 1; }
+}
+.reel-hint-chevron { animation: reelHint 1.25s ease-in-out infinite; }
+@keyframes reelEdge {
+  0% { opacity: 0; transform: translate(-50%, 8px); }
+  18% { opacity: 1; transform: translate(-50%, 0); }
+  78% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.reel-edge { animation: reelEdge 0.9s ease forwards; }

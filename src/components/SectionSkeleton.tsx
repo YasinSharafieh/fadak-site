@@ -32,7 +32,7 @@ function Mark() {
 
 export default function SectionSkeleton({ kind }: { kind: Kind }) {
   return (
-    <div role="status" aria-live="polite" aria-label={`در حال بارگذاری ${label[kind]}`} className="keep-contrast col-span-full">
+    <div role="status" aria-live="polite" aria-label={`در حال بارگذاری ${label[kind]}`} className={`keep-contrast col-span-full ${kind === "reel" ? "h-full" : ""}`}>
       {kind === "video-row" && (
         <div className="flex gap-4">
           {Array.from({ length: 4 }, (_, i) => (
@@ -182,9 +182,9 @@ export default function SectionSkeleton({ kind }: { kind: Kind }) {
       )}
       {kind === "reel" && (
         <div className="flex h-full w-full items-center justify-center bg-black">
-          <div className="relative h-[78vh] w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-[#111]">
-            <Bone className="absolute inset-0" />
-            <div className="absolute bottom-8 right-6 left-6 space-y-3">
+          <div className="relative h-full w-full overflow-hidden bg-[#111] sm:h-[min(92%,860px)] sm:w-auto sm:aspect-[9/16] sm:rounded-[28px] sm:ring-1 sm:ring-[#14a3a2]/40">
+            <Bone className="absolute inset-0 rounded-none" />
+            <div className="absolute inset-x-5 bottom-8 space-y-3">
               <Bone className="h-4 w-1/2 rounded" />
               <Bone className="h-3 w-2/3 rounded" />
               <Mark />
