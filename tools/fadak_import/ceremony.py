@@ -40,13 +40,32 @@ MONTH_SLUG = {
 }
 
 
-def _slug(date_key: str) -> str:
+def _slug(date_key: str, year: int | None = None) -> str:
     text = normalize(date_key)
     for fa, en in MONTH_SLUG.items():
         text = text.replace(fa, en)
     text = re.sub(r"[^0-9a-z]+", "-", text.lower())
     text = re.sub(r"-+", "-", text).strip("-")
-    return "majles-" + text
+    slug = "majles-" + text
+    return f"{slug}-{year}" if year else slug
+
+
+def _audio_title(text: str) -> str:
+    remix = "تنظیم_دیجیتال" in (text or "") or "تنظیم دیجیتال" in (text or "")
+    title = ""
+    for line in (text or "").splitlines():
+        if "🔊" not in line:
+            continue
+        title = get_subtitle(line)
+        if title and title not in {"🔻", "تنظیم دیجیتال"}:
+            break
+    if not title:
+        title = get_subtitle(text)
+    if not title or title in {"🔻"}:
+        title = "صوت مراسم"
+    if remix and not title.startswith("تنظیم دیجیتال"):
+        return f"تنظیم دیجیتال | {title}"
+    return title
 
 
 # این‌ها عکس مراسم نیستند. حتی اگر نزدیک تاریخ مراسم منتشر شده باشند وارد آلبوم نمی‌شوند.
@@ -102,8 +121,14 @@ async def _collect(client, entity, date_key: str) -> tuple[object | None, list]:
         other = extract_date(text)
         if is_announcement(text) and other and other != date_key and msg.id > announcement.id:
             break
+        # ریمیکس و لینک آپارات گاهی چند روز بعد می‌آید. مراسم بعدی وارد این یکی نمی‌شود.
         if msg.date and announcement.date and msg.date > announcement.date + timedelta(days=3):
-            break
+            if msg.date > announcement.date + timedelta(days=6):
+                break
+            remix = "تنظیم_دیجیتال" in text or "تنظیم دیجیتال" in text
+            linked = "aparat.com" in text
+            if other not in (None, "", date_key) or not (remix or linked or same_date(text, date_key)):
+                continue
         if msg.id < announcement.id:
             close_in_time = bool(
                 msg.date and announcement.date and announcement.date - msg.date <= timedelta(hours=2)
@@ -171,15 +196,11 @@ async def import_ceremony(client, channel: str, date: str, commit: bool) -> str:
                 continue
         photos.append(row)
     audios = []
-    remixes = []
     for row in rows:
         if row["kind"] != "audio" or row["date"] not in ("", date_key):
             continue
         text = by_id[row["id"]].message or ""
-        # نسخهٔ تنظیم‌دیجیتال همان قطعه است، نه یک بخش جدید مراسم.
-        if "تنظیم_دیجیتال" in text or "تنظیم دیجیتال" in text:
-            remixes.append(row)
-            continue
+        row["subtitle"] = _audio_title(text)
         audios.append(row)
     videos = [r for r in rows if r["kind"] == "video"]
     too_big = [r for r in audios + photos if r["size"] > SUPABASE_SAFE_BYTES]
@@ -195,9 +216,7 @@ async def import_ceremony(client, channel: str, date: str, commit: bool) -> str:
         "telegram_videos_ignored": len(videos),
         "over_supabase_limit": [{"id": r["id"], "kind": r["kind"], "size": r["size"]} for r in too_big],
         "written": [],
-        "skipped": [
-            {"audio": row["id"], "reason": "digital-remix", "title": row["subtitle"]} for row in remixes
-        ],
+        "skipped": [],
     }
 
     if not commit:
@@ -209,9 +228,13 @@ async def import_ceremony(client, channel: str, date: str, commit: bool) -> str:
         return json.dumps(report, ensure_ascii=False, indent=2)
 
     store = Store()
-    event = store.find_event(date_key)
+    year = None
+    year_match = re.search(r"1[34]\d{2}", normalize(parsed.get("date_fa") or ""))
+    if year_match:
+        year = int(year_match.group(0))
+    event = store.find_event(date_key, year)
     if not event:
-        event = store.create_event(parsed, _slug(date_key))
+        event = store.create_event(parsed, _slug(date_key, year))
         report["written"].append({"event": event["id"], "slug": event["slug"]})
     else:
         report["skipped"].append({"event_exists": event["id"], "slug": event.get("slug")})

@@ -145,7 +145,7 @@ export default function AboutTaheriPage() {
     <div className="relative overflow-hidden">
       <div className="islamic-pattern-dark pointer-events-none absolute inset-0 opacity-30" />
       <div className="media-glow pointer-events-none absolute left-1/2 top-16 h-72 w-72 -translate-x-1/2 rounded-full" />
-      <div className="relative mx-auto max-w-7xl px-3 py-10 sm:px-4">
+      <div data-motion="fade" className="relative mx-auto max-w-7xl px-3 py-10 sm:px-4">
         <CenteredScroller>
           <div className="media-board">
             <section className="media-col">

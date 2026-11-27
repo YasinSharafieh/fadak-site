@@ -12,6 +12,13 @@ type Props = {
   ceremonyHref?: string;
 };
 
+function fileVideoUrl(aparatId: string) {
+  if (!aparatId.startsWith("file-")) return "";
+  const id = aparatId.slice("file-".length);
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  return `${base}/storage/v1/object/public/videos/ceremony/${id}.mp4`;
+}
+
 export default function CeremonyTabs({ photos, audios, videos, ceremonyHref = "/audio" }: Props) {
   const [tab, setTab] = useState<"photos" | "audios" | "videos">("photos");
   const [playingId, setPlayingId] = useState<string | null>(null);
@@ -24,12 +31,12 @@ export default function CeremonyTabs({ photos, audios, videos, ceremonyHref = "/
 
   return (
     <div className="mt-10">
-      <div className="flex gap-2 border-b border-[#0e7c7b]/30 pb-3">
+      <div className="flex flex-wrap gap-2 border-b border-[#0e7c7b]/30 pb-3">
         {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`rounded-full px-5 py-2 text-sm font-bold transition ${
+            className={`rounded-full px-3 py-2 text-xs font-bold transition sm:px-5 sm:text-sm ${
               tab === t.id
                 ? "bg-[#0b3d2e] text-[#F7F3E8]"
                 : "bg-[#1a1a1a] text-white/70 hover:bg-[#111111]"
@@ -68,7 +75,15 @@ export default function CeremonyTabs({ photos, audios, videos, ceremonyHref = "/
               {videos.map((v) => (
                 <div key={v.id} className="overflow-hidden rounded-3xl bg-[#1a1a1a] shadow">
                   <div className="relative aspect-video w-full bg-black">
-                    {playingId === v.id && v.aparat_id ? (
+                    {playingId === v.id && v.aparat_id?.startsWith("file-") ? (
+                      <video
+                        src={fileVideoUrl(v.aparat_id)}
+                        poster={v.thumbnail || undefined}
+                        controls
+                        playsInline
+                        className="h-full w-full bg-black"
+                      />
+                    ) : playingId === v.id && v.aparat_id ? (
                       <VideoPlayer aparatId={v.aparat_id} title={v.title} thumbnail={v.thumbnail} videoId={v.id} />
                     ) : (
                       <button onClick={() => setPlayingId(v.id)} className="absolute inset-0 block w-full">

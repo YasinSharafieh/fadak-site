@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { comparePersianDates } from "@/lib/jalali";
 
 export const instant = false;
 
@@ -14,7 +15,7 @@ export default async function AdminEventsPage() {
   let events: any[] = [];
   if (supabase) {
     const { data } = await supabase.from("events").select("*").order("created_at", { ascending: false });
-    events = data || [];
+    events = [...(data || [])].sort((a, b) => comparePersianDates(a.date_fa || "", b.date_fa || ""));
   }
 
   return (

@@ -45,6 +45,7 @@ function sealOf(dateFa: string) {
     weekday: (dateFa || "").trim().split(/\s+/)[0] || "",
     day: parsed ? toPersianDigits(parsed.d) : "",
     month: parsed ? MONTHS[parsed.m - 1] || "" : "",
+    year: parsed?.y ? toPersianDigits(parsed.y) : "",
   };
 }
 
@@ -152,7 +153,7 @@ export default function PoemsPage() {
                       </span>
                     </span>
                     <span className={`mt-3 line-clamp-2 text-xs font-bold leading-5 ${active ? "text-[#c9a227]" : "text-white/75"}`}>{event.title}</span>
-                    <span className="mt-1 text-[11px] text-white/50">{toPersianDigits(count)} شعر</span>
+                    <span className="mt-1 text-[11px] text-white/50">{seal.year ? `${seal.year} · ` : ""}{toPersianDigits(count)} شعر</span>
                   </button>
                 );
               })}

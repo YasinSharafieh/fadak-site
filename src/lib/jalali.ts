@@ -51,7 +51,13 @@ export function comparePersianDates(a: string, b: string) {
   if (!da && !db) return 0;
   if (!da) return 1;
   if (!db) return -1;
-  return db.y - da.y || db.m - da.m || db.d - da.d;
+  // سالِ نامشخص آخر می‌آید تا با سال صفر قاطی نشود. روز و ماه و سال هر سه ملاک‌اند.
+  if (da.y !== db.y) {
+    if (!da.y) return 1;
+    if (!db.y) return -1;
+    return db.y - da.y;
+  }
+  return db.m - da.m || db.d - da.d;
 }
 
 export type NextMajles = {

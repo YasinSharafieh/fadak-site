@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { englishCeremonySlug } from "@/lib/ceremony";
+import { comparePersianDates, parsePersianDate } from "@/lib/jalali";
 
 // استخراج تاریخ شمسی از متن
 function extractDate(text: string): string | null {
@@ -71,21 +72,30 @@ function getSubtitle(text: string): string {
   return sub.slice(0, 80);
 }
 
+async function datedEvents() {
+  if (!supabase) return [];
+  const { data } = await supabase.from("events").select("*").limit(200);
+  return [...(data || [])].sort((a, b) => comparePersianDates(a.date_fa || "", b.date_fa || ""));
+}
+
 async function findOrCreateEvent(text: string) {
   if (!supabase) return null;
+  const wanted = parsePersianDate(text);
   const date = extractDate(text);
 
-  if (date) {
-    const { data: existing } = await supabase
-      .from("events")
-      .select("*")
-      .ilike("date_fa", `%${date}%`)
-      .order("created_at", { ascending: false })
-      .limit(1);
-    if (existing && existing.length > 0) return existing[0];
+  if (wanted || date) {
+    const rows = await datedEvents();
+    const match = rows.find((event) => {
+      const found = parsePersianDate(event.date_fa || "");
+      if (!wanted || !found) return false;
+      if (found.d !== wanted.d || found.m !== wanted.m) return false;
+      if (wanted.y && found.y && wanted.y !== found.y) return false;
+      return true;
+    });
+    if (match) return match;
 
     const parsed = parseCeremony(text);
-    const slug = englishCeremonySlug(parsed.dateFa || date);
+    const slug = englishCeremonySlug(parsed.dateFa || date || text);
     const { data: created } = await supabase
       .from("events")
       .insert({ title: parsed.title, slug, date_fa: parsed.dateFa || date, speaker: parsed.speaker, status: "past", maddah: parsed.maddah, description: parsed.description })
@@ -94,8 +104,8 @@ async function findOrCreateEvent(text: string) {
     return created;
   }
 
-  const { data: latest } = await supabase.from("events").select("*").order("created_at", { ascending: false }).limit(1).single();
-  return latest || null;
+  const rows = await datedEvents();
+  return rows[0] || null;
 }
 
 async function downloadAndUpload(fileId: string, bucket: string, ext: string) {
@@ -135,8 +145,8 @@ async function handlePost(post: any) {
   if (isEventText && text) {
     event = await findOrCreateEvent(text);
   } else if (hasMedia) {
-    const { data: latest } = await supabase.from("events").select("*").order("created_at", { ascending: false }).limit(1).single();
-    event = latest;
+    const rows = await datedEvents();
+    event = rows[0] || null;
   } else if (text) {
     return;
   }
@@ -228,7 +238,8 @@ export async function POST(req: Request) {
 سایت: https://fadak-site-murex.vercel.app`);
       } else if (text.startsWith("/next")) {
         if (supabase) {
-          const { data } = await supabase.from("events").select("*").eq("status", "upcoming").order("created_at", { ascending: false }).limit(1).single();
+          const { data: upcomingRows } = await supabase.from("events").select("*").eq("status", "upcoming");
+          const data = [...(upcomingRows || [])].sort((a, b) => comparePersianDates(b.date_fa || "", a.date_fa || ""))[0];
           if (data) {
             await sendMessage(token, chatId, `🕌 <b>${data.title}</b>
 

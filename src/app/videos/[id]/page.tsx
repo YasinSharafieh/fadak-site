@@ -43,7 +43,15 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
 
       {/* پلیر آپارات */}
       <div className="mt-6 overflow-hidden rounded-3xl bg-black shadow-2xl">
-        {video.aparat_id ? (
+        {String(video.aparat_id || "").startsWith("file-") ? (
+          <video
+            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/videos/ceremony/${String(video.aparat_id).slice(5)}.mp4`}
+            poster={video.thumbnail || undefined}
+            controls
+            playsInline
+            className="aspect-video w-full bg-black"
+          />
+        ) : video.aparat_id ? (
           <VideoPlayer aparatId={video.aparat_id} title={video.title} thumbnail={video.thumbnail} videoId={video.id} />
         ) : (
           <div className="flex aspect-video items-center justify-center text-white/50">
@@ -58,10 +66,11 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
         <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-white/60">
           <span>🎬 کربلایی حسین طاهری</span>
           {video.duration && <span>⏱️ {video.duration}</span>}
-          <span>📺 آپارات</span>
+          {!String(video.aparat_id || "").startsWith("file-") && <span>📺 آپارات</span>}
         </div>
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <EngageBar type="video" id={video.id} title={video.title} href={`/videos/${video.id}`} thumb={video.thumbnail} share={false} />
+          {video.aparat_id && !String(video.aparat_id).startsWith("file-") && (
           <a
             href={`https://www.aparat.com/v/${video.aparat_id}`}
             target="_blank"
@@ -70,6 +79,7 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
           >
             مشاهده در آپارات
           </a>
+          )}
           <ShareButton title={video.title} path={`/videos/${video.id}`} />
         </div>
       </div>

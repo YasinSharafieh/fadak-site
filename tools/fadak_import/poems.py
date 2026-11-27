@@ -63,7 +63,8 @@ def body_key(body: str) -> str:
 def _search_forms(date_fa: str, date_key: str, year: int | None) -> list[str]:
     western = normalize(date_key)
     persian = western.translate(str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹"))
-    forms = [date_fa, date_key, western, persian]
+    arabic = western.translate(str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩"))
+    forms = [date_fa, date_key, western, persian, arabic]
     if year:
         forms.append(f"{persian} {year}")
         forms.append(f"{western} {year}")

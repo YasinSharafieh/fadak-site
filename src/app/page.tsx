@@ -63,7 +63,7 @@ export default function Home() {
     async function load() {
       if (supabase) {
         const [ev, nm, pop, ph] = await Promise.all([
-          supabase.from("events").select("*").order("created_at", { ascending: false }).limit(8),
+          supabase.from("events").select("*").limit(200),
           // ثابت: ۱۰ نماهنگ تازه، مرتب بر اساس تاریخ انتشار. تعداد و ترتیب را کم نکن.
           supabase.from("videos").select("*").ilike("title", "%نماهنگ%").order("created_at", { ascending: false }).limit(10),
           supabase.from("videos").select("*").in("aparat_id", popularIds),

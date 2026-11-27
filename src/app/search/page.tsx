@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import EngageBar from "@/components/EngageBar";
 import SectionSkeleton from "@/components/SectionSkeleton";
+import { comparePersianDates } from "@/lib/jalali";
 
 type Result = {
   type: "event" | "audio" | "video" | "photo" | "reel" | "poem";
@@ -13,6 +14,7 @@ type Result = {
   subtitle?: string;
   url: string;
   thumb?: string;
+  sortDate?: string;
 };
 
 // نرمال‌سازی فارسی
@@ -56,6 +58,7 @@ export default function SearchPage() {
           title: e.title,
           subtitle: e.date_fa,
           url: `/archive/${e.slug}`,
+          sortDate: e.date_fa || "",
         });
       }
     });
@@ -71,8 +74,9 @@ export default function SearchPage() {
           type: "audio",
           id: a.id,
           title: a.title,
-          subtitle: event?.title ? `صوت · ${event.title}` : "صوت",
+          subtitle: event?.date_fa ? `صوت · ${event.date_fa}` : event?.title ? `صوت · ${event.title}` : "صوت",
           url: event?.slug ? `/archive/${event.slug}` : "/audio",
+          sortDate: event?.date_fa || "",
         });
       }
     });
@@ -103,6 +107,7 @@ export default function SearchPage() {
           title: poem.title,
           subtitle: event?.date_fa ? `شعر · ${event.date_fa}` : "شعر",
           url: `/poems/${poem.id}`,
+          sortDate: event?.date_fa || "",
         });
       }
     });
@@ -121,6 +126,7 @@ export default function SearchPage() {
       }
     });
 
+    allResults.sort((a, b) => comparePersianDates(a.sortDate || "", b.sortDate || ""));
     setResults(allResults);
     setLoading(false);
   }

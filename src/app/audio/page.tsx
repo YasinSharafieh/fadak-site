@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import AudioPlayer from "@/components/AudioPlayer";
 import SectionSkeleton from "@/components/SectionSkeleton";
+import { comparePersianDates } from "@/lib/jalali";
 
 type Audio = {
   id: string;
@@ -35,18 +36,25 @@ export default function AudioPage() {
           supabase.from("events").select("id,title,date_fa,slug").order("created_at", { ascending: false }),
         ]);
         setAudios(au.data || []);
-        setEvents(ev.data || []);
+        setEvents([...(ev.data || [])].sort((a, b) => comparePersianDates(a.date_fa || "", b.date_fa || "")));
       }
       setLoading(false);
     }
     load();
   }, []);
 
-  const filtered = audios.filter((a) => {
-    const matchEvent = filterEvent === "all" || a.event_id === filterEvent;
-    const matchSearch = !search || a.title.includes(search);
-    return matchEvent && matchSearch;
-  });
+  const eventDate = new Map(events.map((event) => [event.id, event.date_fa || ""]));
+  const filtered = audios
+    .filter((a) => {
+      const matchEvent = filterEvent === "all" || a.event_id === filterEvent;
+      const matchSearch = !search || a.title.includes(search);
+      return matchEvent && matchSearch;
+    })
+    .sort((a, b) => {
+      const byCeremony = comparePersianDates(eventDate.get(a.event_id) || "", eventDate.get(b.event_id) || "");
+      if (byCeremony) return byCeremony;
+      return (a.created_at || "").localeCompare(b.created_at || "");
+    });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
@@ -67,7 +75,7 @@ export default function AudioPage() {
         <select
           value={filterEvent}
           onChange={(e) => setFilterEvent(e.target.value)}
-          className="rounded-full border border-[#0e7c7b]/40 bg-[#1a1a1a] px-5 py-3"
+          className="w-full rounded-full border border-[#0e7c7b]/40 bg-[#1a1a1a] px-5 py-3 md:w-auto md:max-w-md"
         >
           <option value="all">همه مراسم‌ها</option>
           {events.map((e) => (

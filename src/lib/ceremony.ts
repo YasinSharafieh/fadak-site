@@ -23,6 +23,7 @@ export function shortPersianDate(dateFa: string) {
 export function englishCeremonySlug(dateFa: string) {
   const parsed = parsePersianDate(dateFa || "");
   const month = parsed?.m ? MONTH_SLUG[parsed.m - 1] : "";
+  if (parsed?.d && month && parsed.y) return `majles-${parsed.d}-${month}-${parsed.y}`;
   if (parsed?.d && month) return `majles-${parsed.d}-${month}`;
   return `majles-${Date.now()}`;
 }

@@ -78,7 +78,7 @@ class Store:
             raise RuntimeError(f"خواندن شعرها ناموفق: {status} {raw[:300]!r}")
         return [row.get("body") or "" for row in json.loads(raw.decode() or "[]")]
 
-    def find_event(self, date_key: str) -> dict | None:
+    def find_event(self, date_key: str, year: int | None = None) -> dict | None:
         western = (date_key or "").translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789"))
         western = western.translate(str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789"))
         persian = western.translate(str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹"))
@@ -86,22 +86,37 @@ class Store:
         for item in (date_key, western, persian):
             if item and item not in forms:
                 forms.append(item)
+        year_text = str(year) if year else ""
+        year_fa = year_text.translate(str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹"))
+        matches: list[dict] = []
+        seen: set[str] = set()
         for form in forms:
             query = urllib.parse.urlencode(
                 {
                     "select": "*",
                     "date_fa": f"ilike.*{form}*",
-                    "order": "created_at.desc",
-                    "limit": "1",
+                    "limit": "20",
                 }
             )
             status, raw = _request("GET", f"{self.base}/rest/v1/events?{query}", headers=self._headers())
             if status != 200:
                 raise RuntimeError(f"جستجوی مراسم ناموفق: {status} {raw[:300]!r}")
-            rows = json.loads(raw.decode() or "[]")
-            if rows:
-                return rows[0]
-        return None
+            for row in json.loads(raw.decode() or "[]"):
+                if row.get("id") in seen:
+                    continue
+                seen.add(row.get("id") or "")
+                date_fa = row.get("date_fa") or ""
+                if year and year_text not in date_fa and year_fa not in date_fa:
+                    continue
+                matches.append(row)
+        if not matches:
+            return None
+        if len(matches) == 1:
+            return matches[0]
+        # همان روز در چند سال. بدون سالِ قطعی، مراسمِ اشتباه برنمی‌گردد.
+        if not year:
+            return None
+        return matches[0]
 
     def create_event(self, parsed: dict, slug: str) -> dict:
         payload = json.dumps(
@@ -172,6 +187,15 @@ class Store:
         if status not in (200, 204):
             raise RuntimeError(f"قفل پوستر ناموفق: {status} {raw[:300]!r}")
         return chosen
+
+    def video_exists(self, event_id: str, aparat_id: str) -> bool:
+        query = urllib.parse.urlencode(
+            {"select": "id", "event_id": f"eq.{event_id}", "aparat_id": f"eq.{aparat_id}", "limit": "1"}
+        )
+        status, raw = _request("GET", f"{self.base}/rest/v1/videos?{query}", headers=self._headers())
+        if status != 200:
+            return False
+        return bool(json.loads(raw.decode() or "[]"))
 
     def audio_exists(self, event_id: str, title: str) -> bool:
         query = urllib.parse.urlencode(

@@ -56,7 +56,7 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
 
   const freshVideos = await Promise.all(
     allVideos.map(async (v: any) => {
-      if (!v.aparat_id) return v;
+      if (!v.aparat_id || String(v.aparat_id).startsWith("file-")) return v;
       const info = await getAparatVideoInfo(v.aparat_id);
       return {
         ...v,
@@ -73,7 +73,7 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
       <Link href="/archive" className="text-sm text-[#14a3a2] hover:underline">← بازگشت به آرشیو</Link>
 
       {/* هدر مراسم */}
-      <div data-motion="rise" className="gold-frame mt-4 rounded-3xl bg-[#1a1a1a] p-8">
+      <div data-motion="rise" className="gold-frame mt-4 rounded-3xl bg-[#1a1a1a] p-4 sm:p-8">
         <div className="flex flex-col md:flex-row gap-6">
           {posterUrl && (
             <div className="shrink-0">

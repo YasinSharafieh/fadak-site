@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import SectionSkeleton from "@/components/SectionSkeleton";
 import { supabase } from "@/lib/supabase";
+import { comparePersianDates } from "@/lib/jalali";
 
 function visibleCaption(caption?: string) {
   const text = (caption || "").trim();
@@ -39,14 +40,22 @@ export default function GalleryPage() {
           supabase.from("events").select("id,title,date_fa").order("created_at", { ascending: false }),
         ]);
         setPhotos(ph.data || []);
-        setEvents(ev.data || []);
+        setEvents([...(ev.data || [])].sort((a, b) => comparePersianDates(a.date_fa || "", b.date_fa || "")));
       }
       setLoading(false);
     }
     load();
   }, []);
 
-  const filtered = photos.filter((p) => filterEvent === "all" || p.event_id === filterEvent);
+  const eventDate = new Map(events.map((event) => [event.id, event.date_fa || ""]));
+  const filtered = photos
+    .filter((p) => !(p.caption || "").includes("ویدیو"))
+    .filter((p) => filterEvent === "all" || p.event_id === filterEvent)
+    .sort((a, b) => {
+      const byCeremony = comparePersianDates(eventDate.get(a.event_id) || "", eventDate.get(b.event_id) || "");
+      if (byCeremony) return byCeremony;
+      return (a.created_at || "").localeCompare(b.created_at || "");
+    });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
@@ -108,8 +117,8 @@ export default function GalleryPage() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
           onClick={() => setLightbox(null)}
         >
-          <div className="max-w-4xl" onClick={(e) => e.stopPropagation()}>
-            <img src={lightbox.url} alt="" className="max-h-[80vh] w-auto rounded-2xl" />
+          <div className="w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
+            <img src={lightbox.url} alt="" className="max-h-[80vh] w-auto max-w-full rounded-2xl" />
             {visibleCaption(lightbox.caption) && (
               <p className="mt-4 text-center text-white">{visibleCaption(lightbox.caption)}</p>
             )}
