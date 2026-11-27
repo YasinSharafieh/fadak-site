@@ -34,7 +34,7 @@ export default function ReelsListPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
-      <div className="text-center">
+      <div data-motion="fade" className="text-center">
         <h1 className="text-3xl font-extrabold text-white">ریلزها</h1>
         <p className="mt-2 text-sm text-white/60">از تازه‌ترین به قدیمی‌ترین</p>
         <Link href="/reels" className="mt-4 inline-block rounded-full border border-white/20 px-5 py-2 text-sm hover:bg-white/10">
@@ -51,7 +51,7 @@ export default function ReelsListPage() {
       ) : reels.length === 0 ? (
         <p className="mt-10 text-center text-sm text-white/60">هنوز ریلزی ثبت نشده.</p>
       ) : (
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+        <div data-motion-stagger="photo" className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
           {reels.map((reel) => (
             <article key={reel.id} className="reel-shelf-card">
               <Link href={`/reels#${reel.id}`} className="block">

@@ -54,12 +54,12 @@ export default function KhadamPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 animate-fade-in">
-      <div className="text-center">
+      <div data-motion="fade" className="text-center">
         <h1 className="text-3xl font-extrabold text-white">ثبت‌نام خادمین فدک</h1>
         <p className="mt-2 text-white/70/70">برای خدمت در هیئت ثبت‌نام کنید — هر مهارتی ارزشمند است</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="gold-frame mt-8 rounded-3xl bg-[#1a1a1a] p-8 space-y-6">
+      <form data-motion="rise" onSubmit={handleSubmit} className="gold-frame mt-8 rounded-3xl bg-[#1a1a1a] p-8 space-y-6">
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="mb-1 block text-sm font-bold">نام و نام خانوادگی *</label>

@@ -86,7 +86,7 @@ export default function Home() {
   return (
     <div>
       <ReelRail />
-      <section className="relative overflow-hidden bg-black">
+      <section data-motion="fade" className="relative overflow-hidden bg-black">
         <div className="islamic-pattern-dark absolute inset-0" />
         <div className="relative mx-auto max-w-7xl px-4 py-8 md:py-12">
           <div className="grid items-center gap-8 lg:grid-cols-[0.92fr_1.08fr]">
@@ -121,7 +121,7 @@ export default function Home() {
 
       <ReelShelf />
 
-      <section className="mx-auto max-w-7xl px-4 py-10">
+      <section data-motion="rise" className="mx-auto max-w-7xl px-4 py-10">
         <div className="section-head flex items-start justify-between gap-3">
           <div>
             <h2 className="text-2xl font-extrabold text-white">آخرین مراسم‌ها</h2>
@@ -147,7 +147,7 @@ export default function Home() {
         <p className="mt-1 text-xs text-white/40">برای مشاهده بیشتر بکشید ←</p>
       </section>
 
-      <section className="bg-[#111111] py-10">
+      <section data-motion="media" className="bg-[#111111] py-10">
         <div className="mx-auto max-w-7xl px-4">
           <div className="section-head flex items-start justify-between gap-3">
             <div>
@@ -198,7 +198,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10">
+      <section data-motion="slide" className="mx-auto max-w-7xl px-4 py-10">
         <div className="section-head flex items-start justify-between gap-3">
           <div>
             <span className="text-xs text-[#14a3a2]">آرشیو</span>
@@ -228,7 +228,7 @@ export default function Home() {
         </CarouselRow>
       </section>
 
-      <section className="bg-[#111111] py-10">
+      <section data-motion="media" className="bg-[#111111] py-10">
         <div className="mx-auto max-w-7xl px-4">
           <div className="section-head flex items-start justify-between gap-3">
             <div>
@@ -273,7 +273,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10">
+      <section data-motion="lift" className="mx-auto max-w-7xl px-4 py-10">
         <div className="keep-contrast rounded-3xl bg-gradient-to-br from-[#0b3d2e] to-[#0e7c7b] p-8 text-center text-white md:p-10">
           <p className="text-sm text-[#c9a227]">یک قدم برای ساختن یک خانه ماندگار</p>
           <h2 className="mt-2 text-2xl font-extrabold md:text-3xl">با هم، آینده حسینیه را بسازیم</h2>
@@ -300,13 +300,13 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-4">
-        <div className="section-head flex items-end justify-between gap-3">
+        <div data-motion="rise" className="section-head flex items-end justify-between gap-3">
           <div>
             <span className="text-xs text-[#14a3a2]">اخبار و اعلامیه</span>
             <h2 className="mt-1 text-2xl font-extrabold text-white">آخرین خبرهای هیئت</h2>
           </div>
         </div>
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
+        <div data-motion-stagger="rise" className="mt-5 grid gap-4 md:grid-cols-3">
           <a href="https://gharaar.net" target="_blank" rel="noopener noreferrer" className="card-hover rounded-3xl border border-white/10 bg-[#1a1a1a] p-6">
             <p className="text-xs text-[#c9a227]">فرهنگی</p>
             <h3 className="mt-2 text-lg font-extrabold">قرار بی‌قرارها</h3>
@@ -325,7 +325,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-10">
+      <section data-motion="fade" className="mx-auto max-w-7xl px-4 py-10">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="rounded-3xl border border-white/10 bg-[#1a1a1a] p-8">
             <span className="text-xs text-[#14a3a2]">موقعیت حسینیه</span>

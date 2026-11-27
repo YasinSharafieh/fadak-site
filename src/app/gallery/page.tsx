@@ -50,7 +50,7 @@ export default function GalleryPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
-      <div className="text-center">
+      <div data-motion="fade" className="text-center">
         <h1 className="text-3xl font-extrabold text-white">گالری عکس</h1>
         <p className="mt-2 text-white/70/70">تصاویر مراسم‌های فدک</p>
       </div>
@@ -70,7 +70,7 @@ export default function GalleryPage() {
       </div>
 
       {/* گالری */}
-      <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div data-motion-stagger="photo" className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {loading ? (
           <SectionSkeleton kind="photos" />
         ) : filtered.length === 0 ? (

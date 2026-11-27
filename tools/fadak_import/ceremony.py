@@ -170,7 +170,17 @@ async def import_ceremony(client, channel: str, date: str, commit: bool) -> str:
             if not same_album:
                 continue
         photos.append(row)
-    audios = [r for r in rows if r["kind"] == "audio" and r["date"] in ("", date_key)]
+    audios = []
+    remixes = []
+    for row in rows:
+        if row["kind"] != "audio" or row["date"] not in ("", date_key):
+            continue
+        text = by_id[row["id"]].message or ""
+        # نسخهٔ تنظیم‌دیجیتال همان قطعه است، نه یک بخش جدید مراسم.
+        if "تنظیم_دیجیتال" in text or "تنظیم دیجیتال" in text:
+            remixes.append(row)
+            continue
+        audios.append(row)
     videos = [r for r in rows if r["kind"] == "video"]
     too_big = [r for r in audios + photos if r["size"] > SUPABASE_SAFE_BYTES]
 
@@ -185,7 +195,9 @@ async def import_ceremony(client, channel: str, date: str, commit: bool) -> str:
         "telegram_videos_ignored": len(videos),
         "over_supabase_limit": [{"id": r["id"], "kind": r["kind"], "size": r["size"]} for r in too_big],
         "written": [],
-        "skipped": [],
+        "skipped": [
+            {"audio": row["id"], "reason": "digital-remix", "title": row["subtitle"]} for row in remixes
+        ],
     }
 
     if not commit:

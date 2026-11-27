@@ -52,7 +52,7 @@ export default function ArchivePage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
-      <div className="text-center">
+      <div data-motion="fade" className="text-center">
         <h1 className="text-3xl font-extrabold text-white">آرشیو مراسم‌ها</h1>
         <p className="mt-2 text-white/70">همه مراسم‌های برگزار شده — هر مراسم یک آلبوم زنده</p>
       </div>
@@ -87,7 +87,7 @@ export default function ArchivePage() {
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+      <div data-motion-stagger="rise" className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
         {loading ? (
           <SectionSkeleton kind="archive" />
         ) : filtered.length === 0 ? (

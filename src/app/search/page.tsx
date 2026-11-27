@@ -145,7 +145,7 @@ export default function SearchPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 animate-fade-in">
-      <div className="text-center">
+      <div data-motion="fade" className="text-center">
         <h1 className="text-3xl font-extrabold text-white">جستجوی سراسری</h1>
         <p className="mt-2 text-white/70/70">جستجو در مراسم‌ها، صوت‌ها، ویدیوها، ریلزها و اشعار</p>
       </div>
@@ -181,7 +181,7 @@ export default function SearchPage() {
         ) : results.length > 0 ? (
           <>
             <p className="mb-4 text-sm text-white/70/60">{results.length} نتیجه یافت شد</p>
-            <div className="space-y-3">
+            <div data-motion-stagger="row" className="space-y-3">
               {results.map((r) => (
                 <div key={`${r.type}-${r.id}`} className="card-hover flex items-center gap-4 rounded-2xl bg-[#1a1a1a] p-4 shadow">
                   <Link href={r.url} className="flex min-w-0 flex-1 items-center gap-4">

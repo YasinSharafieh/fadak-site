@@ -24,4 +24,19 @@ assert parsed["description"].count("\n") == 2
 assert get_subtitle(audio) == "شور | یوحنا"
 assert extract_date("۱۴ مهر") == "14 مهر"
 assert extract_date("۰۷ مهر ۱۴۰۵") == "7 مهر"
+
+old_style = """📌| مجلس روضه هفتگی
+سخنران :
+✍️ | حجت‌الاسلام بندانی نیشابوری
+مداحان :
+حاج حنیف طاهری
+#کربلایی_حسین_طاهری
+🗓| سه‌شنبه ۱۱ آذر ۱۴۰۴
+"""
+old = parse_ceremony(old_style)
+assert old["date_fa"] == "سه‌شنبه ۱۱ آذر ۱۴۰۴", old
+assert old["date_key"] == "11 آذر", old
+assert "بندانی" in old["speaker"], old
+assert "حنیف" in old["maddah"], old
+assert "حسین طاهری" in old["maddah"], old
 print("parse ok")

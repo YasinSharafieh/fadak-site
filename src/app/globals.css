@@ -60,6 +60,64 @@ body {
 .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
 .animate-fade-in { animation: fadeIn 0.4s ease-out; }
 
+/* ورود بخش‌ها. بعد از انیمیشن transform پاک می‌شود تا هاور کارت‌ها بماند. */
+@keyframes fadak-rise {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fadak-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadak-slide {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fadak-lift {
+  from { opacity: 0; transform: translateY(16px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fadak-media {
+  from { opacity: 0; transform: translateY(14px) scale(0.975); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fadak-photo {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fadak-row {
+  from { opacity: 0; transform: translateX(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+[data-motion-state="wait"] { opacity: 0; }
+[data-motion="rise"][data-motion-state="wait"] { transform: translateY(22px); }
+[data-motion="slide"][data-motion-state="wait"] { transform: translateX(18px); }
+[data-motion="lift"][data-motion-state="wait"] { transform: translateY(16px) scale(0.985); }
+[data-motion="media"][data-motion-state="wait"] { transform: translateY(14px) scale(0.975); }
+[data-motion="photo"][data-motion-state="wait"] { transform: scale(0.96); }
+[data-motion="row"][data-motion-state="wait"] { transform: translateX(14px); }
+
+[data-motion="rise"][data-motion-state="in"] { animation: fadak-rise 0.72s cubic-bezier(0.16, 1, 0.3, 1) both; }
+[data-motion="fade"][data-motion-state="in"] { animation: fadak-fade 0.62s ease both; }
+[data-motion="slide"][data-motion-state="in"] { animation: fadak-slide 0.68s cubic-bezier(0.16, 1, 0.3, 1) both; }
+[data-motion="lift"][data-motion-state="in"] { animation: fadak-lift 0.74s cubic-bezier(0.16, 1, 0.3, 1) both; }
+[data-motion="media"][data-motion-state="in"] { animation: fadak-media 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+[data-motion="photo"][data-motion-state="in"] { animation: fadak-photo 0.64s cubic-bezier(0.16, 1, 0.3, 1) both; }
+[data-motion="row"][data-motion-state="in"] { animation: fadak-row 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+[data-motion-state="in"] { animation-delay: var(--motion-delay, 0ms); }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-motion-state="wait"],
+  [data-motion-state="in"],
+  [data-motion-state="shown"] {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
 @keyframes fadakShimmer {
   0% { background-position: 160% 0; }
   100% { background-position: -160% 0; }

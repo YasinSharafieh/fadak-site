@@ -59,8 +59,8 @@ def parse_ceremony(text: str) -> dict:
             in_maddah = False
         elif "مداحان" in line or "مداح :" in line:
             in_maddah = True
-        elif "📅" in line:
-            date_fa = line.replace("📅|", "").replace("📅", "").strip()
+        elif "📅" in line or "🗓" in line:
+            date_fa = line.replace("📅|", "").replace("📅", "").replace("🗓|", "").replace("🗓", "").strip()
             in_maddah = False
         elif in_maddah:
             if any(mark in line for mark in STOP_MARKS):

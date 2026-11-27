@@ -4,12 +4,12 @@ import { collections } from "@/data/mock";
 export default function CollectionsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
-      <div className="text-center">
+      <div data-motion="fade" className="text-center">
         <h1 className="text-3xl font-extrabold text-white">مجموعه‌ها</h1>
         <p className="mt-2 text-white/70/70">دسترسی سریع به آرشیو مناسبت‌های مختلف</p>
       </div>
 
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div data-motion-stagger="slide" className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {collections.map((col) => (
           <Link
             key={col.slug}

@@ -4,7 +4,7 @@ import ThemeImage from "@/components/ThemeImage";
 
 export default function Footer() {
   return (
-    <footer className="mt-16 bg-black border-t border-white/10 text-white">
+    <footer data-motion="fade" className="mt-16 bg-black border-t border-white/10 text-white">
       <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="grid gap-8 md:grid-cols-4">
           <div>

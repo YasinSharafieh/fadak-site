@@ -9,7 +9,7 @@ const LIVE_PAGE = "https://www.aparat.com/fadakinfo/live";
 export default function LivePage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 animate-fade-in">
-      <div className="text-center">
+      <div data-motion="fade" className="text-center">
         <h1 className="text-3xl font-extrabold text-white">پخش زنده</h1>
         <p className="mt-2 text-sm text-white/70">مراسم هیئت فدائیان حضرت زهرا (س) از آپارات فدک</p>
       </div>

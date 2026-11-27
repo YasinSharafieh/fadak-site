@@ -4,14 +4,14 @@ import ThemeImage from "@/components/ThemeImage";
 export default function AboutHeyatPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 animate-fade-in">
-      <div className="text-center">
+      <div data-motion="fade" className="text-center">
         <ThemeImage darkSrc="/brand/heyat-mark.png" lightSrc="/brand/heyat-mark-ink.png" alt="هیئت فدائیان حضرت زهرا (س)" className="mx-auto h-52 w-auto object-contain sm:h-64" />
         <ThemeImage darkSrc="/brand/fadak-wordmark.png" lightSrc="/brand/fadak-wordmark-ink.png" alt="فدک" className="mx-auto mt-6 h-16 w-auto object-contain sm:h-20" />
         <h1 className="mt-6 text-3xl font-extrabold text-white">هیأت فدائیان حضرت زهرا (س)</h1>
         <p className="mt-2 text-white/70/70">فدک — پایگاه حفظ و نشر آثار</p>
       </div>
 
-      <div className="gold-frame mt-10 rounded-3xl bg-[#1a1a1a] p-8 md:p-10">
+      <div data-motion="rise" className="gold-frame mt-10 rounded-3xl bg-[#1a1a1a] p-8 md:p-10">
         <h2 className="text-xl font-extrabold text-white">درباره هیئت</h2>
         <div className="poem-text mt-4 space-y-4 leading-loose text-white/70/90">
           <p>
@@ -26,7 +26,7 @@ export default function AboutHeyatPage() {
         </div>
       </div>
 
-      <div className="gold-frame mt-6 rounded-3xl bg-[#1a1a1a] p-8">
+      <div data-motion="rise" className="gold-frame mt-6 rounded-3xl bg-[#1a1a1a] p-8">
         <h2 className="text-xl font-extrabold text-white">نشانی</h2>
         <p className="mt-3 leading-7 text-white/70/80">
           تهران، میدان هفتم تیر، خیابان مفتح جنوبی، خیابان ورزنده (جنب ورزشگاه شهید شیرودی)، خیابان ملک الشعراء بهار، حسینیه سیدالشهدا (ع)
@@ -36,7 +36,7 @@ export default function AboutHeyatPage() {
         </a>
       </div>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
+      <div data-motion-stagger="lift" className="mt-8 grid gap-4 md:grid-cols-3">
         <a href="/khadam" className="card-hover rounded-2xl bg-[#0b3d2e] p-6 text-center text-white">
           <div className="text-3xl">🤝</div>
           <div className="mt-2 font-extrabold">خادم شوید</div>

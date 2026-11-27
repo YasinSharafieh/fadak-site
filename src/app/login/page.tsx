@@ -48,7 +48,7 @@ export default function LoginPage() {
     <div className="relative overflow-hidden">
       <div className="islamic-pattern-dark absolute inset-0 opacity-70" />
       <div className="relative mx-auto flex min-h-[70vh] max-w-md items-center px-4 py-16">
-        <div className="w-full rounded-3xl border border-[#c9a227]/40 bg-[#1a1a1a] p-7 shadow-2xl">
+        <div data-motion="lift" className="w-full rounded-3xl border border-[#c9a227]/40 bg-[#1a1a1a] p-7 shadow-2xl">
           <div className="flex items-center justify-center gap-3">
             <ThemeImage darkSrc="/brand/fadak-mark.png" lightSrc="/brand/fadak-mark.png" alt="" className="h-14 w-14 object-contain" />
             <div>

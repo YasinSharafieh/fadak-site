@@ -46,7 +46,7 @@ export default function ReelRail() {
   if (reels && reels.length === 0) return null;
 
   return (
-    <section className="reel-orbit" aria-label="ریلز">
+    <section data-motion="fade" className="reel-orbit" aria-label="ریلز">
       <div ref={rowRef} className={`reel-orbit-row ${isLong ? "is-long" : ""}`} role={reels === null ? "status" : undefined} aria-busy={reels === null}>
         {shown === null
           ? [0, 1, 2].map((item) => (

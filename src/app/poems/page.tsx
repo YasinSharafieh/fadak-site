@@ -106,7 +106,7 @@ export default function PoemsPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 animate-fade-in">
-      <div className="text-center">
+      <div data-motion="fade" className="text-center">
         <h1 className="text-3xl font-extrabold text-white">اشعار و متون</h1>
         <p className="mt-2 text-white/70">مراسم را انتخاب کنید تا شعرهای همان شب بیاید</p>
       </div>
@@ -129,7 +129,7 @@ export default function PoemsPage() {
         <p className="mt-10 text-center text-sm text-white/60">شعری یافت نشد.</p>
       ) : (
         <>
-          <div className="mx-auto mt-9 w-max max-w-full overflow-x-auto px-1 pb-2">
+          <div data-motion="fade" className="mx-auto mt-9 w-max max-w-full overflow-x-auto px-1 pb-2">
             <div className="flex items-start gap-5">
               {ceremonyOptions.map((event) => {
                 const active = event.id === selected?.id;
@@ -160,7 +160,7 @@ export default function PoemsPage() {
           </div>
 
           {selected && (
-            <section className="mt-8">
+            <section data-motion="rise" className="mt-8">
               <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
                 <div>
                   <h2 className="text-xl font-extrabold text-white">{selected.date_fa}</h2>

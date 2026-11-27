@@ -41,13 +41,13 @@ export default function DonatePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 animate-fade-in">
-      <div className="text-center">
+      <div data-motion="fade" className="text-center">
         <h1 className="text-3xl font-extrabold text-white">کمک به هیئت</h1>
         <p className="mt-2 text-white/70/70">حمایت مالی از مراسم‌ها و فعالیت‌های هیئت فدائیان حضرت زهرا (س)</p>
       </div>
 
       {/* شفافیت */}
-      <div className="gold-frame mt-8 rounded-3xl bg-[#1a1a1a] p-8">
+      <div data-motion="lift" className="gold-frame mt-8 rounded-3xl bg-[#1a1a1a] p-8">
         <h2 className="text-lg font-extrabold text-white">کمک شما کجا مصرف می‌شه؟</h2>
         <ul className="mt-4 space-y-2 text-sm leading-7 text-white/70/80">
           <li>• برگزاری مراسم‌های روضه هفتگی و مناسبت‌های مذهبی</li>
@@ -61,7 +61,7 @@ export default function DonatePage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="gold-frame mt-6 rounded-3xl bg-[#1a1a1a] p-8 space-y-6">
+      <form data-motion="lift" onSubmit={handleSubmit} className="gold-frame mt-6 rounded-3xl bg-[#1a1a1a] p-8 space-y-6">
         <div>
           <label className="mb-2 block text-sm font-bold">مبلغ کمک (تومان)</label>
           <div className="flex flex-wrap gap-2">

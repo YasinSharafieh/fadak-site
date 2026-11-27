@@ -50,7 +50,7 @@ export default function AudioPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
-      <div className="text-center">
+      <div data-motion="fade" className="text-center">
         <h1 className="text-3xl font-extrabold text-white">کتابخانه صوتی</h1>
         <p className="mt-2 text-white/70/70">آرشیو کامل صوت‌های مراسم‌های فدک</p>
       </div>
@@ -77,7 +77,7 @@ export default function AudioPage() {
       </div>
 
       {/* لیست صوت‌ها */}
-      <div className="mt-8 space-y-3">
+      <div data-motion-stagger="row" className="mt-8 space-y-3">
         {loading ? (
           <SectionSkeleton kind="audio" />
         ) : filtered.length === 0 ? (

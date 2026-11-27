@@ -73,7 +73,7 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
       <Link href="/archive" className="text-sm text-[#14a3a2] hover:underline">← بازگشت به آرشیو</Link>
 
       {/* هدر مراسم */}
-      <div className="gold-frame mt-4 rounded-3xl bg-[#1a1a1a] p-8">
+      <div data-motion="rise" className="gold-frame mt-4 rounded-3xl bg-[#1a1a1a] p-8">
         <div className="flex flex-col md:flex-row gap-6">
           {posterUrl && (
             <div className="shrink-0">
@@ -113,7 +113,9 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      <CeremonyTabs photos={onlyPhotos} audios={audios} videos={freshVideos} ceremonyHref={`/archive/${event?.slug || slug}`} />
+      <div data-motion="fade">
+        <CeremonyTabs photos={onlyPhotos} audios={audios} videos={freshVideos} ceremonyHref={`/archive/${event?.slug || slug}`} />
+      </div>
     </div>
   );
 }

@@ -37,7 +37,7 @@ export default function ReelShelf() {
   if (reels && reels.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8" aria-label="همه ریلزها">
+    <section data-motion="fade" className="mx-auto max-w-7xl px-4 py-8" aria-label="همه ریلزها">
       <div className="section-head flex items-start justify-between gap-3">
         <div className="min-w-0">
           <span className="text-xs text-[#14a3a2]">ریلز</span>

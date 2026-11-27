@@ -129,7 +129,7 @@ export default function AccountPage() {
         </div>
       </div>
 
-      <section className="mt-8 rounded-3xl border border-[#c9a227]/30 bg-[#111] p-6">
+      <section data-motion="rise" className="mt-8 rounded-3xl border border-[#c9a227]/30 bg-[#111] p-6">
         <h2 className="text-lg font-extrabold">اطلاعات من</h2>
         {!durable ? (
           <div className="mt-4">
@@ -160,7 +160,7 @@ export default function AccountPage() {
         )}
       </section>
 
-      <section className="mt-8">
+      <section data-motion="fade" className="mt-8">
         <h2 className="text-lg font-extrabold">علاقه‌مندی‌ها</h2>
         <p className="mt-1 text-sm text-white/55">ویدیوها، ریلزها، صوت‌ها و شعرهایی که ذخیره کرده‌اید.</p>
         {items.length === 0 && <p className="mt-4 rounded-2xl bg-[#1a1a1a] p-5 text-sm text-white/60">هنوز چیزی ذخیره نکرده‌اید.</p>}

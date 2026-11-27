@@ -34,7 +34,7 @@ export default function VideosPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 animate-fade-in">
-      <div className="text-center">
+      <div data-motion="fade" className="text-center">
         <h1 className="text-3xl font-extrabold text-white">نماهنگ‌ها و ویدیوها</h1>
         <p className="mt-2 text-white/60">ویدیوهای کانال آپارات فدک</p>
         <a href="https://www.aparat.com/fadakinfo" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block rounded-full border border-white/20 px-5 py-2 text-sm hover:bg-white/10 transition">
@@ -55,7 +55,7 @@ export default function VideosPage() {
       {!loading && namahang.length > 0 && (
         <section className="mt-12">
           <h2 className="text-2xl font-extrabold text-white">نماهنگ‌ها</h2>
-          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div data-motion-stagger="media" className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {namahang.map((v) => (
                 <div
                   key={v.id}

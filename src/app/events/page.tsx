@@ -60,7 +60,7 @@ export default function EventsPage() {
       </div>
 
       {/* مراسم آینده */}
-      <section className="mt-12">
+      <section data-motion="lift" className="mt-12">
         <h2 className="text-2xl font-extrabold text-white">مراسم آینده</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {loading ? (
@@ -100,11 +100,11 @@ export default function EventsPage() {
 
       {/* مراسم گذشته */}
       <section className="mt-12">
-        <div className="section-head flex flex-wrap items-center justify-between gap-2">
+        <div data-motion="fade" className="section-head flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-2xl font-extrabold text-white">مراسم‌های گذشته</h2>
           <Link href="/archive" className="text-sm font-bold text-[#14a3a2] hover:underline">آرشیو کامل ←</Link>
         </div>
-        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+        <div data-motion-stagger="rise" className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
           {loading ? (
             <SectionSkeleton kind="archive" />
           ) : past.length === 0 ? (

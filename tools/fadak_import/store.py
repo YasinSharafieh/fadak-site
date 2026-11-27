@@ -79,19 +79,29 @@ class Store:
         return [row.get("body") or "" for row in json.loads(raw.decode() or "[]")]
 
     def find_event(self, date_key: str) -> dict | None:
-        query = urllib.parse.urlencode(
-            {
-                "select": "*",
-                "date_fa": f"ilike.*{date_key}*",
-                "order": "created_at.desc",
-                "limit": "1",
-            }
-        )
-        status, raw = _request("GET", f"{self.base}/rest/v1/events?{query}", headers=self._headers())
-        if status != 200:
-            raise RuntimeError(f"جستجوی مراسم ناموفق: {status} {raw[:300]!r}")
-        rows = json.loads(raw.decode() or "[]")
-        return rows[0] if rows else None
+        western = (date_key or "").translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789"))
+        western = western.translate(str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789"))
+        persian = western.translate(str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹"))
+        forms: list[str] = []
+        for item in (date_key, western, persian):
+            if item and item not in forms:
+                forms.append(item)
+        for form in forms:
+            query = urllib.parse.urlencode(
+                {
+                    "select": "*",
+                    "date_fa": f"ilike.*{form}*",
+                    "order": "created_at.desc",
+                    "limit": "1",
+                }
+            )
+            status, raw = _request("GET", f"{self.base}/rest/v1/events?{query}", headers=self._headers())
+            if status != 200:
+                raise RuntimeError(f"جستجوی مراسم ناموفق: {status} {raw[:300]!r}")
+            rows = json.loads(raw.decode() or "[]")
+            if rows:
+                return rows[0]
+        return None
 
     def create_event(self, parsed: dict, slug: str) -> dict:
         payload = json.dumps(
