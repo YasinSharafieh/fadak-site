@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import CeremonyTabs from "@/components/CeremonyTabs";
+import ShareButton from "@/components/ShareButton";
 import { getAparatVideoInfo } from "@/lib/aparat";
 import { fadakMapUrl } from "@/data/mock";
 import { coverByEvent } from "@/lib/ceremony";
@@ -100,9 +101,7 @@ export default async function ArchiveDetailPage({ params }: { params: Promise<{ 
               <a href={`https://t.me/fadak_media_bot`} target="_blank" rel="noopener noreferrer" className="rounded-full border px-5 py-2 text-sm hover:bg-[#111111] transition">
                 🔔 یادآور تلگرام
               </a>
-              <button className="rounded-full border px-5 py-2 text-sm hover:bg-[#111111] transition">
-                📤 اشتراک‌گذاری
-              </button>
+              <ShareButton title={title} path={`/archive/${event?.slug || slug}`} />
             </div>
 
             {event?.description && (

@@ -92,16 +92,16 @@ export default function PageLoader() {
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-[#0a0a0a]"
+      className="page-loader fixed inset-0 z-[70] flex items-center justify-center bg-[#0a0a0a]"
       role="status"
       aria-live="polite"
       aria-label="در حال آماده‌سازی صفحه"
     >
       <div className="flex flex-col items-center">
         <div className="relative flex h-40 w-40 items-center justify-center">
-          <div className="absolute inset-8 rounded-full bg-[#0e7c7b]/40 blur-2xl" />
+          <div className="page-loader-glow absolute inset-8 rounded-full bg-[#0e7c7b]/40 blur-2xl" />
           <svg className="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
-            <circle cx="60" cy="60" r={RING_R} fill="none" stroke="rgba(14,124,123,0.28)" strokeWidth="2.5" />
+            <circle className="page-loader-ring" cx="60" cy="60" r={RING_R} fill="none" stroke="rgba(14,124,123,0.28)" strokeWidth="2.5" />
             <circle
               cx="60"
               cy="60"
@@ -120,9 +120,9 @@ export default function PageLoader() {
             className="relative h-[4.5rem] w-[4.5rem] drop-shadow-[0_0_18px_rgba(20,163,162,0.9)]"
           />
         </div>
-        <p className="mt-1 text-xl font-extrabold text-white">فدک</p>
-        <p className="mt-1 text-xs text-white/55">در حال آماده‌سازی صفحه</p>
-        <div className="mt-4 h-1 w-28 overflow-hidden rounded-full bg-white/10">
+        <p className="page-loader-title mt-1 text-xl font-extrabold text-white">فدک</p>
+        <p className="page-loader-sub mt-1 text-xs text-white/55">در حال آماده‌سازی صفحه</p>
+        <div className="page-loader-track mt-4 h-1 w-28 overflow-hidden rounded-full bg-white/10">
           <div className="h-full rounded-full bg-[#14a3a2] transition-[width] duration-200" style={{ width: `${Math.min(progress, 100)}%` }} />
         </div>
       </div>

@@ -83,10 +83,10 @@ export default function HeroSlides({ nextMajles, recent }: Props) {
 
       {count > 1 && (
         <>
-          <button type="button" onClick={() => go(1)} aria-label="اسلاید بعدی" className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-[#0e7c7b]">
+          <button type="button" onClick={() => go(1)} aria-label="اسلاید بعدی" className="keep-contrast absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-[#0e7c7b]">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6" /></svg>
           </button>
-          <button type="button" onClick={() => go(-1)} aria-label="اسلاید قبلی" className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-[#0e7c7b]">
+          <button type="button" onClick={() => go(-1)} aria-label="اسلاید قبلی" className="keep-contrast absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-[#0e7c7b]">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6" /></svg>
           </button>
           <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
@@ -96,7 +96,7 @@ export default function HeroSlides({ nextMajles, recent }: Props) {
                 type="button"
                 aria-label={`اسلاید ${i + 1}`}
                 onClick={() => setIndex(i)}
-                className={`h-1.5 rounded-full transition-all ${i === index ? "w-6 bg-[#c9a227]" : "w-1.5 bg-white/50"}`}
+                className={`keep-contrast h-1.5 rounded-full transition-all ${i === index ? "w-6 bg-[#c9a227]" : "w-1.5 bg-white/50"}`}
               />
             ))}
           </div>

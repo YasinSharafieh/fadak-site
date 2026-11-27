@@ -75,6 +75,7 @@ def parse_ceremony(text: str) -> dict:
     speaker_idx = next((i for i, ln in enumerate(lines) if "سخنران" in ln), -1)
     if not speaker and speaker_idx >= 0 and speaker_idx + 1 < len(lines):
         speaker = lines[speaker_idx + 1].strip()
+    speaker = re.sub(r"^[^\w\u0600-\u06FF]+", "", speaker).strip()
 
     maddahs = [name for name in maddahs if "🗓" not in name and "📅" not in name and not extract_date(name)]
     maddah = "، ".join(dict.fromkeys(maddahs)) if maddahs else extract_maddahs(text)
